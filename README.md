@@ -1,24 +1,45 @@
 # cybergraph
 
-A directed authenticated multigraph over content-addressed nodes, carrying an emergent probability measure -- the shared memory of the planet.
+a directed authenticated multigraph over content-addressed nodes, carrying an emergent [[probability]] measure — the shared memory of the planet
 
-## Structure
+five primitives: [[particle]], [[cyberlink]], [[neuron]], [[token]], [[focus]]
 
-### reference/
+## reference
 
-Implementable specifications -- formal definitions, axioms, proofs, data structures, formulas.
+implementable specifications — formal definitions, data structures, formulas
 
-- [cybergraph.md](reference/cybergraph.md) -- formal definition of the cybergraph triple (P, N, L), six axioms, derived structures, four theorems, information geometry, category theory
-- [primitives.md](reference/primitives.md) -- particle (Hemera addressing, tree structure, domain separation), cyberlink (seven fields, three layers, UTXO semantics, CRUD), signal (structure, STARK proof coverage, minting), axon (bundles, homoiconicity, meta-annotation)
-- [tri-kernel.md](reference/tri-kernel.md) -- diffusion, springs, heat kernel specifications, composite operator, free energy functional, contraction lemmas, collective focus theorem (Parts I and II), completeness conjecture, complexity, implementation
-- [focus-flow.md](reference/focus-flow.md) -- focus flow computation, two inference paths, local update rule, compiled transformer derivation, graph-derived architecture parameters, cyberank, compounding property
+### the graph
 
-### docs/
+- [cybergraph.md](reference/cybergraph.md) — formal triple $(P, N, L)$, six axioms, derived structures, four theorems, information geometry
 
-Explainers -- narrative, intuition, motivation, analogies.
+### primitives
 
-- [overview.md](docs/overview.md) -- what the cybergraph is, the five primitives explained intuitively, why content addressing and append-only matter, the cybergraph as shared memory
-- [tri-kernel.md](docs/tri-kernel.md) -- why three operators (the locality filter discovery), what each does (diffusion = curiosity, springs = stability, heat = patience), universal patterns table, phase transitions, adversarial resistance, the Friston connection
-- [convergence.md](docs/convergence.md) -- what convergence means, spectral gap explained, collective focus theorem in plain language, locality and bounded effects
-- [inference.md](docs/inference.md) -- the cybergraph as generative model, comparison to transformers, random walks, query biasing, autoregressive generation, zero-cost proof-carrying
-- [metrics.md](docs/metrics.md) -- attention vs focus, the transformer attention connection, attention as Bayesian query, multi-head and semcon types, gravity metric, ranking in practice
+- [particle.md](reference/particle.md) — content-addressed node. Hemera hash, tree structure, domain separation, endofunction, permanence
+- [cyberlink.md](reference/cyberlink.md) — atomic unit of knowledge. seven fields, three layers, UTXO semantics, CRUD, the card
+
+### cyberlink arguments
+
+- [token.md](reference/token.md) — $\tau$: denomination of conviction. rate function, four token types, multi-denomination staking
+- [amount.md](reference/amount.md) — $a$: quantity of stake. role in adjacency, conviction UTXO, costly signaling, reward proportionality
+- [valence.md](reference/valence.md) — $v$: epistemic prediction $\{-1, 0, +1\}$. BTS meta-prediction, role in ICBS markets, karma compounding
+- [time.md](reference/time.md) — $t$: block height. discovery premium, temporal decay, consensus ordering, machine time
+
+### derived structures
+
+- [signal.md](reference/signal.md) — atomic broadcast unit. cyberlink batch + impulse + STARK proof
+- [axon.md](reference/axon.md) — bundle of all cyberlinks between two particles. weight computation, homoiconicity
+
+### computation
+
+- [tri-kernel.md](reference/tri-kernel.md) — diffusion, springs, heat. composite operator, free energy, convergence proof, locality
+- [focus-flow.md](reference/focus-flow.md) — focus flow computation, local update rule, compiled transformer derivation, cyberank
+
+## docs
+
+explainers — narrative, intuition, motivation
+
+- [overview.md](docs/overview.md) — what the cybergraph is, the five primitives, why content addressing and append-only matter
+- [tri-kernel.md](docs/tri-kernel.md) — why three operators, the locality filter discovery, universal patterns, phase transitions
+- [convergence.md](docs/convergence.md) — what convergence means, spectral gap, collective focus theorem in plain language
+- [inference.md](docs/inference.md) — cybergraph as generative model, comparison to transformers, random walks
+- [metrics.md](docs/metrics.md) — attention vs focus, transformer connection, gravity metric, ranking in practice
