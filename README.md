@@ -33,6 +33,11 @@ implementable specifications — formal definitions, data structures, formulas
 
 - [tri-kernel.md](reference/tri-kernel.md) — diffusion, springs, heat. composite operator, free energy, convergence proof, locality
 - [focus-flow.md](reference/focus-flow.md) — focus flow computation, local update rule, compiled transformer derivation, cyberank
+- [clifford.md](reference/clifford.md) — multivector primitive extensions. axon + $A^{\mathrm{eff}}$ as scalar + bivector, shifted geometric product, CT-1.0 compatibility contract
+
+### rendering
+
+- [render.md](reference/render.md) — deterministic 3d rendering. five tiers T0–T∞, graph-as-transformer neural field at T∞, honeycrisp backend, topology-stable determinism contract
 
 ## docs
 
