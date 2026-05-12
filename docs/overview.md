@@ -76,7 +76,7 @@ A database stores records and answers queries. It does not compute importance, d
 
 A knowledge graph (RDF, Wikidata, property graphs) stores typed relations between entities. It encodes structure but requires external algorithms to compute rankings, infer missing links, or resolve contradictions. The knowledge graph is structural but inert.
 
-The cybergraph is a knowledge graph that computes. Every edge carries economic weight. Every node receives a probability score from the tri-kernel. The structure is authenticated (every edge is signed). The computation is continuous (every new link shifts the fixed point). The result is verifiable (every state transition has a STARK proof).
+The cybergraph is a knowledge graph that computes. Every edge carries economic weight. Every node receives a probability score from the tri-kernel. The structure is authenticated (every edge is signed). The computation is continuous (every new link shifts the fixed point). The result is verifiable (every state transition has a [[zheng]] proof).
 
 Fifteen protocol functions -- identity, key exchange, authentication, consensus, fork choice, finality, privacy, incentives, relay payment, version control, file system, type system, computation, data availability, sybil resistance -- all run through the same five primitives. One data structure, one computation, one shared memory.
 

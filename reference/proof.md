@@ -2,17 +2,17 @@
 tags: cyber, cip
 crystal-type: entity
 crystal-domain: cyber
-alias: stark verification, proof validation, signal proof, submission proof
+alias: proof validation, signal proof, submission proof, zheng proof
 ---
 # proof
 
-the $\sigma$ field of a [[signal]]. a single recursive [[stark]] proof that `submit()` validates before any [[cyberlink]] enters the graph.
+the $\sigma$ field of a [[signal]]. a single [[zheng]] proof that `submit()` validates before any [[cyberlink]] enters the graph.
 
 ## what cybergraph validates
 
 cybergraph does not construct proofs — that is [[zheng]]'s domain. it enforces one rule at the submission boundary:
 
-> a signal is accepted if and only if $\sigma$ is a valid STARK proof covering the entire signal atomically
+> a signal is accepted if and only if $\sigma$ is a valid [[zheng]] proof covering the entire signal atomically
 
 the proof must certify three things together in one verification:
 
@@ -22,7 +22,7 @@ the proof must certify three things together in one verification:
 | all conviction UTXO movements are backed | each $(τ, a)$ spend has an unspent output; new UTXOs are created |
 | the [[impulse]] $\pi_\Delta$ is correct | tri-kernel computation against current BBG root |
 
-one proof for all three. any verifier checks $\sigma$ in $O(\log n)$ — no re-execution.
+one proof for all three. any verifier runs `decide(σ)` in $O(\log n)$ — no re-execution.
 
 ## boundary
 

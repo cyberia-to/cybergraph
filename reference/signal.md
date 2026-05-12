@@ -11,20 +11,20 @@ $$s \;=\; (\nu,\; \vec\ell,\; \pi_\Delta,\; \sigma,\; t)$$
 | $\nu$ | [[subject]] | $N$ | signing [[neuron]] |
 | $\vec\ell$ | links | $L^+$ | one or more [[cyberlinks]] — each a 5-tuple $(p, q, \tau, a, v)$ |
 | $\pi_\Delta$ | [[cyber/impulse]] | $(P \times \mathbb{F}_p)^*$ | sparse [[focus]] update: how the batch of links shifts $\pi^*$ |
-| $\sigma$ | proof | $\Pi$ | recursive [[stark]] proof covering the [[cyber/impulse]], all conviction UTXO movements, and [[cyberlink]] validity against the current [[BBG]] root |
+| $\sigma$ | proof | $\Pi$ | [[zheng]] proof covering the [[cyber/impulse]], all conviction UTXO movements, and [[cyberlink]] validity against the current [[BBG]] root |
 | $t$ | at | $\mathbb{Z}_{\geq 0}$ | block height |
 
 the signal separates what a [[neuron]] asserts (the [[cyberlinks]]) from what the assertion computes (the [[cyber/impulse]]). see [[cyber/impulse]] for how $\pi_\Delta$ is computed
 
-## STARK proof coverage
+## zheng proof coverage
 
-$\sigma$ is a single recursive [[stark]] proof that covers the entire signal atomically:
+$\sigma$ is a single [[zheng]] proof that covers the entire signal atomically:
 
 - correctness of each [[cyberlink]] in $\vec\ell$ (valid signatures, valid particle references)
 - validity of all conviction UTXO movements (each link's $(\tau, a)$ spend is backed by an unspent output)
 - correctness of the [[cyber/impulse]] $\pi_\Delta$ (the [[tri-kernel]] computation against $\text{bbg\_root}$ from the current header)
 
-one proof for everything. proving $n$ links together costs less than $n$ separate proofs because shared neighborhood state and UTXO set are proved once. any verifier checks $\sigma$ in $O(\log n)$ without recomputing anything
+one proof for everything. proving $n$ links together costs less than $n$ separate proofs because shared neighborhood state and UTXO set are proved once. any verifier runs `decide(σ)` in $O(\log n)$ without recomputing anything
 
 ## two effects
 
