@@ -29,22 +29,8 @@ implementable specifications — formal definitions, data structures, formulas
 - [signal.md](reference/signal.md) — atomic broadcast unit. cyberlink batch + impulse + STARK proof
 - [axon.md](reference/axon.md) — bundle of all cyberlinks between two particles. weight computation, homoiconicity
 
-### computation
-
-- [tri-kernel.md](reference/tri-kernel.md) — diffusion, springs, heat. composite operator, free energy, convergence proof, locality
-- [focus-flow.md](reference/focus-flow.md) — focus flow computation, local update rule, compiled transformer derivation, cyberank
-- [clifford.md](reference/clifford.md) — multivector primitive extensions. axon + $A^{\mathrm{eff}}$ as scalar + bivector, shifted geometric product, CT-1.0 compatibility contract
-
-### rendering
-
-- [render.md](reference/render.md) — deterministic 3d rendering. five tiers T0–T∞, graph-as-transformer neural field at T∞, honeycrisp backend, topology-stable determinism contract
-
 ## docs
 
 explainers — narrative, intuition, motivation
 
 - [overview.md](docs/overview.md) — what the cybergraph is, the five primitives, why content addressing and append-only matter
-- [tri-kernel.md](docs/tri-kernel.md) — why three operators, the locality filter discovery, universal patterns, phase transitions
-- [convergence.md](docs/convergence.md) — what convergence means, spectral gap, collective focus theorem in plain language
-- [inference.md](docs/inference.md) — cybergraph as generative model, comparison to transformers, random walks
-- [metrics.md](docs/metrics.md) — attention vs focus, transformer connection, gravity metric, ranking in practice
