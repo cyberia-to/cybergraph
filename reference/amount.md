@@ -16,7 +16,7 @@ amount feeds directly into the adjacency operator:
 
 $$A_{pq} = \sum_{\substack{\ell \in L \\ \operatorname{src}(\ell)=p,\; \operatorname{tgt}(\ell)=q}} r(\tau(\ell)) \cdot a(\ell)$$
 
-higher amount → higher edge weight → more [[focus]] flows through the link → higher [[cyberank]] for the target [[particle]]. amount is the economic force that shapes the [[tri-kernel]] fixed point $\pi^*$
+higher amount → higher edge weight → more [[focus]] flows through the link → higher [[cyberank]] for the target [[particle]]. amount is the economic force that shapes the [[tri-kernel]] fixed point $\phi^*$
 
 ## role in effective adjacency
 
@@ -32,7 +32,7 @@ creating a cyberlink moves $a$ tokens of denomination $\tau$ from the author's w
 
 - transferable — spend to a new owner. the structural link remains; beneficial ownership moves
 - withdrawable — spend back to the author's wallet. the economic position closes; the structural record remains
-- yield-bearing — earns proportionally to $\Delta\pi^*(q, t)$ over time
+- yield-bearing — earns proportionally to $\Delta\phi^*(q, t)$ over time
 
 the conviction UTXO is the financial instrument. the cyberlink record is the assertion. they are separable
 
@@ -53,8 +53,8 @@ amount makes every [[cyberlink]] a [[costly signal]]. a [[neuron]] with finite [
 
 link yield is proportional to conviction weight:
 
-$$R_\ell(T) = \int_0^T w(t) \cdot \Delta\pi^*(q, t)\, dt$$
+$$R_\ell(T) = \int_0^T w(t) \cdot \Delta\phi^*(q, t)\, dt$$
 
-where $w(t)$ includes $a(\ell)$. higher amount → higher yield when the target [[particle]] gains [[focus]]. the first-mover premium applies: the same amount staked early (when $\pi^*(q)$ is low) earns more than staked late (when $\pi^*(q)$ is already high)
+where $w(t)$ includes $a(\ell)$. higher amount → higher yield when the target [[particle]] gains [[focus]]. the first-mover premium applies: the same amount staked early (when $\phi^*(q)$ is low) earns more than staked late (when $\phi^*(q)$ is already high)
 
 see [[cyberlink]] for the full 5-tuple. see [[token]] for the denomination. see [[valence]] for the epistemic prediction. see [[will]] for the budget that constrains amount allocation

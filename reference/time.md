@@ -8,7 +8,7 @@ time is the temporal anchor of every [[signal]]. it answers [[when]] — the one
 
 $$t(s) \in \mathbb{Z}_{\geq 0}$$
 
-monotonically increasing block counter. every [[cyberlink]] in a given signal shares the same $t$. ordering within a block is determined by the $\pi$ convergence trajectory (see [[foculus]])
+monotonically increasing block counter. every [[cyberlink]] in a given signal shares the same $t$. ordering within a block is determined by the $\phi^*$ convergence trajectory (see [[foculus]])
 
 ## role in the append-only graph
 
@@ -24,9 +24,9 @@ the same author linking the same structural triple $(\nu, p, q)$ in two signals 
 
 time determines who discovered what first. the [[attention]] yield curve rewards early accurate linking:
 
-$$R_\ell(T) = \int_0^T w(t) \cdot \Delta\pi^*(q, t)\, dt$$
+$$R_\ell(T) = \int_0^T w(t) \cdot \Delta\phi^*(q, t)\, dt$$
 
-a [[cyberlink]] created at $t_1$ (early, when $\pi^*(q)$ is low) captures more cumulative $\Delta\pi^*$ than an identical link at $t_2 \gg t_1$ (late, when $\pi^*(q)$ has already risen). the time field is what makes this attribution possible — it is the provenance of priority
+a [[cyberlink]] created at $t_1$ (early, when $\phi^*(q)$ is low) captures more cumulative $\Delta\phi^*$ than an identical link at $t_2 \gg t_1$ (late, when $\phi^*(q)$ has already risen). the time field is what makes this attribution possible — it is the provenance of priority
 
 ## role in temporal decay
 
@@ -38,11 +38,11 @@ where $\lambda$ is a per-namespace decay constant. mathematics namespaces use $\
 
 ## role in consensus
 
-[[foculus]] orders state transitions by $\pi$ convergence trajectory across time. a [[particle]] crosses the finality threshold $\tau$ at some block height — that block height is the finality time. the nullifier set $N$ grows monotonically through time. time provides the causal ordering that makes double-spend detection deterministic
+[[foculus]] orders state transitions by $\phi^*$ convergence trajectory across time. a [[particle]] crosses the finality threshold $\tau$ at some block height — that block height is the finality time. the nullifier set $N$ grows monotonically through time. time provides the causal ordering that makes double-spend detection deterministic
 
 ## role in signals
 
-$t$ is a first-class field of every [[signal]] — the signal's batch of [[cyberlinks]] all inherit this timestamp. the [[stark]] proof $\sigma$ references the [[BBG]] root at $t$ — proving that the [[focus]] shift $\pi_\Delta$ was computed against the graph state at that specific moment
+$t$ is a first-class field of every [[signal]] — the signal's batch of [[cyberlinks]] all inherit this timestamp. the [[stark]] proof $\sigma$ references the [[BBG]] root at $t$ — proving that the [[focus]] shift $\Delta\phi^*$ was computed against the graph state at that specific moment
 
 ## machine time
 

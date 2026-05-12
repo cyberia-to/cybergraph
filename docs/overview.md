@@ -66,7 +66,7 @@ The cybergraph is the shared memory of all participants. Every neuron contribute
 
 This is a different relationship between data and computation than traditional systems. In a database, data sits passively until queried. In a knowledge graph, relations encode structure but require external inference engines. In the cybergraph, the data structure itself computes: the graph continuously converges toward its own fixed point, and that fixed point is the model.
 
-The focus distribution $\pi^*$ IS the model. It is the probability measure over particles that minimizes a free energy functional -- the balance between exploration (diffusion), structural coherence (springs), and adaptive context (heat). Adding a correct, well-placed cyberlink is equivalent to taking a gradient step on this functional. Every link teaches the system.
+The focus distribution $\phi^*$ IS the model. It is the probability measure over particles that minimizes a free energy functional -- the balance between exploration (diffusion), structural coherence (springs), and adaptive context (heat). Adding a correct, well-placed cyberlink is equivalent to taking a gradient step on this functional. Every link teaches the system.
 
 ---
 

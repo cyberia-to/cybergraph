@@ -32,7 +32,7 @@ a neuron is a tuple $(\text{id}, \text{pk}, S, F, K)$:
 
 neurons are the source of all [[cyberlinks]]. without neurons there is no [[cybergraph]] — the graph is the aggregate of all neuron signals over all [[time]].
 
-the [[tri-kernel]] focus distribution $\pi^*$ reflects collective neuron judgment: high-focus [[particles]] are those many neurons have linked to with high [[stake]].
+the [[tri-kernel]] focus distribution $\phi^*$ reflects collective neuron judgment: high-focus [[particles]] are those many neurons have linked to with high [[stake]].
 
 ## see also
 

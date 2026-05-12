@@ -40,7 +40,7 @@ UTXO management is internal to `submit()`: conviction UTXOs created and spent pe
 ### signal internals
 
 - [proof.md](reference/proof.md) — what `submit()` validates. validation interface; construction is [[zheng]]'s
-- [impulse.md](reference/impulse.md) — $\pi_\Delta$: the proven focus shift carried by a signal
+- [impulse.md](reference/impulse.md) — $\Delta\phi^*$: the proven focus shift carried by a signal
 
 ### neuron
 

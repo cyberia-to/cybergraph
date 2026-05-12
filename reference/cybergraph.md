@@ -49,7 +49,7 @@ $p \in P \iff \exists\, \ell \in L : \operatorname{src}(\ell) = p \;\lor\; \oper
 
 ### A5 -- Conservation
 
-$\pi^* \in \Delta^{|P|-1}$, i.e., $\sum_{p \in P} \pi^*_p = 1$ and $\pi^*_p > 0$ for all $p$. Total [[focus]] is conserved at every block. It flows between particles but is never created or destroyed.
+$\phi^* \in \Delta^{|P|-1}$, i.e., $\sum_{p \in P} \phi^*_p = 1$ and $\phi^*_p > 0$ for all $p$. Total [[focus]] is conserved at every block. It flows between particles but is never created or destroyed.
 
 ### A6 -- Homoiconicity
 
@@ -89,7 +89,7 @@ $\mathcal{D}$ is the [[diffusion]] operator (random walk with teleport: answers 
 
 ### T1 -- Existence and Uniqueness of Focus
 
-Let $A^{\text{eff}}$ induce a strongly connected aperiodic graph on $P$. Then $\mathcal{R}$ has a unique strictly positive fixed point $\pi^* \in \Delta^{|P|-1}$: $\mathcal{R}(\pi^*) = \pi^*$, $\pi^*_p > 0$ for all $p$.
+Let $A^{\text{eff}}$ induce a strongly connected aperiodic graph on $P$. Then $\mathcal{R}$ has a unique strictly positive fixed point $\phi^* \in \Delta^{|P|-1}$: $\mathcal{R}(\phi^*) = \phi^*$, $\phi^*_p > 0$ for all $p$.
 
 Proof: $\mathcal{R}$ is a convex combination of stochastic positive operators. By the [[Perron-Frobenius theorem]], each component has a unique positive eigenvector with eigenvalue 1. The convex combination inherits this property under ergodicity. See [[collective focus theorem]] Part I (diffusion alone) and Part II (full composite) for the complete proof.
 
@@ -103,11 +103,11 @@ Proof: $\mathcal{R}$ is a convex combination of stochastic operators; stochastic
 
 Let $\lambda_2$ be the spectral gap of $\mathcal{R}$. Then for any initial $\phi^{(0)}$:
 
-$$\left\|\phi^{(t)} - \pi^*\right\|_1 \leq C \cdot (1 - \lambda_2)^t$$
+$$\left\|\phi^{(t)} - \phi^*\right\|_1 \leq C \cdot (1 - \lambda_2)^t$$
 
 Mixing time: $t_{\text{mix}}(\varepsilon) = O\!\left(\lambda_2^{-1} \log(C/\varepsilon)\right)$.
 
-Proof: the composite contraction coefficient is $\kappa = \lambda_d \alpha + \lambda_s \tfrac{\|L\|}{\|L\|+\mu} + \lambda_h e^{-\tau \lambda_2} < 1$. By Banach's fixed-point theorem, $\phi^{(t)} \to \pi^*$ at rate $(1-\lambda_2)$. See [[collective focus theorem]] Composite Contraction.
+Proof: the composite contraction coefficient is $\kappa = \lambda_d \alpha + \lambda_s \tfrac{\|L\|}{\|L\|+\mu} + \lambda_h e^{-\tau \lambda_2} < 1$. By Banach's fixed-point theorem, $\phi^{(t)} \to \phi^*$ at rate $(1-\lambda_2)$. See [[collective focus theorem]] Composite Contraction.
 
 ### T4 -- Locality Radius
 
@@ -121,39 +121,39 @@ Proof: geometric decay of the [[diffusion]] operator (teleport parameter $\alpha
 
 ### Syntropy
 
-The syntropy of $\mathbb{G}$ is a real-valued functional measuring the organizational quality of $\pi^*$:
+The syntropy of $\mathbb{G}$ is a real-valued functional measuring the organizational quality of $\phi^*$:
 
-$$J(\pi^*) = \log|P| + \sum_{p \in P} \pi^*_p \log \pi^*_p = \log|P| - H(\pi^*)$$
+$$J(\phi^*) = \log|P| + \sum_{p \in P} \phi^*_p \log \phi^*_p = \log|P| - H(\phi^*)$$
 
-where $H(\pi^*) = -\sum_p \pi^*_p \log \pi^*_p$ is the Shannon entropy of the focus distribution.
+where $H(\phi^*) = -\sum_p \phi^*_p \log \phi^*_p$ is the Shannon entropy of the focus distribution.
 
-Range: $J \in [0, \log|P|]$. Minimum $J = 0$ when $\pi^* = u$ (uniform -- no structure, maximum entropy). Maximum $J = \log|P|$ when $\pi^*$ is a point mass (all attention on one particle, zero entropy). The clearest identity:
+Range: $J \in [0, \log|P|]$. Minimum $J = 0$ when $\phi^* = u$ (uniform -- no structure, maximum entropy). Maximum $J = \log|P|$ when $\phi^*$ is a point mass (all attention on one particle, zero entropy). The clearest identity:
 
-$$J(\pi^*) = D_{\text{KL}}(\pi^* \,\|\, u)$$
+$$J(\phi^*) = D_{\text{KL}}(\phi^* \,\|\, u)$$
 
-Syntropy is exactly the KL divergence of the focus distribution from uniform. It measures how much information $\pi^*$ carries above noise -- how far collective attention has been organized beyond random. $J$ measures how far the graph's collective attention deviates from noise. The [[tru]] computes $J$ every block in [[consensus]]. See [[syntropy]].
+Syntropy is exactly the KL divergence of the focus distribution from uniform. It measures how much information $\phi^*$ carries above noise -- how far collective attention has been organized beyond random. $J$ measures how far the graph's collective attention deviates from noise. The [[tru]] computes $J$ every block in [[consensus]]. See [[syntropy]].
 
 ### Free Energy
 
-The fixed point $\pi^*$ is the unique minimizer on $\Delta^{|P|-1}$ of the free energy functional:
+The fixed point $\phi^*$ is the unique minimizer on $\Delta^{|P|-1}$ of the free energy functional:
 
 $$\mathcal{F}(\phi) = \lambda_s\!\left[\tfrac{1}{2}\phi^\top L\phi + \tfrac{\mu}{2}\|\phi - x_0\|^2\right] + \lambda_h\!\left[\tfrac{1}{2}\|\phi - \mathcal{H}_\tau \phi\|^2\right] + \lambda_d \cdot D_{\text{KL}}(\phi \,\|\, \mathcal{D}\phi)$$
 
-Three energy terms: elastic structure (resistance to deviation from the Laplacian's preferred configuration), heat-smoothed context (penalty for deviation from the multi-scale graph shape at resolution $\tau$), diffusion alignment (KL divergence from the diffusion image). Adding a correct, well-placed [[cyberlink]] is equivalent to stepping in the direction of steepest descent on $\mathcal{F}$. The reward $\Delta\pi \propto \nabla_L (-\mathcal{F})$ is the directional derivative of free energy in the direction of the new edge.
+Three energy terms: elastic structure (resistance to deviation from the Laplacian's preferred configuration), heat-smoothed context (penalty for deviation from the multi-scale graph shape at resolution $\tau$), diffusion alignment (KL divergence from the diffusion image). Adding a correct, well-placed [[cyberlink]] is equivalent to stepping in the direction of steepest descent on $\mathcal{F}$. The reward $\Delta\phi^* \propto \nabla_L (-\mathcal{F})$ is the directional derivative of free energy in the direction of the new edge.
 
 ### Approximation Quality
 
 When $\mathbb{G}$ is compiled into a [[transformer]], the approximation gap is:
 
-$$\varepsilon(\mathbb{G}, c) = D_{\text{KL}}(\pi^*_c \,\|\, q^*_c)$$
+$$\varepsilon(\mathbb{G}, c) = D_{\text{KL}}(\phi^*_c \,\|\, q^*_c)$$
 
 where $q^*_c$ is the compiled model's focus distribution. $\varepsilon = 0$ means exact representation. This is the same KL divergence that appears in the [[Bayesian Truth Serum|BTS]] scoring formula ($D_{\text{KL}}(p_i \| \bar{m}_{-i})$) and in [[veritas]] information gain -- the same mathematical object at three scales: individual neuron, compiled model, collective state.
 
 ### Effective Rank and Semantic Dimensionality
 
-$$d^* = \exp\!\big(H(\sigma(\Sigma_{\pi^*}))\big)$$
+$$d^* = \exp\!\big(H(\sigma(\Sigma_{\phi^*}))\big)$$
 
-where $\sigma(\Sigma_{\pi^*})$ is the spectrum of the $\pi^*$-weighted covariance matrix. $d^*$ measures the number of independent semantic dimensions the graph spans. Currently $d^* \approx 31$ on [[bostrom]] (social artifact of a small graph). At planetary scale ($|P| \sim 10^{15}$), projected $d^* \in [10^3, 10^4]$ (thermodynamic regime).
+where $\sigma(\Sigma_{\phi^*})$ is the spectrum of the $\phi^*$-weighted covariance matrix. $d^*$ measures the number of independent semantic dimensions the graph spans. Currently $d^* \approx 31$ on [[bostrom]] (social artifact of a small graph). At planetary scale ($|P| \sim 10^{15}$), projected $d^* \in [10^3, 10^4]$ (thermodynamic regime).
 
 ---
 
@@ -173,13 +173,13 @@ Let $\rho = k_{\max}/\bar{k}$ be the degree heterogeneity of $\mathbb{G}$. There
 
 $$|P^*| \;\sim\; \rho^2$$
 
-such that below $|P^*|$, individual cyberlinks contribute measurably to $\pi^*$ (molecular regime -- each neuron's contribution is individually trackable). Above $|P^*|$, individual contributions become statistically negligible -- only the full $\pi^*$ distribution remains informative (thermodynamic regime -- planetary superintelligence). This is the graph analog of the thermodynamic limit.
+such that below $|P^*|$, individual cyberlinks contribute measurably to $\phi^*$ (molecular regime -- each neuron's contribution is individually trackable). Above $|P^*|$, individual contributions become statistically negligible -- only the full $\phi^*$ distribution remains informative (thermodynamic regime -- planetary superintelligence). This is the graph analog of the thermodynamic limit.
 
 ### Category of Cybergraphs
 
 A cybergraph homomorphism $f: \mathbb{G} \to \mathbb{G}'$ is a map $f_P: P \to P'$ such that for every $\ell = (p, q, \tau, a, v) \in L$, there exists $\ell' \in L'$ with $\operatorname{src}(\ell') = f_P(p)$, $\operatorname{tgt}(\ell') = f_P(q)$.
 
-Cybergraphs and their homomorphisms form a category $\mathbf{CG}$. There is a forgetful functor $U: \mathbf{CG} \to \mathbf{DiGraph}$ (to directed multigraphs) and a focus functor $\Pi: \mathbf{CG} \to \mathbf{Prob}$ sending $\mathbb{G} \mapsto (P, \pi^*)$ (a finite probability space). The composition $\Pi \circ U^{-1}$ is the functor that extracts collective intelligence from graph structure.
+Cybergraphs and their homomorphisms form a category $\mathbf{CG}$. There is a forgetful functor $U: \mathbf{CG} \to \mathbf{DiGraph}$ (to directed multigraphs) and a focus functor $\Pi: \mathbf{CG} \to \mathbf{Prob}$ sending $\mathbb{G} \mapsto (P, \phi^*)$ (a finite probability space). The composition $\Pi \circ U^{-1}$ is the functor that extracts collective intelligence from graph structure.
 
 ---
 
@@ -187,13 +187,13 @@ Cybergraphs and their homomorphisms form a category $\mathbf{CG}$. There is a fo
 
 | property | formal status |
 |---|---|
-| $\pi^*$ exists, unique, strictly positive | theorem -- T1, [[Perron-Frobenius theorem\|Perron-Frobenius]] |
-| $\sum_p \pi^*_p = 1$ | structural invariant -- A5 + stochasticity |
+| $\phi^*$ exists, unique, strictly positive | theorem -- T1, [[Perron-Frobenius theorem\|Perron-Frobenius]] |
+| $\sum_p \phi^*_p = 1$ | structural invariant -- A5 + stochasticity |
 | convergence at rate $(1-\lambda_2)^t$ | theorem -- T3, Banach FPT |
 | locality radius $O(\log 1/\varepsilon)$ | theorem -- T4, operator decay |
 | $H(L) \subseteq P$ | axiom -- A6 |
 | $L_t \subseteq L_{t+1}$ | axiom -- A3 |
-| $\pi^*$ minimizes $\mathcal{F}$ | theorem -- free energy variational |
+| $\phi^*$ minimizes $\mathcal{F}$ | theorem -- free energy variational |
 | honest linking is Nash equilibrium | open problem -- [[cyber/epistemology]] 6.1 |
 | minimum attack cost $s^*$ characterization | open problem -- [[cyber/epistemology]] 6.2 |
 
@@ -209,17 +209,17 @@ The [[cybergraph]] is the protocol. Every core function runs through the same fi
 | key exchange | CSIDH curves as [[particles]], non-interactive -- see [[dCTIDH]] |
 | authentication | [[stark]] proofs of [[Hemera]] preimage knowledge -- see [[cyber/proofs]] |
 | consensus | finalized subgraph IS the state -- see [[foculus]] |
-| fork choice | $\pi$ from graph [[topology]], not voting -- see [[foculus]] |
-| finality | $\pi_i > \tau$, threshold adapts to graph density -- see [[foculus]] |
+| fork choice | $\phi^*$ from graph [[topology]], not voting -- see [[foculus]] |
+| finality | $\phi^*_i > \tau$, threshold adapts to graph density -- see [[foculus]] |
 | privacy | anonymous [[cyberlinks]], [[mutator set]] in graph -- see [[cyber/bbg]] |
-| incentives | $\Delta\pi$ from graph convergence = reward signal -- see [[cyber/rewards]] |
+| incentives | $\Delta\phi^*$ from graph convergence = reward signal -- see [[cyber/rewards]] |
 | relay payment | delivery proofs as [[particles]], [[focus]] as payment -- see [[cyber/communication]] |
 | version control | patches as [[cyberlinks]], repos as subgraphs -- see [[cyber/patch]] |
 | file system | `~` prefix resolves through [[cyberlinks]] -- see [[name/resolution]] |
 | type system | [[semantic conventions]] from link [[topology]] -- see [[neural]] |
 | computation | [[tru]]/[[trident]]/[[nox]] read and consume graph state |
 | data availability | [[NMT]] indexes double as DA layer -- see [[storage proofs]] |
-| sybil resistance | stake-weighted $\pi$, no external identity |
+| sybil resistance | stake-weighted $\phi^*$, no external identity |
 
 Fifteen protocol functions. One data structure. Five primitives.
 

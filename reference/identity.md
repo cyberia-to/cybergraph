@@ -148,7 +148,7 @@ PUBLIC                          │ PRIVATE
 ────────────────────────────────┼────────────────────────────
 edges exist (A → B)             │ who created the edge
 aggregate weight per edge       │ individual stake contributions
-focus distribution (π vector)   │ which neurons shaped it
+focus distribution (φ* vector)   │ which neurons shaped it
 nullifiers (anti-spam)          │ neuron identity behind nullifier
 ```
 

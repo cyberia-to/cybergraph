@@ -18,7 +18,7 @@ three layers in one atomic record. structural $(p, q)$ is binary — the connect
 
 conviction = ($\tau$, $a$): the pair that turns an assertion into a bet. denomination selects the [[token]], [[amount]] declares the stake. a link with zero conviction is structurally identical to a link with maximum conviction — the structural layer is binary. the conviction layer prices it
 
-cyberlinks are bundled into [[signal|signals]] for broadcast. the [[signal]] adds the provenance layer: the signing [[neuron]] $\nu$, block height $t$, an [[cyber/impulse]] ($\pi_\Delta$ — the proven [[focus]] shift), and a recursive [[stark]] proof covering the entire batch.
+cyberlinks are bundled into [[signal|signals]] for broadcast. the [[signal]] adds the provenance layer: the signing [[neuron]] $\nu$, block height $t$, an [[cyber/impulse]] ($\Delta\phi^*$ — the proven [[focus]] shift), and a recursive [[stark]] proof covering the entire batch.
 
 the [[cybergraph]] is append-only. [[time]] (block height from the containing signal) distinguishes every record: the same author linking from→to in two signals at $t_1$ and $t_2 > t_1$ produces two separate entries in $L$. this enables reinforcement (higher [[amount]] on a new record), [[valence]] updates (new $v$ at a new signal), and multi-denomination staking (same structural link in different [[tokens]])
 
@@ -42,7 +42,7 @@ the append-only graph expresses all four operations through cyberlinks:
 | operation | cyberlink action | what changes |
 |-----------|-----------------|--------------|
 | create | first record for structural pair $(p, q)$ | relation enters $L$ |
-| read | query $\pi^*$ at any block — no link required | nothing |
+| read | query $\phi^*$ at any block — no link required | nothing |
 | update | new record with new $(\tau, a, v)$ for the same pair | any mutable dimension |
 | delete | withdraw conviction UTXO + new record with $v = -1$ | economic position closed, epistemic signal negated |
 
@@ -73,9 +73,9 @@ transferable — ownership of a cyberlink and its yield rights can be transferre
 
 yield-bearing — a cyberlink earns in proportion to how much the target [[particle]] gains [[focus]]:
 
-$$R_\ell(T) = \int_0^T w(t) \cdot \Delta\pi^*(q, t)\, dt$$
+$$R_\ell(T) = \int_0^T w(t) \cdot \Delta\phi^*(q, t)\, dt$$
 
-where $w(t)$ is the conviction weight at [[time]] $t$ and $\Delta\pi^*(q, t)$ is the increment in the target particle's focus. early discovery is maximally rewarded; late consensus-following earns little
+where $w(t)$ is the conviction weight at [[time]] $t$ and $\Delta\phi^*(q, t)$ is the increment in the target particle's focus. early discovery is maximally rewarded; late consensus-following earns little
 
 ## edge labeling
 

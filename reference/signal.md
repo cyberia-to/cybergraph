@@ -4,17 +4,17 @@ a bundle of [[cyberlinks]] a [[neuron]] commits in a single [[step]] — the ato
 
 ## structure
 
-$$s \;=\; (\nu,\; \vec\ell,\; \pi_\Delta,\; \sigma,\; t)$$
+$$s \;=\; (\nu,\; \vec\ell,\; \Delta\phi^*,\; \sigma,\; t)$$
 
 | field | name | type | semantics |
 |-------|------|------|-----------|
 | $\nu$ | [[subject]] | $N$ | signing [[neuron]] |
 | $\vec\ell$ | links | $L^+$ | one or more [[cyberlinks]] — each a 5-tuple $(p, q, \tau, a, v)$ |
-| $\pi_\Delta$ | [[cyber/impulse]] | $(P \times \mathbb{F}_p)^*$ | sparse [[focus]] update: how the batch of links shifts $\pi^*$ |
+| $\Delta\phi^*$ | [[cyber/impulse]] | $(P \times \mathbb{F}_p)^*$ | sparse [[focus]] update: how the batch of links shifts $\phi^*$ |
 | $\sigma$ | proof | $\Pi$ | [[zheng]] proof covering the [[cyber/impulse]], all conviction UTXO movements, and [[cyberlink]] validity against the current [[BBG]] root |
 | $t$ | at | $\mathbb{Z}_{\geq 0}$ | block height |
 
-the signal separates what a [[neuron]] asserts (the [[cyberlinks]]) from what the assertion computes (the [[cyber/impulse]]). see [[cyber/impulse]] for how $\pi_\Delta$ is computed
+the signal separates what a [[neuron]] asserts (the [[cyberlinks]]) from what the assertion computes (the [[cyber/impulse]]). see [[cyber/impulse]] for how $\Delta\phi^*$ is computed
 
 ## zheng proof coverage
 
@@ -22,7 +22,7 @@ $\sigma$ is a single [[zheng]] proof that covers the entire signal atomically:
 
 - correctness of each [[cyberlink]] in $\vec\ell$ (valid signatures, valid particle references)
 - validity of all conviction UTXO movements (each link's $(\tau, a)$ spend is backed by an unspent output)
-- correctness of the [[cyber/impulse]] $\pi_\Delta$ (the [[tri-kernel]] computation against $\text{bbg\_root}$ from the current header)
+- correctness of the [[cyber/impulse]] $\Delta\phi^*$ (the [[tri-kernel]] computation against $\text{bbg\_root}$ from the current header)
 
 one proof for everything. proving $n$ links together costs less than $n$ separate proofs because shared neighborhood state and UTXO set are proved once. any verifier runs `decide(σ)` in $O(\log n)$ without recomputing anything
 
@@ -31,10 +31,10 @@ one proof for everything. proving $n$ links together costs less than $n$ separat
 validation of a signal produces two outcomes:
 
 1. each link in $\vec\ell$ enters $L$ — conviction UTXOs are created for each [[cyberlink]]
-2. if $\|\pi_\Delta\| > 0$ and $\sigma$ is valid, the [[neuron]] self-mints [[$CYB]] proportional to the proven shift — a reward UTXO is created for $\nu$
+2. if $\|\Delta\phi^*\| > 0$ and $\sigma$ is valid, the [[neuron]] self-mints [[$CYB]] proportional to the proven shift — a reward UTXO is created for $\nu$
 
 the conviction UTXOs ([[tokens]] spent into links) and the reward UTXO ([[tokens]] minted for contribution) are separate token movements within one atomic signal. see [[cyber/rewards]] for the full reward specification
 
 ## minting conservation
 
-total minting per epoch is bounded by the actual global $\Delta\pi$, verifiable from consecutive headers. if the sum of individual claims exceeds the actual shift (overlapping neighborhoods), all claims are scaled proportionally
+total minting per epoch is bounded by the actual global $\Delta\phi^*$, verifiable from consecutive headers. if the sum of individual claims exceeds the actual shift (overlapping neighborhoods), all claims are scaled proportionally

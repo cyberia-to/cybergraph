@@ -23,4 +23,4 @@ produced by two write paths inside `submit()`:
 - [[staking]] via [[will]] — broad, auto-distributed across all of a neuron's cyberlinks
 - fine-tuning — explicit per-target weight in the cyberlink's `amount` field
 
-see [[cybergraph/reference/staking]] for how attention is written. see [[tru/reference/focus]] for how individual attention aggregates into collective $\pi^*$.
+see [[cybergraph/reference/staking]] for how attention is written. see [[tru/reference/focus]] for how individual attention aggregates into collective $\phi^*$.

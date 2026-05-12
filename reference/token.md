@@ -16,7 +16,7 @@ the rate function $r(\tau)$ normalizes across denominations so that conviction i
 
 | token | ticker | role |
 |-------|--------|------|
-| CYB | [[$CYB]] | root consensus token. staked for security, locked for [[will]], burned for permanent π-weight, spent as fees |
+| CYB | [[$CYB]] | root consensus token. staked for security, locked for [[will]], burned for permanent φ*-weight, spent as fees |
 | HYDROGEN | [[$H]] | liquidity engine. paired with [[$CYB]] via [[bonding curves]]. provides the external price signal |
 
 ## the four token types
@@ -45,6 +45,6 @@ the choice of denomination carries information. staking [[$CYB]] (scarce, govern
 
 ## permanent weight tokens
 
-burning [[$CYB]] creates [[eternal particles]] (permanent π-weight on a [[particle]]) or [[eternal cyberlinks]] (permanent edge weight). burned tokens exit circulation permanently — the strongest possible conviction signal
+burning [[$CYB]] creates [[eternal particles]] (permanent φ*-weight on a [[particle]]) or [[eternal cyberlinks]] (permanent edge weight). burned tokens exit circulation permanently — the strongest possible conviction signal
 
 see [[cyberlink]] for the full 5-tuple. see [[amount]] for the stake quantity. see [[cybernomics]] for the economic theory
