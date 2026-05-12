@@ -30,7 +30,7 @@ implementable specifications — formal definitions, data structures, formulas
 ### signal
 
 - [impulse.md](reference/impulse.md) — $\pi_\Delta$: the proven focus shift a signal delivers. sparse vector, locality theorem, self-minting proof
-- [proofs.md](reference/proofs.md) — the full STARK proof system. recursive verification, proof types, aggregation, nox integration
+- [proof.md](reference/proof.md) — the full STARK proof system. recursive verification, proof types, aggregation, nox integration
 
 ### cyberlink arguments
 
