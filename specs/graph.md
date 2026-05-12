@@ -266,7 +266,7 @@ ordered identically to the signals section. consumers verify against the chain h
 
 ### impulse
 
-per-signal sparse focus delta `π_Δ` that the chain proved when the signal was accepted. compilers may sum these across signals to skip the power-iteration step entirely when computing focus.
+per-signal sparse focus delta `φ*_Δ` that the chain proved when the signal was accepted. compilers may sum these across signals to skip the power-iteration step entirely when computing focus.
 
 frontmatter entry:
 
