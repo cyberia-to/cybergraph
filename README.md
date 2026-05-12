@@ -24,9 +24,12 @@ implementable specifications — formal definitions, data structures, formulas
 - [valence.md](reference/valence.md) — $v$: epistemic prediction $\{-1, 0, +1\}$. BTS meta-prediction, role in ICBS markets, karma compounding
 - [time.md](reference/time.md) — $t$: block height. discovery premium, temporal decay, consensus ordering, machine time
 
+### participation
+
+- [signal.md](reference/signal.md) — how a neuron acts. cyberlink batch + impulse + STARK proof. decomposes into cyberlinks but is the fundamental unit of what happens
+
 ### derived structures
 
-- [signal.md](reference/signal.md) — atomic broadcast unit. cyberlink batch + impulse + STARK proof
 - [axon.md](reference/axon.md) — bundle of all cyberlinks between two particles. weight computation, homoiconicity
 
 ## docs
