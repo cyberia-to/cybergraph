@@ -1,6 +1,6 @@
 # valence
 
-the sixth field of a [[cyberlink]]: $v \in \{-1, 0, +1\}$. the epistemic prediction — the [[neuron]]'s forecast of where the [[inversely coupled bonding surface|ICBS]] market on this edge will converge
+the fifth field of a [[cyberlink]]: $v \in \{-1, 0, +1\}$. the epistemic prediction — the [[neuron]]'s forecast of where the [[inversely coupled bonding surface|ICBS]] market on this edge will converge
 
 valence is what makes every [[cyberlink]] a [[Bayesian Truth Serum]] input. the structural layer says "this link exists." the economic layer says "I stake this much." the epistemic layer says "I predict the collective will agree (or disagree)"
 
@@ -22,7 +22,7 @@ valence is the third dimension of the [[cyberlink]]'s layered structure:
 
 | layer | field(s) | type | what it encodes |
 |-------|----------|------|-----------------|
-| structural | $(\nu, p, q)$ | binary | connection exists or does not |
+| structural | $(p, q)$ | binary | connection exists or does not |
 | economic | $(\tau, a)$ | continuous | conviction depth |
 | epistemic | $v$ | ternary | prediction of collective judgment |
 
@@ -69,4 +69,4 @@ valence creates a two-dimensional epistemic signal per [[cyberlink]]:
 
 one-dimensional price becomes two-dimensional: how much the collective believes, and how confident the collective is in that belief
 
-see [[cyberlink]] for the full 6-tuple. see [[Bayesian Truth Serum]] for the full scoring mechanism. see [[inversely coupled bonding surface]] for the market mechanics. see [[karma]] for accumulation
+see [[cyberlink]] for the full 5-tuple. see [[Bayesian Truth Serum]] for the full scoring mechanism. see [[inversely coupled bonding surface]] for the market mechanics. see [[karma]] for accumulation

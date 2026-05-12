@@ -9,7 +9,7 @@ $$s \;=\; (\nu,\; \vec\ell,\; \pi_\Delta,\; \sigma,\; t)$$
 | field | name | type | semantics |
 |-------|------|------|-----------|
 | $\nu$ | [[subject]] | $N$ | signing [[neuron]] |
-| $\vec\ell$ | links | $L^+$ | one or more [[cyberlinks]] — each a 6-tuple $(\nu, p, q, \tau, a, v)$ |
+| $\vec\ell$ | links | $L^+$ | one or more [[cyberlinks]] — each a 5-tuple $(p, q, \tau, a, v)$ |
 | $\pi_\Delta$ | [[cyber/impulse]] | $(P \times \mathbb{F}_p)^*$ | sparse [[focus]] update: how the batch of links shifts $\pi^*$ |
 | $\sigma$ | proof | $\Pi$ | recursive [[stark]] proof covering the [[cyber/impulse]], all conviction UTXO movements, and [[cyberlink]] validity against the current [[BBG]] root |
 | $t$ | at | $\mathbb{Z}_{\geq 0}$ | block height |

@@ -1,6 +1,6 @@
 # token
 
-the fourth field of a [[cyberlink]]: $\tau \in \mathcal{T}$. the denomination in which conviction is expressed
+the third field of a [[cyberlink]]: $\tau \in \mathcal{T}$. the denomination in which conviction is expressed
 
 a [[cyberlink]] without a [[token]] denomination is a structural assertion with no economic weight. the token field is what makes a link a bet — it selects which scarce resource the [[neuron]] stakes against the claim
 
@@ -47,4 +47,4 @@ the choice of denomination carries information. staking [[$CYB]] (scarce, govern
 
 burning [[$CYB]] creates [[eternal particles]] (permanent π-weight on a [[particle]]) or [[eternal cyberlinks]] (permanent edge weight). burned tokens exit circulation permanently — the strongest possible conviction signal
 
-see [[cyberlink]] for the full 6-tuple. see [[amount]] for the stake quantity. see [[cybernomics]] for the economic theory
+see [[cyberlink]] for the full 5-tuple. see [[amount]] for the stake quantity. see [[cybernomics]] for the economic theory

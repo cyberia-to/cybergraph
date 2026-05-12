@@ -32,7 +32,7 @@ UTXO management is internal to `submit()`: conviction UTXOs created and spent pe
 ### primitives
 
 - [particle.md](reference/particle.md) — content-addressed node. Hemera hash, permanence, domain separation
-- [cyberlink.md](reference/cyberlink.md) — the unit routed. six fields, three layers, UTXO semantics
+- [cyberlink.md](reference/cyberlink.md) — the unit routed. five fields, three layers, UTXO semantics
 - [neuron.md](reference/neuron.md) — the sender. identity, stake, focus, karma
 - [token.md](reference/token.md) — conviction denomination. four types, rate function, multi-token staking
 - [signal.md](reference/signal.md) — the input to `submit()`. cyberlink batch + impulse + proof

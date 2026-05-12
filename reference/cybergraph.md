@@ -23,7 +23,7 @@ $$\mathbb{G} = (P,\; N,\; L)$$
 
 $H: \text{Val} \to \mathbb{F}_p^8$ is the global [[Hemera]] hash primitive, fixed at genesis. Every particle is a hash of some value -- $P$ is a subset of $H$'s image. $\mathcal{T}$ and the karma function $\kappa$ are derived from $L$.
 
-Each element $\ell \in L$ is a [[cyberlink]] -- a 6-tuple $(\nu, p, q, \tau, a, v)$ carrying a [[subject]], two [[particles]], a conviction stake, and an epistemic [[valence]]. Block height $t$ is a property of the containing [[signal]], not of the cyberlink itself. The cyberlink is the only primitive from which the entire graph is built. See [[cyberlink]] for the full field specification, UTXO mechanics, and CRUD semantics.
+Each element $\ell \in L$ is a [[cyberlink]] -- a 5-tuple $(p, q, \tau, a, v)$ carrying two [[particles]], a conviction stake, and an epistemic [[valence]]. The signing [[neuron]] $\nu$ and block height $t$ are attributes of the containing [[signal]], not of the cyberlink itself. The cyberlink is the only primitive from which the entire graph is built. See [[cyberlink]] for the full field specification, UTXO mechanics, and CRUD semantics.
 
 ---
 
@@ -37,7 +37,7 @@ $H$ is collision-resistant -- for all $x \neq x'$, $\Pr[H(x) = H(x')] \leq 2^{-1
 
 ### A2 -- Authentication
 
-For every $\ell \in L$: $\operatorname{Verify}(\operatorname{pk}(\nu(\ell)),\; H(\ell),\; \sigma(\ell)) = \top$. Every cyberlink carries a valid signature from its creating neuron. Unsigned assertions do not enter $L$.
+Every [[signal]] $s$ carries a valid signature from its creating [[neuron]]: $\operatorname{Verify}(\operatorname{pk}(\nu(s)),\; H(s),\; \sigma(s)) = \top$. Authentication is at the signal level — cyberlinks within an invalid signal do not enter $L$.
 
 ### A3 -- Append-Only
 
@@ -71,9 +71,9 @@ where $r: \mathcal{T} \to \mathbb{R}_+$ converts token denomination to a common 
 
 With the epistemic layer active (ICBS markets running and karma accumulated), the effective adjacency modifies each link's weight by market belief and neuron trust:
 
-$$A^{\text{eff}}_{pq} = \sum_{\substack{\ell \in L \\ \operatorname{src}(\ell)=p,\; \operatorname{tgt}(\ell)=q}} a(\ell)\cdot \kappa(\nu(\ell))\cdot f(m(\ell))$$
+$$A^{\text{eff}}_{pq} = \sum_{\substack{\ell \in L \\ \operatorname{src}(\ell)=p,\; \operatorname{tgt}(\ell)=q}} a(\ell)\cdot \kappa(\nu(s_\ell))\cdot f(m(\ell))$$
 
-where $\kappa: N \to \mathbb{R}_+$ is [[karma]] (accumulated [[Bayesian Truth Serum|BTS]] score history), $m: L \to [0,1]$ is the [[inversely coupled bonding surface|ICBS]] reserve ratio (market-implied probability that the link is valid), and $f: [0,1] \to [0,1]$ maps market price to a weight multiplier. Edges the collective disbelieves are suppressed toward zero. This is [[market inhibition]] -- the inhibitory signal that makes $\mathbb{G}$ computationally equivalent to a neural network with both excitation and inhibition.
+where $s_\ell$ is the [[signal]] containing $\ell$, $\kappa: N \to \mathbb{R}_+$ is [[karma]] (accumulated [[Bayesian Truth Serum|BTS]] score history), $m: L \to [0,1]$ is the [[inversely coupled bonding surface|ICBS]] reserve ratio (market-implied probability that the link is valid), and $f: [0,1] \to [0,1]$ maps market price to a weight multiplier. Edges the collective disbelieves are suppressed toward zero. This is [[market inhibition]] -- the inhibitory signal that makes $\mathbb{G}$ computationally equivalent to a neural network with both excitation and inhibition.
 
 ### Tri-Kernel Composite
 
@@ -177,7 +177,7 @@ such that below $|P^*|$, individual cyberlinks contribute measurably to $\pi^*$ 
 
 ### Category of Cybergraphs
 
-A cybergraph homomorphism $f: \mathbb{G} \to \mathbb{G}'$ is a pair $(f_P: P \to P',\; f_N: N \to N')$ such that for every $\ell = (\nu, p, q, \tau, a, v) \in L$, there exists $\ell' \in L'$ with $\nu(\ell') = f_N(\nu)$, $\operatorname{src}(\ell') = f_P(p)$, $\operatorname{tgt}(\ell') = f_P(q)$.
+A cybergraph homomorphism $f: \mathbb{G} \to \mathbb{G}'$ is a map $f_P: P \to P'$ such that for every $\ell = (p, q, \tau, a, v) \in L$, there exists $\ell' \in L'$ with $\operatorname{src}(\ell') = f_P(p)$, $\operatorname{tgt}(\ell') = f_P(q)$.
 
 Cybergraphs and their homomorphisms form a category $\mathbf{CG}$. There is a forgetful functor $U: \mathbf{CG} \to \mathbf{DiGraph}$ (to directed multigraphs) and a focus functor $\Pi: \mathbf{CG} \to \mathbf{Prob}$ sending $\mathbb{G} \mapsto (P, \pi^*)$ (a finite probability space). The composition $\Pi \circ U^{-1}$ is the functor that extracts collective intelligence from graph structure.
 

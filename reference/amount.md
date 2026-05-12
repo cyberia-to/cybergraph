@@ -1,6 +1,6 @@
 # amount
 
-the fifth field of a [[cyberlink]]: $a \in \mathbb{R}_+$. the quantity of [[token]] staked as conviction on the assertion
+the fourth field of a [[cyberlink]]: $a \in \mathbb{R}_+$. the quantity of [[token]] staked as conviction on the assertion
 
 amount is what separates a structural claim from an economic commitment. a link with $a = 0$ is a bare assertion — it exists in the graph but carries no economic weight. a link with $a > 0$ is a funded position — the [[neuron]] has moved real [[tokens]] into a conviction UTXO bound to the claim
 
@@ -57,4 +57,4 @@ $$R_\ell(T) = \int_0^T w(t) \cdot \Delta\pi^*(q, t)\, dt$$
 
 where $w(t)$ includes $a(\ell)$. higher amount → higher yield when the target [[particle]] gains [[focus]]. the first-mover premium applies: the same amount staked early (when $\pi^*(q)$ is low) earns more than staked late (when $\pi^*(q)$ is already high)
 
-see [[cyberlink]] for the full 6-tuple. see [[token]] for the denomination. see [[valence]] for the epistemic prediction. see [[will]] for the budget that constrains amount allocation
+see [[cyberlink]] for the full 5-tuple. see [[token]] for the denomination. see [[valence]] for the epistemic prediction. see [[will]] for the budget that constrains amount allocation
