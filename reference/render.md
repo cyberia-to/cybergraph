@@ -16,6 +16,28 @@ This spec depends on and cites:
 
 It does **not** depend on the [[crystal]] metadata schema. The engine renders pure topology by default; any metadata (domains, types, sizes) is consumed as a togglable overlay (§5.2).
 
+## physics of the rendered world
+
+Rendering does not impose structure from outside the graph. It is an observer — a camera pointed at the equilibrium state of a physical system. The world exists in the physics of [[cybergraph]]; R-1.0 reveals it.
+
+The normalized Laplacian $\mathcal{L} = I - D^{-1/2} A^{\mathrm{eff}} D^{-1/2}$ is the discrete analog of the Laplace-Beltrami operator $\nabla^2$ on Riemannian manifolds. The springs equation from [[tri-kernel]],
+
+$$(L + \mu I)x^* = \mu x_0$$
+
+is the discrete analog of the Yukawa field equation $(\nabla^2 - \mu^2)\Phi = -\rho$, which governs the potential of a massive force mediator. The continuous Yukawa solution is $\Phi(r) \propto e^{-\mu r}/r$ — exponential decay with characteristic screening length $1/\mu$. The discrete Green's function $(L + \mu I)^{-1}$ is its graph analog: entry $(i, j)$ decays as $e^{-\sqrt{\mu}\,d(i,j)}$ with graph distance $d(i,j)$.
+
+This Yukawa decay is not an algorithmic approximation — it is a law of the manifold. Particles beyond $O(1/\sqrt{\mu})$ hops exert exponentially negligible influence on each other's positions. The h-local update rule (§3.3) follows from this physics: recomputing only the $O(\log(1/\varepsilon))$-hop neighborhood of any edit is exact, not an approximation.
+
+The [[tri-kernel]] fixed point minimizes a free-energy functional:
+
+$$\mathcal{F}(\phi) = \lambda_s \!\left[\tfrac{1}{2}\phi^\top L\phi + \tfrac{\mu}{2}\|\phi - x_0\|^2\right] + \lambda_h \!\left[\tfrac{1}{2}\|\phi - H_\tau \phi\|^2\right] + \lambda_d \cdot D_{\mathrm{KL}}(\phi \,\|\, D\phi)$$
+
+The elastic term $\frac{1}{2}\phi^\top L\phi$ is the discrete Dirichlet energy — the potential energy of the graph spring network. The screening term anchors focus against drift. The heat-alignment term enforces scale-consistent rendering. The KL term aligns focus with its own diffusion image, ensuring flow consistency. The world sits at the minimum of $\mathcal{F}$. Perturbations shift the minimum; the tri-kernel iteration rolls downhill.
+
+Focus $\pi^*$ is a conserved scalar field on the manifold: $\sum_p \pi^*(p) = 1$ at all times. Total luminosity is invariant; brightness flows between particles as the graph evolves but is never created or destroyed.
+
+The cybergraph is therefore a world in the same mathematical sense that a Riemannian manifold with matter fields is a world — defined by its geometry ($\mathcal{L}$), its dynamics ([[tri-kernel]]), and its conserved quantities ([[focus]]). R-1.0 is a specification for an observer of that world.
+
 ---
 
 ## 1. Scope
