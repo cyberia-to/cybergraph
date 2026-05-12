@@ -16,6 +16,8 @@ implementable specifications — formal definitions, data structures, formulas
 
 - [particle.md](reference/particle.md) — content-addressed node. Hemera hash, tree structure, domain separation, endofunction, permanence
 - [cyberlink.md](reference/cyberlink.md) — atomic unit of knowledge. seven fields, three layers, UTXO semantics, CRUD, the card
+- [neuron.md](reference/neuron.md) — the one who links. identity, stake, focus, karma. source of all cyberlinks
+- [signal.md](reference/signal.md) — the atomic act. cyberlink batch + impulse + STARK proof. decomposes into cyberlinks but is the fundamental unit of what happens
 
 ### cyberlink arguments
 
@@ -23,10 +25,6 @@ implementable specifications — formal definitions, data structures, formulas
 - [amount.md](reference/amount.md) — $a$: quantity of stake. role in adjacency, conviction UTXO, costly signaling, reward proportionality
 - [valence.md](reference/valence.md) — $v$: epistemic prediction $\{-1, 0, +1\}$. BTS meta-prediction, role in ICBS markets, karma compounding
 - [time.md](reference/time.md) — $t$: block height. discovery premium, temporal decay, consensus ordering, machine time
-
-### participation
-
-- [signal.md](reference/signal.md) — how a neuron acts. cyberlink batch + impulse + STARK proof. decomposes into cyberlinks but is the fundamental unit of what happens
 
 ### derived structures
 
