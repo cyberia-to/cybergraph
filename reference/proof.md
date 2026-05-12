@@ -30,4 +30,4 @@ cybergraph owns: the validation check (`verify(σ, signal, bbg_root) → bool`)
 
 [[zheng]] owns: proof construction, the circuit, the proof system, the taxonomy of all proof types
 
-see [[zheng]] for the full STARK proof system specification.
+see [[zheng/specs/proof-types]] for the full taxonomy of all proof types the protocol generates.

@@ -17,6 +17,7 @@ neurons  →  signals  →  cybergraph  →  .graph queries  →  tru
 ```
 submit(signal)            validate σ, extract cyberlinks, persist, emit events
 query(.graph)             link query engine — from?, to?, neuron?, depth?
+query(from=ν, to=p)       attention: how much focus ν projects onto p
 subscribe(filter)         stream cyberlinks to tru / glia consumers
 ```
 
