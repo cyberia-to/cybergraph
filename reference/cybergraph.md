@@ -23,7 +23,7 @@ $$\mathbb{G} = (P,\; N,\; L)$$
 
 $H: \text{Val} \to \mathbb{F}_p^8$ is the global [[Hemera]] hash primitive, fixed at genesis. Every particle is a hash of some value -- $P$ is a subset of $H$'s image. $\mathcal{T}$ and the karma function $\kappa$ are derived from $L$.
 
-Each element $\ell \in L$ is a [[cyberlink]] -- a 7-tuple $(\nu, p, q, \tau, a, v, t)$ carrying a [[subject]], two [[particles]], a conviction stake, an epistemic [[valence]], and a block timestamp. The cyberlink is the only primitive from which the entire graph is built. See [[cyberlink]] for the full field specification, UTXO mechanics, and CRUD semantics.
+Each element $\ell \in L$ is a [[cyberlink]] -- a 6-tuple $(\nu, p, q, \tau, a, v)$ carrying a [[subject]], two [[particles]], a conviction stake, and an epistemic [[valence]]. Block height $t$ is a property of the containing [[signal]], not of the cyberlink itself. The cyberlink is the only primitive from which the entire graph is built. See [[cyberlink]] for the full field specification, UTXO mechanics, and CRUD semantics.
 
 ---
 
@@ -177,7 +177,7 @@ such that below $|P^*|$, individual cyberlinks contribute measurably to $\pi^*$ 
 
 ### Category of Cybergraphs
 
-A cybergraph homomorphism $f: \mathbb{G} \to \mathbb{G}'$ is a pair $(f_P: P \to P',\; f_N: N \to N')$ such that for every $\ell = (\nu, p, q, \tau, a, v, t) \in L$, there exists $\ell' \in L'$ with $\nu(\ell') = f_N(\nu)$, $\operatorname{src}(\ell') = f_P(p)$, $\operatorname{tgt}(\ell') = f_P(q)$.
+A cybergraph homomorphism $f: \mathbb{G} \to \mathbb{G}'$ is a pair $(f_P: P \to P',\; f_N: N \to N')$ such that for every $\ell = (\nu, p, q, \tau, a, v) \in L$, there exists $\ell' \in L'$ with $\nu(\ell') = f_N(\nu)$, $\operatorname{src}(\ell') = f_P(p)$, $\operatorname{tgt}(\ell') = f_P(q)$.
 
 Cybergraphs and their homomorphisms form a category $\mathbf{CG}$. There is a forgetful functor $U: \mathbf{CG} \to \mathbf{DiGraph}$ (to directed multigraphs) and a focus functor $\Pi: \mathbf{CG} \to \mathbf{Prob}$ sending $\mathbb{G} \mapsto (P, \pi^*)$ (a finite probability space). The composition $\Pi \circ U^{-1}$ is the functor that extracts collective intelligence from graph structure.
 

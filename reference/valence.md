@@ -69,4 +69,4 @@ valence creates a two-dimensional epistemic signal per [[cyberlink]]:
 
 one-dimensional price becomes two-dimensional: how much the collective believes, and how confident the collective is in that belief
 
-see [[cyberlink]] for the full 7-tuple. see [[Bayesian Truth Serum]] for the full scoring mechanism. see [[inversely coupled bonding surface]] for the market mechanics. see [[karma]] for accumulation
+see [[cyberlink]] for the full 6-tuple. see [[Bayesian Truth Serum]] for the full scoring mechanism. see [[inversely coupled bonding surface]] for the market mechanics. see [[karma]] for accumulation

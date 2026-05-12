@@ -1,20 +1,20 @@
 # time
 
-the seventh field of a [[cyberlink]]: $t \in \mathbb{Z}_{\geq 0}$. block height at which the assertion is committed to the [[cybergraph]]
+the $t$ field of a [[signal]]: $t \in \mathbb{Z}_{\geq 0}$. block height at which the signal is committed to the [[cybergraph]]. every [[cyberlink]] in the signal shares the same $t$ — they enter the graph together, timestamped by the containing signal.
 
-time is the temporal anchor of every [[cyberlink]]. it answers [[when]] — the one question that cannot be answered by content or structure alone. the block height is the [[cybergraph]]'s logical clock
+time is the temporal anchor of every [[signal]]. it answers [[when]] — the one question that cannot be answered by content or structure alone. the block height is the [[cybergraph]]'s logical clock.
 
 ## definition
 
-$$t(\ell) \in \mathbb{Z}_{\geq 0}$$
+$$t(s) \in \mathbb{Z}_{\geq 0}$$
 
-monotonically increasing block counter. every [[cyberlink]] in a given block shares the same $t$. ordering within a block is determined by the $\pi$ convergence trajectory (see [[foculus]])
+monotonically increasing block counter. every [[cyberlink]] in a given signal shares the same $t$. ordering within a block is determined by the $\pi$ convergence trajectory (see [[foculus]])
 
 ## role in the append-only graph
 
-axiom A3 guarantees $t < t' \Rightarrow L_t \subseteq L_{t'}$. time makes this ordering explicit: every record carries its birth moment. the graph grows monotonically through time
+axiom A3 guarantees $t < t' \Rightarrow L_t \subseteq L_{t'}$. time makes this ordering explicit: every signal carries its birth moment, and every cyberlink it produces enters $L$ at that height. the graph grows monotonically through time.
 
-the same author linking the same structural triple $(\nu, p, q)$ at $t_1$ and $t_2 > t_1$ produces two separate entries in $L$. time is what distinguishes them. this enables:
+the same author linking the same structural triple $(\nu, p, q)$ in two signals at $t_1$ and $t_2 > t_1$ produces two separate entries in $L$. the signals' block heights distinguish them. this enables:
 
 - reinforcement — higher [[amount]] on a new record at a later block
 - [[valence]] update — new epistemic prediction at a new block
@@ -42,7 +42,7 @@ where $\lambda$ is a per-namespace decay constant. mathematics namespaces use $\
 
 ## role in signals
 
-every [[signal]] carries $t$ (block height). the signal's batch of [[cyberlinks]] all share the same $t$. the [[stark]] proof $\sigma$ in the signal references the [[BBG]] root at $t$ — proving that the [[focus]] shift $\pi_\Delta$ was computed against the graph state at that specific moment
+$t$ is a first-class field of every [[signal]] — the signal's batch of [[cyberlinks]] all inherit this timestamp. the [[stark]] proof $\sigma$ references the [[BBG]] root at $t$ — proving that the [[focus]] shift $\pi_\Delta$ was computed against the graph state at that specific moment
 
 ## machine time
 
@@ -56,4 +56,4 @@ time in the [[cybergraph]] is discrete, deterministic, and consensus-verified. i
 | granularity | Planck time | block interval (~5s in [[bostrom]]) |
 | verifiability | requires trusted clock | verifiable from chain headers |
 
-see [[cyberlink]] for the full 7-tuple. see [[foculus]] for how time interacts with finality. see [[signal]] for batch temporal semantics
+see [[signal]] for the full structure. see [[cyberlink]] for the 6-tuple content that time stamps. see [[foculus]] for how time interacts with finality.

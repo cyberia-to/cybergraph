@@ -47,4 +47,4 @@ the choice of denomination carries information. staking [[$CYB]] (scarce, govern
 
 burning [[$CYB]] creates [[eternal particles]] (permanent π-weight on a [[particle]]) or [[eternal cyberlinks]] (permanent edge weight). burned tokens exit circulation permanently — the strongest possible conviction signal
 
-see [[cyberlink]] for the full 7-tuple. see [[amount]] for the stake quantity. see [[cybernomics]] for the economic theory
+see [[cyberlink]] for the full 6-tuple. see [[amount]] for the stake quantity. see [[cybernomics]] for the economic theory

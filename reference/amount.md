@@ -57,4 +57,4 @@ $$R_\ell(T) = \int_0^T w(t) \cdot \Delta\pi^*(q, t)\, dt$$
 
 where $w(t)$ includes $a(\ell)$. higher amount → higher yield when the target [[particle]] gains [[focus]]. the first-mover premium applies: the same amount staked early (when $\pi^*(q)$ is low) earns more than staked late (when $\pi^*(q)$ is already high)
 
-see [[cyberlink]] for the full 7-tuple. see [[token]] for the denomination. see [[valence]] for the epistemic prediction. see [[will]] for the budget that constrains amount allocation
+see [[cyberlink]] for the full 6-tuple. see [[token]] for the denomination. see [[valence]] for the epistemic prediction. see [[will]] for the budget that constrains amount allocation
