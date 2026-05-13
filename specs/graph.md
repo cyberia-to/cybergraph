@@ -320,7 +320,7 @@ a snapshot that wants full self-containment puts every particle referenced by si
 
 ## relation to .model
 
-a .graph compiles into a .model via the [[compiled transformers spec]] (CT-1):
+a .graph compiles into a .model via the [[compiled transformers spec]] (CT-0):
 
 ```
 *.graph                 *.model
