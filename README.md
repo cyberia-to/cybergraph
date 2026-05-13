@@ -23,39 +23,39 @@ subscribe(filter)         stream cyberlinks to tru / glia consumers
 
 UTXO management is internal to `submit()`: conviction UTXOs created and spent per cyberlink, token movements trigger adjacency updates that tru reads.
 
-## reference
+## specs
 
 ### the graph
 
-- [cybergraph.md](reference/cybergraph.md) — formal triple $(P, N, L)$, six axioms, derived structures, four theorems
+- [cybergraph.md](specs/cybergraph.md) — formal triple $(P, N, L)$, six axioms, derived structures, four theorems
 
 ### primitives
 
-- [particle.md](reference/particle.md) — content-addressed node. Hemera hash, permanence, domain separation
-- [cyberlink.md](reference/cyberlink.md) — the unit routed. five fields, three layers, UTXO semantics
-- [neuron.md](reference/neuron.md) — the sender. identity, stake, focus, karma
-- [token.md](reference/token.md) — conviction denomination. four types, rate function, multi-token staking
-- [signal.md](reference/signal.md) — the input to `submit()`. cyberlink batch + impulse + proof
+- [particle.md](specs/particle.md) — content-addressed node. Hemera hash, permanence, domain separation
+- [cyberlink.md](specs/cyberlink.md) — the unit routed. five fields, three layers, UTXO semantics
+- [neuron.md](specs/neuron.md) — the sender. identity, stake, focus, karma
+- [token.md](specs/token.md) — conviction denomination. four types, rate function, multi-token staking
+- [signal.md](specs/signal.md) — the input to `submit()`. cyberlink batch + impulse + proof
 
 ### signal internals
 
-- [proof.md](reference/proof.md) — what `submit()` validates. validation interface; construction is [[zheng]]'s
-- [impulse.md](reference/impulse.md) — $\Delta\phi^*$: the proven focus shift carried by a signal
+- [proof.md](specs/proof.md) — what `submit()` validates. validation interface; construction is [[zheng]]'s
+- [impulse.md](specs/impulse.md) — $\Delta\phi^*$: the proven focus shift carried by a signal
 
 ### neuron
 
-- [identity.md](reference/identity.md) — Hemera hash of public key. no registration, no authority
-- [staking.md](reference/staking.md) — token movement as graph event. conviction UTXOs, adjacency updates
+- [identity.md](specs/identity.md) — Hemera hash of public key. no registration, no authority
+- [staking.md](specs/staking.md) — token movement as graph event. conviction UTXOs, adjacency updates
 
 ### cyberlink fields
 
-- [amount.md](reference/amount.md) — $a$: stake quantity. conviction UTXO, adjacency weight
-- [valence.md](reference/valence.md) — $v \in \{-1,0,+1\}$: epistemic prediction. BTS, ICBS markets
-- [time.md](reference/time.md) — $t$: block height. ordering, decay, discovery premium
+- [amount.md](specs/amount.md) — $a$: stake quantity. conviction UTXO, adjacency weight
+- [valence.md](specs/valence.md) — $v \in \{-1,0,+1\}$: epistemic prediction. BTS, ICBS markets
+- [time.md](specs/time.md) — $t$: block height. ordering, decay, discovery premium
 
 ### derived
 
-- [axon.md](reference/axon.md) — bundle of all cyberlinks between two particles. homoiconic, rankable
+- [axon.md](specs/axon.md) — bundle of all cyberlinks between two particles. homoiconic, rankable
 
 ## docs
 
