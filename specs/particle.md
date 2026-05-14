@@ -71,7 +71,7 @@ different uses of Hemera are separated at the input:
 
 ```
 IPFS CIDv1:  <version><multicodec><multihash><length><digest>   36-69 bytes
-nox CID:     <digest>                                           64 bytes
+particle:     <digest>                                          64 bytes
 ```
 
 inside the protocol, the 64-byte digest is the complete identifier. IPFS compatibility is a thin translation layer at the gateway — inside [[nox]], the wrapper never exists
