@@ -12,14 +12,14 @@ use std::collections::BTreeMap;
 
 use hemera::hash as hemera_hash;
 
-use bbg::{Cid, NeuronId};
+use bbg::{Particle, NeuronId};
 
 /// A single cyberlink inside a signal.
 pub struct CyberlinkRecord {
     pub neuron: NeuronId,
-    pub from: Cid,
-    pub to: Cid,
-    pub token: Cid,
+    pub from: Particle,
+    pub to: Particle,
+    pub token: Particle,
     pub amount: u64,
     pub valence: i8,
     pub height: u64,
@@ -29,9 +29,9 @@ pub struct CyberlinkRecord {
 pub struct Signal {
     pub neuron: NeuronId,
     pub links: Vec<CyberlinkRecord>,
-    pub delta_pi: Vec<(Cid, u64)>,
+    pub delta_pi: Vec<(Particle, u64)>,
     /// Hash of the previous signal in this neuron's chain.
-    pub prev: Cid,
+    pub prev: Particle,
     pub step: u64,
     /// Block height (0 until finalized).
     pub height: u64,
@@ -40,7 +40,7 @@ pub struct Signal {
 
 impl Signal {
     /// Canonical hash of this signal: hemera over (neuron ‖ step ‖ prev).
-    pub fn hash(&self) -> Cid {
+    pub fn hash(&self) -> Particle {
         let mut buf = [0u8; 72]; // 32 + 8 + 32
         buf[..32].copy_from_slice(&self.neuron);
         buf[32..40].copy_from_slice(&self.step.to_le_bytes());
@@ -79,7 +79,7 @@ impl SignalChain {
             return Err(ChainError::StepNotSequential);
         }
 
-        let expected_prev: Cid = if expected_step == 0 {
+        let expected_prev: Particle = if expected_step == 0 {
             [0u8; 32]
         } else {
             let last = self.entries.get(&(expected_step - 1)).ok_or(ChainError::PrevMismatch)?;
@@ -120,11 +120,11 @@ mod tests {
         [seed; 32]
     }
 
-    fn cid(seed: u8) -> Cid {
+    fn particle(seed: u8) -> Particle {
         [seed; 32]
     }
 
-    fn signal(neuron: NeuronId, step: u64, prev: Cid) -> Signal {
+    fn signal(neuron: NeuronId, step: u64, prev: Particle) -> Signal {
         Signal {
             neuron,
             links: vec![],
@@ -173,7 +173,7 @@ mod tests {
     fn wrong_prev_is_rejected() {
         let mut chain = SignalChain::new();
         chain.append(signal(neuron(1), 0, [0u8; 32])).unwrap();
-        let s1 = signal(neuron(1), 1, cid(99));
+        let s1 = signal(neuron(1), 1, particle(99));
         assert!(matches!(chain.append(s1), Err(ChainError::PrevMismatch)));
     }
 
