@@ -19,8 +19,8 @@ bbg.insert(signal) -> Result<Cid, DoubleSpend>:
 
 ### A1 — content addressing
 
-particle CIDs in ℓ⃗ match H(particle_bytes). a CID that does not resolve to its
-preimage fails here. cybergraph caches resolved CIDs; unknown CIDs are fetched
+particles in ℓ⃗ match H(particle_bytes). a particle that does not resolve to its
+preimage fails here. cybergraph caches resolved particles; unknown particles are fetched
 before validation.
 
 ### A2 — authentication
