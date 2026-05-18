@@ -37,7 +37,7 @@ the same structural link $(p, q)$ can carry conviction in multiple denominations
 - $(\nu, p, q, \text{CYB}, 100, +1, t_1)$
 - $(\nu, p, q, \text{H}, 50, +1, t_2)$
 
-expresses conviction in two currencies. the adjacency weight $A_{pq}$ sums both via $r(\tau)$. each creates a separate UTXO, a separate card, a separate yield stream
+expresses conviction in two currencies. the adjacency weight $A_{pq}$ sums both via $r(\tau)$. each creates a separate box, a separate card, a separate yield stream
 
 ## token as costly signal
 

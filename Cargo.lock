@@ -166,6 +166,8 @@ dependencies = [
  "bbg",
  "cyb-nebu",
  "cyber-hemera 0.3.0",
+ "cyber-lens",
+ "nox",
  "zheng",
 ]
 

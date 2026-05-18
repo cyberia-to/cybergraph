@@ -129,16 +129,40 @@ a DEX is not a contract. it is a semcon that validates swap cyberlinks. a lendin
 
 ## state
 
-one state: BBG. two visibility zones:
+a cyberlink destroys input boxes and creates output boxes. a box is what persists between two cyberlinks — the token holding. every box has two visibility properties that combine independently:
 
 ```
-BBG:
-  PRIVATE:   A_live[c] = commit_jali(v, ρ)    UTXO commitments (RLWE-encrypted values)
-             N_live[n] = 0 | 1                 nullifiers (spent flags)
-  PUBLIC:    BBG_poly(dimension, key) = value  aggregates + derived (queryable by anyone)
+chain visibility    local visibility
+────────────────    ────────────────
+encrypted           plaintext         ← default: private on chain, public to owner
+plaintext           plaintext         ← opt-in: public on chain, public to everyone
 ```
 
-every signal updates both zones atomically. UTXOs are nullified and committed (private, zero-knowledge). polynomial dimensions are updated (public). one zheng proof covers the full transition. validators verify the proof without seeing individual amounts or link authorship.
+there is no "private locally" — the owner always sees plaintext. chain privacy means encrypted for the world, not for the owner.
+
+```
+BBG (chain):
+  private box:  A_live[c] = commit_jali(v, ρ)              encrypted for all
+  public box:   BBG_poly(balances, H(owner || token)) = v   plaintext for all
+
+personal BBG (local):
+  owner store: (c → (v, ρ))                                 plaintext always, for owner only
+```
+
+box privacy is determined by the `to` address type — the cyberlink is unchanged:
+
+```
+to = stealth address (genies-derived)  →  private box  (A_live)
+to = direct neuron_id or card_id       →  public box   (BBG_poly balances)
+```
+
+a single signal mixes both freely. one zheng proof covers the full transition.
+
+spending:
+```
+private box:  nullifier + ZK proof of ownership
+public box:   auth signature + conservation check (no nullifier)
+```
 
 ---
 

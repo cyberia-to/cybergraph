@@ -52,7 +52,7 @@ lock_script(witness):
   return 0  // success
 ```
 
-the [[neuron]] provides its secret as a witness via `hint` (Layer 2). [[nox]] evaluates the lock script and produces a [[zheng]] proof that the script executed correctly. the proof goes on-chain. the secret stays private.
+the [[neuron]] provides its secret as a witness via `call` (Layer 2, pattern 16). [[nox]] evaluates the lock script and produces a [[zheng]] proof that the script executed correctly. the proof goes on-chain. the secret stays private.
 
 ### verification
 
@@ -112,7 +112,7 @@ PUBLIC INPUTS:
   nullifier:  [F_p; 4]         unique link identifier
   bbg_root:   [F_p; 4]         current BBG state root
 
-PRIVATE WITNESS (via hint):
+PRIVATE WITNESS (via call, pattern 16):
   secret:     [F_p; 4]         neuron preimage
   stake:      F_p              neuron stake amount
   membership_path: [...]       polynomial evaluation proof

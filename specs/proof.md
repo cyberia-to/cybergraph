@@ -19,7 +19,7 @@ the proof must certify three things together in one verification:
 | what | why |
 |------|-----|
 | every [[cyberlink]] in $\vec\ell$ is valid | correct signatures, valid particle references, non-expired |
-| all conviction UTXO movements are backed | each $(τ, a)$ spend has an unspent output; new UTXOs are created |
+| all conviction box movements are backed | each $(τ, a)$ spend has an unspent output; new boxes are created |
 | the [[impulse]] $\Delta\phi^*$ is correct | tri-kernel computation against current BBG root |
 
 one proof for all three. any verifier runs `decide(σ)` in $O(\log n)$ — no re-execution.

@@ -29,7 +29,7 @@ signal carries a valid zheng proof σ covering the entire batch atomically:
 
 - valid signature from ν over H(ℓ⃗ ‖ Δφ* ‖ t)
 - correctness of each cyberlink ℓ ∈ ℓ⃗ (valid particle references)
-- validity of all conviction UTXO movements (each (τ, a) spend is backed by unspent output)
+- validity of all conviction box movements (each (τ, a) spend is backed by unspent output)
 - correctness of Δφ* (tri-kernel computation against current BBG_root from latest header)
 
 one proof covers everything. verification: `decide(σ)` in O(log n) where n = |ℓ⃗|.
@@ -48,22 +48,22 @@ for the signal as a whole: neurons[ν].focus >= Σ cost(ℓ) for all ℓ ∈ ℓ
 cost(ℓ) = a (conviction amount) + base_fee.
 checked against current BBG_poly(neurons, ν, t) via Lens opening.
 
-### UTXO ownership
+## box ownership
 
-every conviction UTXO referenced in ℓ⃗ must be:
+every conviction box referenced in ℓ⃗ must be:
   - unspent: N(nullifier) ≠ 0 (Lens opening into N(x))
   - owned by ν: A(commitment) resolves to ν's key (Lens opening into A(x))
 
 note: BBG also checks double-spend structurally via N(x). cybergraph's ownership
 check is the semantic layer on top — it confirms the right neuron is spending,
-not just that the UTXO hasn't been spent by anyone.
+not just that the box hasn't been spent by anyone.
 
 ### conservation
 
-for all conviction UTXO movements in the signal:
+for all conviction box movements in the signal:
   Σ inputs = Σ outputs + fee
 
-verified by the zheng proof σ — it covers UTXO validity and conservation atomically.
+verified by the zheng proof σ — it covers box validity and conservation atomically.
 
 ### temporal ordering
 
@@ -98,7 +98,7 @@ network
   ▼
 cybergraph.submit(signal)
   │
-  ├─ validate: A1, A2, A3, focus, UTXO ownership, conservation, VDF
+  ├─ validate: A1, A2, A3, focus, box ownership, conservation, VDF
   │    any failure → ValidationError, signal dropped
   │
   ▼

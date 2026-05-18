@@ -36,16 +36,16 @@ see [[token]] for token types and standards. see [[amount]] for conviction mecha
 
 the from/to pair forms the structural edge in the knowledge graph. the token/amount pair is the economic weight. valence is the epistemic layer.
 
-## UTXO semantics
+## box model
 
-conviction is a [[UTXO]]. creating a cyberlink is a transaction: the author moves $a$ units of $token$ from the source ($from$) UTXO to a new output bound to the cyberlink record. funds always move from one object to another
+conviction is a box. creating a cyberlink is a transaction: the author moves $a$ units of $token$ from the source ($from$) box to a new output bound to the cyberlink record. funds always move from one object to another
 
 the conviction output can itself be spent:
 
-- transfer: spend the conviction UTXO to a new owner. the structural record stays in $L$; beneficial ownership moves. this is how the card's transferability operates at the protocol level
-- withdraw: spend the conviction UTXO back to the author's wallet. the economic position closes. the structural record remains
+- transfer: spend the conviction box to a new owner. the structural record stays in $L$; beneficial ownership moves. this is how the card's transferability operates at the protocol level
+- withdraw: spend the conviction box back to the author's wallet. the economic position closes. the structural record remains
 
-the non-fungibility of the card (5-tuple content + signal provenance) and the fungibility of the [[token]] (transferable UTXO) coexist: the assertion is non-fungible, the economic position is a standard UTXO output
+the non-fungibility of the card (5-tuple content + signal provenance) and the fungibility of the [[token]] (transferable box) coexist: the assertion is non-fungible, the economic position is a standard box
 
 ## CRUD operations
 
@@ -56,7 +56,7 @@ the append-only graph expresses all four operations through cyberlinks:
 | create | first record for structural pair $(from, to)$ | relation enters $L$ |
 | read | query $\phi^*$ at any block — no link required | nothing |
 | update | new record with new $(token, a, v)$ for the same pair | any mutable dimension |
-| delete | withdraw conviction UTXO + new record with $v = -1$ | economic position closed, epistemic signal negated |
+| delete | withdraw conviction box + new record with $v = -1$ | economic position closed, epistemic signal negated |
 
 the two mutable dimensions — epistemic ($v$) and economic ($a$) — vary independently. temporal context comes from the containing signal. every combination is meaningful:
 

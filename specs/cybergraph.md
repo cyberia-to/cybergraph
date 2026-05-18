@@ -23,7 +23,7 @@ $$\mathbb{G} = (P,\; N,\; L)$$
 
 $H: \text{Val} \to \mathbb{F}_p^8$ is the global [[Hemera]] hash primitive, fixed at genesis. Every particle is a hash of some value -- $P$ is a subset of $H$'s image. $\mathcal{T}$ and the karma function $\kappa$ are derived from $L$.
 
-Each element $\ell \in L$ is a [[cyberlink]] -- a 5-tuple $(p, q, \tau, a, v)$ carrying two [[particles]], a conviction stake, and an epistemic [[valence]]. The signing [[neuron]] $\nu$ and block height $t$ are attributes of the containing [[signal]], not of the cyberlink itself. The cyberlink is the only primitive from which the entire graph is built. See [[cyberlink]] for the full field specification, UTXO mechanics, and CRUD semantics.
+Each element $\ell \in L$ is a [[cyberlink]] -- a 5-tuple $(p, q, \tau, a, v)$ carrying two [[particles]], a conviction stake, and an epistemic [[valence]]. The signing [[neuron]] $\nu$ and block height $t$ are attributes of the containing [[signal]], not of the cyberlink itself. The cyberlink is the only primitive from which the entire graph is built. See [[cyberlink]] for the full field specification, box mechanics, and CRUD semantics.
 
 ---
 

@@ -2,7 +2,7 @@
 
 the fourth field of a [[cyberlink]]: $a \in \mathbb{R}_+$. the quantity of [[token]] staked as conviction on the assertion
 
-amount is what separates a structural claim from an economic commitment. a link with $a = 0$ is a bare assertion — it exists in the graph but carries no economic weight. a link with $a > 0$ is a funded position — the [[neuron]] has moved real [[tokens]] into a conviction UTXO bound to the claim
+amount is what separates a structural claim from an economic commitment. a link with $a = 0$ is a bare assertion — it exists in the graph but carries no economic weight. a link with $a > 0$ is a funded position — the [[neuron]] has moved real [[tokens]] into a conviction box bound to the claim
 
 ## definition
 
@@ -26,15 +26,15 @@ $$A^{\text{eff}}_{pq} = \sum_\ell a(\ell) \cdot \kappa(\nu(\ell)) \cdot f(m(\ell
 
 amount is one of three factors. a link with high amount but low [[karma]] or low market price contributes little. all three must align for maximum effective weight
 
-## conviction as UTXO
+## conviction as box
 
-creating a cyberlink moves $a$ tokens of denomination $\tau$ from the author's wallet UTXO to a new output bound to the cyberlink record. this UTXO is:
+creating a cyberlink moves $a$ tokens of denomination $\tau$ from the author's wallet box to a new output bound to the cyberlink record. this box is:
 
 - transferable — spend to a new owner. the structural link remains; beneficial ownership moves
 - withdrawable — spend back to the author's wallet. the economic position closes; the structural record remains
 - yield-bearing — earns proportionally to $\Delta\phi^*(q, t)$ over time
 
-the conviction UTXO is the financial instrument. the cyberlink record is the assertion. they are separable
+the conviction box is the financial instrument. the cyberlink record is the assertion. they are separable
 
 ## amount and costly signaling
 

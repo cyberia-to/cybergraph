@@ -24,7 +24,7 @@ a neuron is a tuple $(\text{id}, \text{pk}, S, F, K)$:
 
 **N2 (costly participation):** every [[cyberlink]] in a [[signal]] consumes focus. $\Delta F \geq |\vec\ell| \cdot c_{\min}$ where $c_{\min}$ is the minimum focus cost per link.
 
-**N3 (stake-bounded links):** a neuron cannot commit [[cyberlinks]] with total [[amount]] exceeding available stake. conviction UTXOs are created and locked.
+**N3 (stake-bounded links):** a neuron cannot commit [[cyberlinks]] with total [[amount]] exceeding available stake. conviction boxes are created and locked.
 
 **N4 (karma accountability):** karma accrues from [[valence]] predictions that converge with the collective [[focus distribution]]. no external karma injection.
 

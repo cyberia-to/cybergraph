@@ -16,14 +16,14 @@ this is the default: stake once, [[attention]] flows to everything you link. no 
 
 ## conviction — per-link staking
 
-the $(\tau, a)$ fields in a [[cyberlink]] are a [[UTXO]]. creating a link locks [[tokens]] of denomination $\tau$ with amount $a$ directly into that edge. this is conviction — economic weight bound to a specific assertion
+the $(\tau, a)$ fields in a [[cyberlink]] are a box. creating a link locks [[tokens]] of denomination $\tau$ with amount $a$ directly into that edge. this is conviction — economic weight bound to a specific assertion
 
 conviction is stronger than [[will]]: it prices a single claim, not the [[neuron]]'s entire portfolio. high conviction on one link signals "I bet specifically on this connection"
 
 conviction can be:
-- maintained — the UTXO stays, the link carries weight
-- withdrawn — spend the UTXO back to wallet, the link loses economic weight but the structural record remains
-- transferred — spend the UTXO to a new owner, the assertion stays but beneficial ownership moves
+- maintained — the box stays, the link carries weight
+- withdrawn — spend the box back to wallet, the link loses economic weight but the structural record remains
+- transferred — spend the box to a new owner, the assertion stays but beneficial ownership moves
 
 ## fine-tuning
 
@@ -48,6 +48,6 @@ $$A^{\text{eff}}_{pq} = \sum_\ell a(\ell) \cdot \kappa(\nu(\ell)) \cdot f(m(\ell
 
 where $a(\ell)$ is conviction + [[will]]-derived [[attention]], $\kappa$ is [[karma]], and $f(m)$ is the [[coupling|ICBS]] market weight. staking determines the $a$ term — the economic input to [[focus]] computation
 
-see [[will]] for the lock mechanics. see [[cyber/link]] for the conviction UTXO model. see [[attention]] for how [[will]] produces per-target weight
+see [[will]] for the lock mechanics. see [[cyber/link]] for the conviction box model. see [[attention]] for how [[will]] produces per-target weight
 
 discover all [[concepts]]
