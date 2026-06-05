@@ -4,7 +4,7 @@ a bundle of [[cyberlinks]] a [[neuron]] commits in a single [[step]] — the ato
 
 ## structure
 
-$$s \;=\; (\nu,\; \vec\ell,\; \Delta\phi^*,\; \sigma,\; t)$$
+$$s \;=\; (\nu,\; \vec\ell,\; \Delta\phi^*,\; \sigma,\; h_0,\; h_1)$$
 
 | field | name | type | semantics |
 |-------|------|------|-----------|
@@ -12,7 +12,12 @@ $$s \;=\; (\nu,\; \vec\ell,\; \Delta\phi^*,\; \sigma,\; t)$$
 | $\vec\ell$ | links | $L^+$ | one or more [[cyberlinks]] — each a 5-tuple $(p, q, \tau, a, v)$ |
 | $\Delta\phi^*$ | [[cyber/impulse]] | $(P \times \mathbb{F}_p)^*$ | sparse [[focus]] update: how the batch of links shifts $\phi^*$ |
 | $\sigma$ | proof | $\Pi$ | [[zheng]] proof covering the [[cyber/impulse]], all conviction box movements, and [[cyberlink]] validity against the current [[BBG]] root |
-| $t$ | at | $\mathbb{Z}_{\geq 0}$ | block height |
+| $h_0$ | [[inception]] | $\mathbb{Z}_{\geq 0}$ | block height when the [[neuron]] declared the signal |
+| $h_1$ | [[sealing]] | $\mathbb{Z}_{\geq 0}$ | block height when the signal was finalized and proven |
+
+a signal has duration: $h_0$ marks when the [[neuron]] committed to the action; $h_1$ marks when the proof was produced and the signal became final. the gap $h_1 - h_0$ is the signal's span
+
+before $h_1$ is assigned and $\sigma$ produced, the signal exists as an [[intent]]: declared, identity-proven, but not yet sealed
 
 the signal separates what a [[neuron]] asserts (the [[cyberlinks]]) from what the assertion computes (the [[cyber/impulse]]). see [[cyber/impulse]] for how $\Delta\phi^*$ is computed
 

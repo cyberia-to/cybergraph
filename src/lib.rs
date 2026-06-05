@@ -13,3 +13,7 @@ pub mod vdf;
 
 pub use chain::{ChainError, CyberlinkRecord, Signal, SignalChain};
 pub use vdf::{VdfProof, challenge_from_hash, evaluate as vdf_evaluate, verify as vdf_verify};
+
+// Re-export the foundational identity types so downstream crates do not
+// need a direct dependency on bbg just to name a Particle or NeuronId.
+pub use bbg::{NeuronId, Particle};

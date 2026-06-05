@@ -216,7 +216,7 @@ The [[cybergraph]] is the protocol. Every core function runs through the same fi
 | relay payment | delivery proofs as [[particles]], [[focus]] as payment -- see [[cyber/communication]] |
 | version control | patches as [[cyberlinks]], repos as subgraphs -- see [[cyber/patch]] |
 | file system | `~` prefix resolves through [[cyberlinks]] -- see [[name/resolution]] |
-| type system | [[semantic conventions]] from link [[topology]] -- see [[neural]] |
+| type system | [[dialects]] from link [[topology]] -- see [[neural]] |
 | computation | [[tru]]/[[trident]]/[[nox]] read and consume graph state |
 | data availability | [[NMT]] indexes double as DA layer -- see [[storage proofs]] |
 | sybil resistance | stake-weighted $\phi^*$, no external identity |

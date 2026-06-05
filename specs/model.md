@@ -80,7 +80,7 @@ every cyberlink is a plumb Pay operation. there is no separate lock script layer
 ```
 auth_hash      WHO     hemera(secret) == leaf.auth_hash    ownership of from token
 conservation   WHAT    Σ inputs(d) ≥ Σ outputs(d)          token conservation
-hooks          HOW     semcon rules for this link type      semantic validity
+hooks          HOW     dialect rules for this link type      semantic validity
 ```
 
 proving ownership of the `from` token is the only authorization needed. there is no other "who can act" question — token ownership IS the right to link.
@@ -121,9 +121,9 @@ ethereum:   A.method() → calls B → calls C      ordering matters, reentrancy
 cyber:      proof(A valid) ⊗ proof(B valid) ⊗ proof(C valid) = proof(signal valid)
 ```
 
-a signal batches multiple cyberlinks governed by different semcons. zheng validates all of them in one folded proof via HyperNova. 1000 cyberlink proofs fold into one constant-size proof. no ordering constraints, no reentrancy surface, no call stack.
+a signal batches multiple cyberlinks governed by different dialects. zheng validates all of them in one folded proof via HyperNova. 1000 cyberlink proofs fold into one constant-size proof. no ordering constraints, no reentrancy surface, no call stack.
 
-a DEX is not a contract. it is a semcon that validates swap cyberlinks. a lending protocol is not a contract. it is a semcon that validates borrow/repay cyberlinks. every application is semcon rules + optional progs. the graph is the state.
+a DEX is not a contract. it is a dialect that validates swap cyberlinks. a lending protocol is not a contract. it is a dialect that validates borrow/repay cyberlinks. every application is dialect rules + optional progs. the graph is the state.
 
 ---
 
@@ -191,7 +191,7 @@ prog lifecycle (both runtimes):
   plumb validates                           ← identical path as manual cyberlinks
 ```
 
-progs run outside the proof circuit. the cyberlinks they produce go through normal plumb validation. progs have no elevated permissions — the semcon does not care whether the author is a human, a Rune prog, or a Trident warrior.
+progs run outside the proof circuit. the cyberlinks they produce go through normal plumb validation. progs have no elevated permissions — the dialect does not care whether the author is a human, a Rune prog, or a Trident warrior.
 
 `os.cyber.*` is the syscall ABI — a Trident namespace task. Rune implements bindings to the same interface.
 
@@ -199,7 +199,7 @@ progs run outside the proof circuit. the cyberlinks they produce go through norm
 
 ## state queries
 
-semcon hooks and progs read BBG_poly state without spending anything:
+dialect hooks and progs read BBG_poly state without spending anything:
 
 ```
 bbg_query(neurons,   ν,       karma)     is this neuron reputable?
@@ -215,9 +215,9 @@ O(1) polynomial evaluation. one lens opening. ~200 bytes proof. replaces Ethereu
 
 | ethereum | cyber |
 |---|---|
-| contract deployment | register semcon (cyberlink in the graph) |
+| contract deployment | register dialect (cyberlink in the graph) |
 | contract storage | BBG_poly dimensions |
-| function call | cyberlink with matching semcon |
+| function call | cyberlink with matching dialect |
 | msg.sender | `from` token's plumb auth |
 | wallet | neuron card (identity IS the wallet) |
 | ERC-20 | TSP-1 coin |
