@@ -3,17 +3,26 @@
 // crystal-type: source
 // crystal-domain: cyber
 // ---
-//! cybergraph — signal lifecycle, equivocation detection, and local sync.
+//! cybergraph — local-first cyberlink processor.
 //!
-//! owns layer 1 (validity) and layer 2 (ordering) from the structural sync spec.
-//! calls `bbg::apply_tx` for layer 3 (completeness / state).
+//! cybergraph is the unified API for cyberlink lifecycle: declare an intent,
+//! seal an intent into a signal, submit a discrete signal (`link`), subscribe
+//! to events, and query cybergraph relations via `inf`.
+//!
+//! Backends:
+//!   bbg          — authenticated state (store)
+//!   cyber-sync   — sync-protocol mechanics: chain, VDF, equivocation, DAS, CRDT
+//!   radio        — wire transport
+//!
+//! Signal/chain/VDF types are re-exported from `cyber-sync` so downstream
+//! callers (soma, soft3 SDK) have a single import for the public API.
 
-pub mod chain;
-pub mod vdf;
+// Re-export foundational identity types so downstream crates don't need a
+// direct dependency on bbg just to name a Particle or NeuronId.
+pub use bbg::{NeuronId, Particle, IntentRecord, SignalRecord};
 
-pub use chain::{ChainError, CyberlinkRecord, Signal, SignalChain};
-pub use vdf::{VdfProof, challenge_from_hash, evaluate as vdf_evaluate, verify as vdf_verify};
-
-// Re-export the foundational identity types so downstream crates do not
-// need a direct dependency on bbg just to name a Particle or NeuronId.
-pub use bbg::{NeuronId, Particle};
+// Re-export the signal lifecycle primitives owned by sync.
+pub use cyber_sync::{
+    ChainError, CyberlinkRecord, Signal, SignalChain,
+    VdfProof, vdf_evaluate, vdf_verify, challenge_from_hash,
+};

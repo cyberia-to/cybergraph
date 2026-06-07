@@ -38,8 +38,9 @@ fn make_axis_opening() -> AxisOpening {
     let commitment = Brakedown::commit(&poly);
     let point      = vec![Goldilocks::ZERO, Goldilocks::ZERO];
     let value      = Goldilocks::new(1);
-    let opening    = { let mut lt = LensTx::new(b"axis-open"); Brakedown::open(&poly, &point, &mut lt) };
-    AxisOpening { commitment, point, value, opening }
+    let transcript_seed = b"axis-open".to_vec();
+    let opening = { let mut lt = LensTx::new(&transcript_seed); Brakedown::open(&poly, &point, &mut lt) };
+    AxisOpening { commitment, point, value, opening, transcript_seed }
 }
 
 // ── mixed traces ──────────────────────────────────────────────────────────────

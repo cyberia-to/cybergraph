@@ -7,11 +7,12 @@
 name = "cybergraph"
 version = "0.1.0"
 edition = "2024"
-description = "signal lifecycle, equivocation detection, and local sync — coordinator layer over BBG"
+description = "local-first cyberlink processor — unified API over bbg + sync + radio"
 license = "Cyber"
 
 [dependencies]
 bbg    = { path = "../bbg/rs" }
+cyber-sync = { path = "../sync", default-features = false }
 hemera = { package = "cyber-hemera", path = "../hemera/rs" }
 nebu   = { package = "cyb-nebu", path = "../strata/nebu/rs" }
 zheng  = { path = "../zheng" }
