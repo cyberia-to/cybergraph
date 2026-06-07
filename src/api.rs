@@ -27,6 +27,11 @@ use std::collections::BTreeMap;
 
 use bbg::{Bbg, IntentRecord, NeuronId, Particle};
 use cyber_sync::{ChainError, Signal, SignalChain};
+use inf_eval::{eval, Ctx, Output};
+use inf_parse::parse;
+use inf_plan::plan;
+
+use crate::source::BbgSource;
 
 /// Structured description of an intended action.
 ///
@@ -91,6 +96,14 @@ pub enum ApiError {
     UnknownIntent(Particle),
 }
 
+/// Errors from `query` — one variant per inf pipeline stage.
+#[derive(Debug)]
+pub enum QueryError {
+    Parse(String),
+    Plan(String),
+    Eval(String),
+}
+
 /// The cybergraph runtime: bbg state + per-neuron chains + event bus.
 ///
 /// Scope is local-first — a cybergraph instance processes whichever cyberlinks
@@ -152,12 +165,21 @@ impl Cybergraph {
         self.subscribers.push((filter, Box::new(handler)));
     }
 
-    /// query — run an inf (CozoScript) query. The actual execution is
-    /// delegated to inf; the relation schema lives in specs/query.md.
-    /// This stub returns the raw script for the caller to feed into inf.
-    pub fn query(&self, inf_script: &str) -> String {
-        // Real implementation routes to a CozoDB instance fed by bbg state.
-        inf_script.to_string()
+    /// query — run an inf query over local bbg state.
+    ///
+    /// Pipeline: parse → plan → eval against a `BbgSource` (the bbg aggregate
+    /// relations: particles, neurons, axons, focus, karma, signals). Returns the
+    /// inf `Output` (columns + rows, or a derived mutation batch).
+    ///
+    /// Release 0: reads run over the local snapshot and are not yet provable
+    /// (`BbgSource::provable` is false) — Lens openings over the committed root
+    /// arrive in a later release. The query language itself lives in [[inf]].
+    pub fn query(&self, inf_script: &str) -> Result<Output, QueryError> {
+        let prog = parse(inf_script)
+            .map_err(|e| QueryError::Parse(format!("[{}:{}] {}", e.line, e.col, e.msg)))?;
+        let ir = plan(&prog).map_err(|e| QueryError::Plan(e.msg))?;
+        let src = BbgSource::new(&self.bbg.state);
+        eval(&ir, &src, &Ctx::default()).map_err(|e| QueryError::Eval(e.msg))
     }
 
     // ── internals ────────────────────────────────────────────────────────────
@@ -388,9 +410,22 @@ mod tests {
     }
 
     #[test]
-    fn query_returns_script_stub() {
+    fn query_runs_inf_over_bbg_state() {
+        // Seed two particles via a link, then query the focus relation.
+        let mut g = Cybergraph::new();
+        g.link(one_link_signal(n(1), 0, [0u8; 32], p(2), p(3))).unwrap();
+
+        // particles relation exposes every materialized particle.
+        let out = g.query("?[cid, energy] := particles{cid, energy}").expect("query runs");
+        assert_eq!(out.columns, vec!["cid", "energy"]);
+        // target p3 (energy 1) + axon-particle H(2,3) both materialize.
+        assert!(!out.rows.is_empty(), "query returns the materialized particles");
+    }
+
+    #[test]
+    fn query_parse_error_is_reported() {
         let g = Cybergraph::new();
-        let q = g.query("?[x] := *cyberlinks{}");
-        assert_eq!(q, "?[x] := *cyberlinks{}");
+        let err = g.query("this is not inf");
+        assert!(matches!(err, Err(QueryError::Parse(_))));
     }
 }

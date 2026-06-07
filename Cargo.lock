@@ -293,6 +293,11 @@ dependencies = [
  "cyber-hemera",
  "cyber-lens",
  "cyber-sync",
+ "inf-eval",
+ "inf-parse",
+ "inf-plan",
+ "inf-source",
+ "inf-value",
  "nox",
  "zheng",
 ]
@@ -314,6 +319,49 @@ name = "heck"
 version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2304e00983f87ffb38b55b444b5e3b60a884b5d30c0fca7d82fe33449bbe55ea"
+
+[[package]]
+name = "inf-ast"
+version = "0.1.0"
+
+[[package]]
+name = "inf-eval"
+version = "0.1.0"
+dependencies = [
+ "inf-ast",
+ "inf-source",
+ "inf-value",
+]
+
+[[package]]
+name = "inf-lex"
+version = "0.1.0"
+
+[[package]]
+name = "inf-parse"
+version = "0.1.0"
+dependencies = [
+ "inf-ast",
+ "inf-lex",
+]
+
+[[package]]
+name = "inf-plan"
+version = "0.1.0"
+dependencies = [
+ "inf-ast",
+]
+
+[[package]]
+name = "inf-source"
+version = "0.1.0"
+dependencies = [
+ "inf-value",
+]
+
+[[package]]
+name = "inf-value"
+version = "0.1.0"
 
 [[package]]
 name = "is_terminal_polyfill"

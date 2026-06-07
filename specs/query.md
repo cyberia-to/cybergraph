@@ -22,6 +22,25 @@ this spec defines only the **relation schema** that cybergraph commits to exposi
 
 cybergraph guarantees that the relations below exist and are kept in sync with the signal log. inf can be pointed at them without further coupling.
 
+## implementation status (Release 0)
+
+`Cybergraph::query(inf_script)` is wired to the inf engine: `parse → plan → eval` over a `BbgSource` that projects local bbg aggregate state into inf relations. The bootstrap path runs the native inf evaluator (`inf-eval`), not CozoDB — CozoDB is inf's differential oracle, and shrinks to zero as inf self-hosts (see [[inf/README]]).
+
+`BbgSource` exposes the relations bbg actually holds as public aggregate state:
+
+| relation | columns | bbg source |
+|---|---|---|
+| `particles` | cid, energy, pi_star, weight | `particles` map |
+| `neurons` | id, focus, karma, stake | `neurons` map |
+| `axons` | from, to, weight_sum | `axon_edges` × `particles[axon].weight` |
+| `focus` | particle, score | `particles[cid].pi_star` |
+| `karma` | neuron, k | `neurons[id].karma` |
+| `signals` | step, neuron, link_count, height | `signals` map |
+
+`cyberlinks` is **not** exposed by the bbg source. Individual cyberlinks are the private layer (mutator set); bbg holds only the public aggregate, so a query referencing `cyberlinks` over the bbg source sees an empty relation. The private cyberlink source is a separate (future) `RelationSource`.
+
+Release 0 reads run over the local snapshot and are not yet provable (`BbgSource::provable() == false`); Lens openings over the committed root arrive in a later release.
+
 ## exposed relations
 
 every relation is a stored CozoDB relation keyed by content-addressed identifiers. types follow [[inf/stored relations]] conventions.

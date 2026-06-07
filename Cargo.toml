@@ -17,6 +17,13 @@ hemera = { package = "cyber-hemera", path = "../hemera/rs" }
 nebu   = { package = "cyb-nebu", path = "../strata/nebu/rs" }
 zheng  = { path = "../zheng" }
 
+# inf query engine — the local query path runs inf IR over a bbg-backed source.
+inf-value  = { path = "../inf/rs/value" }
+inf-source = { path = "../inf/rs/source" }
+inf-parse  = { path = "../inf/rs/parse" }
+inf-plan   = { path = "../inf/rs/plan" }
+inf-eval   = { path = "../inf/rs/eval" }
+
 [dev-dependencies]
 nox  = { path = "../nox/rs" }
 lens = { package = "cyber-lens", path = "../lens/src" }

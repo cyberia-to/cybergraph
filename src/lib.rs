@@ -18,6 +18,7 @@
 //! callers (soma, soft3 SDK) have a single import for the public API.
 
 pub mod api;
+pub mod source;
 
 // Re-export foundational identity types so downstream crates don't need a
 // direct dependency on bbg just to name a Particle or NeuronId.
@@ -30,4 +31,8 @@ pub use cyber_sync::{
 };
 
 // The five-verb public API.
-pub use api::{ApiError, Cybergraph, Event, Filter, Intent, Scope};
+pub use api::{ApiError, Cybergraph, Event, Filter, Intent, QueryError, Scope};
+pub use source::BbgSource;
+
+// inf query result type, re-exported so callers don't depend on inf-eval directly.
+pub use inf_eval::Output as QueryOutput;
