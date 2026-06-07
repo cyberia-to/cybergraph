@@ -30,7 +30,9 @@ query(inf_script)        run an [[inf]] (CozoScript) query over relations
 
 the query language is [[inf]] — datalog over the cybergraph, implemented via CozoDB. cybergraph exposes a stable set of stored relations (cyberlinks, particles, neurons, signals, focus, karma) and delegates query execution to inf. see [specs/query.md](specs/query.md) for the relation schema and [[inf/README]] for the language.
 
-internal fan-out: cybergraph calls `bbg.apply_intent` / `bbg.apply_signal_record` for state, `cyber_sync::SignalChain` for ordering, and radio (via sync) for distribution. soma sees a single import surface.
+internal fan-out: `link`/`seal` order the signal through `cyber_sync::SignalChain`, then apply its cyberlinks to authenticated state via `bbg.insert` (particle energy, axon weights, focus debit), then record the signal header. `intend` persists through `bbg.apply_intent`. soma sees a single import surface.
+
+Release 0 scope (local-first): cyberlinks land in bbg state and move `BBG_root`; no network, no STARK validation, no conviction `box_moves` yet (the local `CyberlinkRecord` carries none). `query` is wired to inf in a later release.
 
 UTXO management is internal to `submit()`: conviction UTXOs created and spent per cyberlink, token movements trigger adjacency updates that tru reads.
 

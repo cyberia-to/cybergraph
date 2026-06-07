@@ -131,18 +131,7 @@ impl Cybergraph {
         if !self.bbg.state.intents.contains_key(&intent_key) {
             return Err(ApiError::UnknownIntent(intent_key));
         }
-        let neuron = signal.neuron;
-        let step = signal.step;
-        self.chain_append(signal.clone())?;
-        // The signal carries CyberlinkRecord but bbg.insert expects bbg::Signal —
-        // adapt: write a header-only record and skip cyberlink application for
-        // now (full bridge lives in Phase 5+).
-        self.bbg.apply_signal_record(step, bbg::SignalRecord {
-            neuron,
-            link_count: signal.links.len() as u32,
-            block_height: signal.height,
-            proof_hash: [0u8; 32],
-        });
+        let (neuron, step) = self.commit_signal(signal)?;
         self.emit(Event::SignalSealed { intent_key, neuron, step });
         Ok(())
     }
@@ -150,15 +139,7 @@ impl Cybergraph {
     /// link — atomic, one-shot submit. No prior intent required. Used for
     /// discrete local statements where the process does not need phasing.
     pub fn link(&mut self, signal: Signal) -> Result<(), ApiError> {
-        let neuron = signal.neuron;
-        let step = signal.step;
-        self.chain_append(signal.clone())?;
-        self.bbg.apply_signal_record(step, bbg::SignalRecord {
-            neuron,
-            link_count: signal.links.len() as u32,
-            block_height: signal.height,
-            proof_hash: [0u8; 32],
-        });
+        let (neuron, step) = self.commit_signal(signal)?;
         self.emit(Event::Linked { neuron, step });
         Ok(())
     }
@@ -180,6 +161,40 @@ impl Cybergraph {
     }
 
     // ── internals ────────────────────────────────────────────────────────────
+
+    /// Order, apply, and record a signal. Shared by `link` and `seal`.
+    ///
+    /// Three steps, in order:
+    ///   1. chain ordering — equivocation / step / prev (gate: sync)
+    ///   2. state application — cyberlinks land in bbg via `insert` (gate: double-spend)
+    ///   3. header record — the signal header enters the signals dimension
+    ///
+    /// Release 0: `box_moves` is always empty (CyberlinkRecord carries none), so
+    /// `insert` is infallible here and the partial-failure window between step 1
+    /// and step 2 cannot open. When conviction spends arrive (Release 1), this
+    /// must become a validate-then-apply two-phase commit.
+    fn commit_signal(&mut self, signal: Signal) -> Result<(NeuronId, u64), ApiError> {
+        let neuron = signal.neuron;
+        let step = signal.step;
+        let link_count = signal.links.len() as u32;
+        let height = signal.height;
+
+        let bbg_signal = bridge_to_bbg(&signal);
+
+        // 1. ordering gate
+        self.chain_append(signal)?;
+        // 2. apply cyberlinks to authenticated state
+        self.bbg.insert(&bbg_signal).map_err(ApiError::BbgRejected)?;
+        // 3. record the signal header
+        self.bbg.apply_signal_record(step, bbg::SignalRecord {
+            neuron,
+            link_count,
+            block_height: height,
+            proof_hash: [0u8; 32],
+        });
+
+        Ok((neuron, step))
+    }
 
     fn chain_append(&mut self, signal: Signal) -> Result<(), ApiError> {
         let chain = self.chains.entry(signal.neuron).or_default();
@@ -205,6 +220,31 @@ impl Cybergraph {
     }
 }
 
+/// Convert a sync signal into a bbg signal for state application.
+///
+/// Maps each `CyberlinkRecord` to a `bbg::Cyberlink` (from, to, token, amount,
+/// valence). Release 0 limitation: `CyberlinkRecord` carries no box movements,
+/// so `box_moves` is empty — the local path applies cyberlinks only; conviction
+/// spends arrive in Release 1.
+fn bridge_to_bbg(signal: &Signal) -> bbg::Signal {
+    bbg::Signal {
+        neuron: signal.neuron,
+        links: signal
+            .links
+            .iter()
+            .map(|l| bbg::Cyberlink {
+                from: l.from,
+                to: l.to,
+                token: l.token,
+                amount: l.amount,
+                valence: l.valence,
+            })
+            .collect(),
+        box_moves: Vec::new(),
+        height: signal.height,
+    }
+}
+
 impl Default for Cybergraph {
     fn default() -> Self {
         Self::new()
@@ -214,6 +254,7 @@ impl Default for Cybergraph {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use cyber_sync::CyberlinkRecord;
     use std::sync::{Arc, Mutex};
 
     fn n(seed: u8) -> NeuronId { [seed; 32] }
@@ -229,6 +270,18 @@ mod tests {
 
     fn empty_signal(neuron: NeuronId, step: u64, prev: Particle) -> Signal {
         Signal { neuron, links: vec![], delta_pi: vec![], prev, step, height: 0, proof: None }
+    }
+
+    fn one_link_signal(neuron: NeuronId, step: u64, prev: Particle, from: Particle, to: Particle) -> Signal {
+        Signal {
+            neuron,
+            links: vec![CyberlinkRecord { neuron, from, to, token: p(0), amount: 1, valence: 1, height: 0 }],
+            delta_pi: vec![],
+            prev,
+            step,
+            height: 0,
+            proof: None,
+        }
     }
 
     #[test]
@@ -261,6 +314,47 @@ mod tests {
         let s = empty_signal(n(1), 0, [0u8; 32]);
         g.link(s).unwrap();
         assert!(g.bbg.state.signals.contains_key(&0));
+    }
+
+    #[test]
+    fn link_applies_cyberlinks_to_bbg_state() {
+        let mut g = Cybergraph::new();
+        let s = one_link_signal(n(1), 0, [0u8; 32], p(2), p(3));
+        g.link(s).unwrap();
+        // The cyberlink (p2 → p3, amount 1) must reach bbg state, not just the header.
+        let target = g.bbg.state.particles.get(&p(3)).expect("target particle materialized");
+        assert_eq!(target.energy, 1, "target energy reflects the staked link");
+        assert!(g.bbg.state.axons_out.get(&p(2)).is_some(), "outgoing axon recorded");
+        assert!(g.bbg.state.axons_in.get(&p(3)).is_some(), "incoming axon recorded");
+    }
+
+    #[test]
+    fn link_moves_the_root() {
+        let mut g = Cybergraph::new();
+        let before = g.bbg.state.root;
+        g.link(one_link_signal(n(1), 0, [0u8; 32], p(2), p(3))).unwrap();
+        assert_ne!(g.bbg.state.root, before, "applying cyberlinks advances BBG_root");
+    }
+
+    #[test]
+    fn seal_applies_cyberlinks_to_bbg_state() {
+        let mut g = Cybergraph::new();
+        let key = g.intend(intent(n(1), 0, p(3))).unwrap();
+        let s = one_link_signal(n(1), 0, [0u8; 32], p(2), p(3));
+        g.seal(key, s).unwrap();
+        assert_eq!(g.bbg.state.particles.get(&p(3)).unwrap().energy, 1);
+    }
+
+    #[test]
+    fn link_accumulates_across_signals() {
+        let mut g = Cybergraph::new();
+        let s0 = one_link_signal(n(1), 0, [0u8; 32], p(2), p(3));
+        let prev = s0.hash(); // chain link for the next signal
+        g.link(s0).unwrap();
+        let s1 = one_link_signal(n(1), 1, prev, p(2), p(3));
+        g.link(s1).unwrap();
+        // Two staked links onto p3 accumulate energy.
+        assert_eq!(g.bbg.state.particles.get(&p(3)).unwrap().energy, 2);
     }
 
     #[test]
