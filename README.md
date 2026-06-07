@@ -1,13 +1,13 @@
 # cybergraph
 
-signal in → .graph out. the glue between [[neuron]]s and the compute stack.
+signal in → [[inf]] queries out. the glue between [[neuron]]s and the compute stack.
 
-takes [[signal]]s from [[BBG]], validates [[proof]]s, persists [[cyberlink]]s, manages conviction UTXOs, and routes events to [[tru]] and [[glia]] via subscriptions. embeds a link query engine that speaks `.graph`.
+takes [[signal]]s from [[BBG]], validates [[proof]]s, persists [[cyberlink]]s, manages conviction boxes, and routes events to [[tru]] and [[glia]] via subscriptions. exposes the cybergraph relations to [[inf]] (CozoDB-backed datalog) as the link query layer.
 
 ```
-neurons  →  signals  →  cybergraph  →  .graph queries  →  tru
-                              ↓                            glia
-                         subscriptions  ────────────────→  tru / glia / mir
+neurons  →  signals  →  cybergraph  ─── inf queries ─── ▶  tru
+                              ↓                              glia
+                         subscriptions  ──────────────────▶  tru / glia / mir
                               ↓
                          BBG (state)
 ```
@@ -16,10 +16,11 @@ neurons  →  signals  →  cybergraph  →  .graph queries  →  tru
 
 ```
 submit(signal)            validate σ, extract cyberlinks, persist, emit events
-query(.graph)             link query engine — from?, to?, neuron?, depth?
-query(from=ν, to=p)       attention: how much focus ν projects onto p
+query(inf_script)         run an [[inf]] (CozoScript) query over cybergraph relations
 subscribe(filter)         stream cyberlinks to tru / glia consumers
 ```
+
+the query language is [[inf]] — datalog over the cybergraph, implemented via CozoDB. cybergraph exposes a stable set of stored relations (cyberlinks, particles, neurons, signals, focus, karma) and delegates query execution to inf. see [specs/query.md](specs/query.md) for the relation schema and [[inf/README]] for the language.
 
 UTXO management is internal to `submit()`: conviction UTXOs created and spent per cyberlink, token movements trigger adjacency updates that tru reads.
 
@@ -41,6 +42,10 @@ UTXO management is internal to `submit()`: conviction UTXOs created and spent pe
 
 - [proof.md](specs/proof.md) — what `submit()` validates. validation interface; construction is [[zheng]]'s
 - [impulse.md](specs/impulse.md) — $\Delta\phi^*$: the proven focus shift carried by a signal
+
+### query interface
+
+- [query.md](specs/query.md) — relations cybergraph exposes to [[inf]]. schema only; language spec lives in [[inf/README]]
 
 ### neuron
 
