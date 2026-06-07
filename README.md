@@ -14,13 +14,23 @@ neurons  →  signals  →  cybergraph  ─── inf queries ─── ▶  tru
 
 ## API
 
+five verbs over a local cyberlink processor:
+
 ```
-submit(signal)            validate σ, extract cyberlinks, persist, emit events
-query(inf_script)         run an [[inf]] (CozoScript) query over cybergraph relations
-subscribe(filter)         stream cyberlinks to tru / glia consumers
+// lifecycle (discrete, ordered phases)
+intend(scope)            declare an unsealed intent: signed scope, no STARK yet
+seal(key, signal)        finalize an intent into a complete signal with STARK
+link(signal)             atomic one-shot submit for discrete local statements
+                         (no separate intent phase required)
+
+// interaction (read / observe)
+subscribe(filter)        register a handler over an event filter
+query(inf_script)        run an [[inf]] (CozoScript) query over relations
 ```
 
 the query language is [[inf]] — datalog over the cybergraph, implemented via CozoDB. cybergraph exposes a stable set of stored relations (cyberlinks, particles, neurons, signals, focus, karma) and delegates query execution to inf. see [specs/query.md](specs/query.md) for the relation schema and [[inf/README]] for the language.
+
+internal fan-out: cybergraph calls `bbg.apply_intent` / `bbg.apply_signal_record` for state, `cyber_sync::SignalChain` for ordering, and radio (via sync) for distribution. soma sees a single import surface.
 
 UTXO management is internal to `submit()`: conviction UTXOs created and spent per cyberlink, token movements trigger adjacency updates that tru reads.
 

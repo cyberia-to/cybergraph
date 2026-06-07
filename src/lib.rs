@@ -17,6 +17,8 @@
 //! Signal/chain/VDF types are re-exported from `cyber-sync` so downstream
 //! callers (soma, soft3 SDK) have a single import for the public API.
 
+pub mod api;
+
 // Re-export foundational identity types so downstream crates don't need a
 // direct dependency on bbg just to name a Particle or NeuronId.
 pub use bbg::{NeuronId, Particle, IntentRecord, SignalRecord};
@@ -26,3 +28,6 @@ pub use cyber_sync::{
     ChainError, CyberlinkRecord, Signal, SignalChain,
     VdfProof, vdf_evaluate, vdf_verify, challenge_from_hash,
 };
+
+// The five-verb public API.
+pub use api::{ApiError, Cybergraph, Event, Filter, Intent, Scope};
