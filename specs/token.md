@@ -30,6 +30,15 @@ from [[token theory]] — two axes (fungible/unique × movable/immovable):
 | [[score]] | fungible, immovable | [[karma]], [[will]] — reputation and capacity |
 | [[badge]] | unique, immovable | achievements, proofs |
 
+## card as network identity
+
+a [[card]] id can denote a [[network]] — a shard of the [[cybergraph]] a
+[[signal]] is delivered to. this is the economic sharding dimension of
+[[cyber/hierarchy]] realized as a discrete, unique, ownable label: a network is
+unique (not a fungible denomination), owned (the card's owner is its governance),
+and transferable. the default network is the neuron's private network. see
+[[network]].
+
 ## multi-denomination staking
 
 the same structural link $(p, q)$ can carry conviction in multiple denominations. a [[neuron]] who creates:

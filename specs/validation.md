@@ -42,6 +42,14 @@ equivocation: two signals from the same ν at the same t:
   - both signals rejected; the neuron's focus is slashed
   - evidence committed to signals dimension in BBG_poly
 
+### network routing
+
+the signal's destination network is resolved before state insertion: the
+`SELF_NETWORK` sentinel (zero card) resolves to `private_network(ν)`. a node
+serving a specific network accepts the signal only if the resolved network
+matches the served network; otherwise it rejects with `WrongNetwork`. the
+resolved network is recorded in the signals dimension. see [[network]].
+
 ### focus sufficiency
 
 for the signal as a whole: neurons[ν].focus >= Σ cost(ℓ) for all ℓ ∈ ℓ⃗.
@@ -89,6 +97,7 @@ produce a valid VDF proof without actually waiting.
 | ConservationViolation | — | cybergraph (via zheng proof) |
 | InvalidVdf | — | cybergraph (SignalChain) |
 | StaleHeight | — | cybergraph |
+| WrongNetwork | — | cybergraph (network routing) |
 
 ## signal lifecycle
 
