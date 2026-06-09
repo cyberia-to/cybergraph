@@ -18,7 +18,7 @@ mod common;
 
 use common::{bbg_object_from_state, default_params, make_look_formula, zero_statement};
 
-use cybergraph::{Signal, SignalChain, vdf_evaluate, vdf_verify, challenge_from_hash};
+use cybergraph::{Signal, SignalChain, SELF_NETWORK, vdf_evaluate, vdf_verify, challenge_from_hash};
 use bbg::{BbgState, Signal as BbgSignal, Cyberlink as BbgCyberlink, Particle, NeuronId};
 use bbg::types::NeuronRecord;
 use bbg::ProofLookProvider;
@@ -31,7 +31,7 @@ fn neuron(seed: u8) -> NeuronId  { [seed; 32] }
 fn particle(seed: u8) -> Particle { [seed; 32] }
 
 fn make_signal(n: NeuronId, step: u64, prev: Particle) -> Signal {
-    Signal { neuron: n, links: vec![], delta_pi: vec![], prev, step, height: 0, proof: None }
+    Signal { neuron: n, network: SELF_NETWORK, links: vec![], delta_pi: vec![], prev, step, height: 0, proof: None }
 }
 
 // ── signal chain ordering ─────────────────────────────────────────────────────

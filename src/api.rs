@@ -94,6 +94,24 @@ pub enum ApiError {
     BbgRejected(bbg::InsertError),
     /// Intent key not found (seal called for unknown intent).
     UnknownIntent(Particle),
+    /// Signal's resolved destination network does not match the network this
+    /// node serves.
+    WrongNetwork { expected: Particle, got: Particle },
+}
+
+/// A neuron's private network — the default destination for its signals.
+///
+/// Derived deterministically as a card id from the neuron identity, so every
+/// neuron has a sovereign private network with no minting step.
+pub fn private_network(neuron: &NeuronId) -> Particle {
+    let mut buf = Vec::with_capacity(8 + 32);
+    buf.extend_from_slice(b"network:");
+    buf.extend_from_slice(neuron);
+    let h = hemera::hash(&buf);
+    let b = h.as_bytes();
+    let mut out = [0u8; 32];
+    out[..b.len().min(32)].copy_from_slice(&b[..b.len().min(32)]);
+    out
 }
 
 /// Errors from `query` — one variant per inf pipeline stage.
@@ -112,6 +130,9 @@ pub enum QueryError {
 pub struct Cybergraph {
     pub bbg:         Bbg,
     pub chains:      BTreeMap<NeuronId, SignalChain>,
+    /// The network this node serves. `None` accepts any network (local-first
+    /// dev default); `Some(n)` enforces that each signal's resolved network is `n`.
+    pub network:     Option<Particle>,
     subscribers:     Vec<(Filter, Box<dyn Fn(&Event) + Send + Sync>)>,
 }
 
@@ -120,8 +141,15 @@ impl Cybergraph {
         Self {
             bbg:         Bbg::new(),
             chains:      BTreeMap::new(),
+            network:     None,
             subscribers: Vec::new(),
         }
+    }
+
+    /// A node serving exactly one network — rejects any signal whose resolved
+    /// destination network differs from `network`.
+    pub fn serving(network: Particle) -> Self {
+        Self { network: Some(network), ..Self::new() }
     }
 
     /// intend — declare an unsealed intent. Persists the record and emits
@@ -201,6 +229,20 @@ impl Cybergraph {
         let link_count = signal.links.len() as u32;
         let height = signal.height;
 
+        // Resolve the destination network: the SELF_NETWORK sentinel routes the
+        // signal to the sender's private network.
+        let network = if signal.network == cyber_sync::SELF_NETWORK {
+            private_network(&neuron)
+        } else {
+            signal.network
+        };
+        // Routing gate: a node serving a specific network rejects foreign signals.
+        if let Some(serving) = self.network {
+            if network != serving {
+                return Err(ApiError::WrongNetwork { expected: serving, got: network });
+            }
+        }
+
         let bbg_signal = bridge_to_bbg(&signal);
 
         // 1. ordering gate
@@ -210,6 +252,7 @@ impl Cybergraph {
         // 3. record the signal header
         self.bbg.apply_signal_record(step, bbg::SignalRecord {
             neuron,
+            network,
             link_count,
             block_height: height,
             proof_hash: [0u8; 32],
@@ -291,12 +334,13 @@ mod tests {
     }
 
     fn empty_signal(neuron: NeuronId, step: u64, prev: Particle) -> Signal {
-        Signal { neuron, links: vec![], delta_pi: vec![], prev, step, height: 0, proof: None }
+        Signal { neuron, network: cyber_sync::SELF_NETWORK, links: vec![], delta_pi: vec![], prev, step, height: 0, proof: None }
     }
 
     fn one_link_signal(neuron: NeuronId, step: u64, prev: Particle, from: Particle, to: Particle) -> Signal {
         Signal {
             neuron,
+            network: cyber_sync::SELF_NETWORK,
             links: vec![CyberlinkRecord { neuron, from, to, token: p(0), amount: 1, valence: 1, height: 0 }],
             delta_pi: vec![],
             prev,

@@ -26,12 +26,12 @@ pub use bbg::{NeuronId, Particle, IntentRecord, SignalRecord};
 
 // Re-export the signal lifecycle primitives owned by sync.
 pub use cyber_sync::{
-    ChainError, CyberlinkRecord, Signal, SignalChain,
+    ChainError, CyberlinkRecord, Signal, SignalChain, SELF_NETWORK,
     VdfProof, vdf_evaluate, vdf_verify, challenge_from_hash,
 };
 
 // The five-verb public API.
-pub use api::{ApiError, Cybergraph, Event, Filter, Intent, QueryError, Scope};
+pub use api::{ApiError, Cybergraph, Event, Filter, Intent, private_network, QueryError, Scope};
 pub use source::BbgSource;
 
 // inf query result type, re-exported so callers don't depend on inf-eval directly.
