@@ -40,13 +40,13 @@ $$\text{cyberlink} \;=\; \text{link}(from,\,to) \;+\; \text{box}(coin,\,amount) 
 
 | concept | fields | article | type / deep mechanics |
 |---|---|---|---|
-| link | $from, to$ | [link.md](link.md) | [[card]] → [[card]] — a [[particle]] is a knowledge card |
+| link | $from, to$ | [link.md](link.md) | [[card]] → [[card]] |
+| └ from | $from$ | [particle.md](particle.md) | the source — a [[card]] (a [[particle]] is a knowledge card) |
+| └ to | $to$ | [particle.md](particle.md) | the target — a [[card]] |
 | box | $coin, amount$ | [box.md](box.md) | [[coin]] (token layer [[tok]]) × amount; mutator set in [[bbg]] |
 | └ amount | $a$ | [amount.md](amount.md) | the box magnitude |
 | └ coin | $token$ | [token.md](token.md) | the denomination (a coin; a card for transfers) |
 | valence | $v$ | [valence.md](valence.md) | BTS / markets in [[tru]] |
-
-the endpoints are [[card|cards]]; the content-addressed node a card can be is the [[particle]] ([particle.md](particle.md)).
 
 ## emergents — what appears when you read or group the structure
 
