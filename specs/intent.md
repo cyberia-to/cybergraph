@@ -13,7 +13,7 @@ $$i \;=\; (\nu,\; h_0,\; \Sigma,\; \pi_\text{id})$$
 | $\Sigma$ | [[scope]] | $S$ | structured description of the intended action: target particle, predicate, deadline, constraints |
 | $\pi_\text{id}$ | identity proof | $\text{Sig}$ | [[neuron]]'s signature over $(\nu \;\|\; h_0 \;\|\; \Sigma)$ |
 
-an intent carries an identity proof (the neuron's signature over the declared scope) but no content STARK. the STARK is produced at sealing, when the full computation is complete
+an intent carries an identity proof (the neuron's signature over the declared scope) but no content STARK. the STARK is produced at sealing — it proves the neuron actually *ran* the scope. the intent commits to what will be computed; the signal proves it was.
 
 ## lifecycle
 
@@ -29,7 +29,7 @@ declared
 
 ### sealed
 
-a sealed intent is a [[signal]]. the neuron assigns a sealing height and produces a [[zheng]] proof covering all [[cyberlinks]] and the [[cyber/impulse]]. the intent's scope becomes the signal's link set
+a sealed intent is a [[signal]]: the neuron ran the scope, produced a [[zheng]] proof $\sigma$ over the execution (its [[cyberlinks]] and [[cyber/impulse]]), and committed it. seal is accepted only if $\sigma$ attests the declared scope — see completion below.
 
 ### abandoned
 
@@ -38,6 +38,28 @@ if the neuron never seals, the intent record stays in the [[cybergraph]] at ince
 ### cascaded
 
 a neuron may declare an intent with scope that invites participation: subscribers observe it, self-organize into coordinated sub-signals, and the lead neuron seals a parent signal with a recursive [[zheng]] proof over the entire cascade. see [[cascade]] for the full multiparty protocol
+
+## completion — how an intent becomes a complete signal
+
+an intent is a deferred computation. its [[scope]] is not a passive description — it is an executable specification of what to compute. the intent commits to it; the signal proves it was run. completion fills the three things an intent lacks — the [[cyberlinks]], the [[impulse]] $\Delta\phi^*$, and the proof $\sigma$ — by executing the scope and proving the execution:
+
+```
+declare    intend(scope)         scope_hash committed + signed — nothing run yet
+execute    run the scope on nox  reading committed state via cybergraph query;
+                                  iterate until it converges → cyberlinks + Δφ* (+ a trace)
+prove      zheng proves the trace → σ
+seal       seal(intent, signal)  commit the proven run
+```
+
+the orchestration — decide, collect, run, judge what is left, iterate — is the [[soma]] control loop, not [[cybergraph]]'s. cybergraph stores the intent, serves the reads ([[query]]), and gates the seal. [[nox]] executes; [[zheng]] proves; soma drives.
+
+### the seal binding
+
+seal is valid only if $\sigma$ proves an execution of the intent's declared scope:
+
+$$\text{seal}(i, s)\ \text{accepted} \iff \sigma(s) \vdash \text{scope\_hash}(i)$$
+
+this binding is what makes intent and signal **one transaction** rather than two unrelated records. the intent is a promise (committed scope); the signal is its proven fulfillment. a sealed signal is cryptographic proof the neuron did exactly what it declared — the alignment property, enforced at the boundary. without the binding, any signal could seal any intent.
 
 ## relationship to signal
 

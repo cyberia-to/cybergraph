@@ -66,9 +66,13 @@ the structure above is what cybergraph *is*; these four verbs are what it *does*
 
 validate→order→apply is the write path (inside `link`/`seal`); expose is the read (`query`).
 
+## the seal binding — promise to proof
+
+a signal's life is a promise then a proof: [intent.md](intent.md) `intend(scope)` commits a signed scope; the neuron runs it ([[nox]]) and proves it ([[zheng]]); `seal` commits the result. the commit gate enforces one rule — `seal(i, s)` accepted **iff** `σ(s) ⊢ scope_hash(i)`. that binding makes intent and signal one transaction, and is the alignment property at the commit port. see [intent.md](intent.md) `## completion`.
+
 ## what cybergraph does NOT do — orchestration is soma's
 
-the *decision* loop — read an [[intent]], collect recomputed state from [[bbg]], run it through [[nox]], judge what is left to compute, make internal calls, iterate, and only then emit a signal — is dynamic control, not a static pipeline. it falls out, upward, to the [[soma]] cognitive loop. soma *calls* cybergraph's four verbs; it is not one of them. cybergraph is the fast, correct, stateless processor; soma is the mind that drives it.
+cybergraph and [[soma]] are one processor: cybergraph is the dumb half (store · events · commit-gate), soma the smart half (the runtime). the *decision* loop — read an [[intent]], collect recomputed state from [[bbg]], run it through [[nox]], judge what is left to compute, iterate, and only then emit a signal — is dynamic control, not a static pipeline. it falls out, upward, to soma. soma *calls* cybergraph's four verbs and drives the fetch→execute→prove→commit cycle; it is not one of the verbs. cybergraph is fast, correct, stateless; soma is the mind that drives it. see [docs/whitepaper.md](../docs/whitepaper.md).
 
 ## staking — placing weight
 
