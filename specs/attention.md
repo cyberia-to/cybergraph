@@ -1,14 +1,12 @@
 ---
-alias: cyber/attention query, attention query
-tags: cyber, cybergraph
+alias: attention, neuron attention
+tags: cyber, cybergraph, core
 crystal-type: measure
 crystal-domain: cyber
 ---
-# attention (query)
+# attention
 
-`query(from, to)` reads how much [[focus]] a [[neuron]] projects onto a target — its [[attention]]. this page is the query-interface view; the quantity itself is a focus concept defined in [[tru]] (see [[tru/specs/attention]]).
-
-a derived read, never a stored field: cybergraph runs the query over committed state, the value comes from tru's focus computation.
+a read-emergent: how much [[focus]] a [[neuron]] projects onto a target [[particle]] or [[axon]]. not a field of the structure — it appears when you read the structure. `query(from, to)` returns it.
 
 ```
 query(from: ν, to: p)  →  attention(ν → p)        one neuron's weight on one target
@@ -16,4 +14,6 @@ query(from: ν)         →  attention distribution across all targets
 query(to: p)           →  all neurons attending to p (weighted backlink set)
 ```
 
-the two write paths that produce attention — [[will]] (broad, auto-distributed) and per-link conviction ([[box]] in the cyberlink's `amount`) — are described in [[staking]]. how individual attention aggregates into collective $\phi^*$ is in [[tru/specs/attention]].
+attention is written by two paths the structure already carries: [[will]] (broad, auto-distributed across a neuron's links) and per-link conviction (the [[box]] in a cyberlink's [[amount]]). cybergraph exposes the read; the focus quantity it returns — and how individual attention aggregates into collective $\phi^*$ — is computed by the [[tru]] (see [[focus-flow]]).
+
+see [[axon]] for the other emergent · [[query]] for the read interface · [[tru]] for the focus computation.
