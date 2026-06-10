@@ -23,14 +23,14 @@ a cybergraph is built from signals; a signal is built from cyberlinks; each has 
 
 $$s = (\nu,\; \mathit{net},\; \vec\ell,\; \Delta\phi^*,\; \sigma,\; h_0,\; h_1)$$
 
-| field | name | article | deep mechanics |
-|---|---|---|---|
-| $\nu$ | subject | [neuron.md](neuron.md) | identity in [[mudra]] |
-| $\mathit{net}$ | network | [network.md](network.md) | — |
-| $\vec\ell$ | links | [cyberlink.md](cyberlink.md) | — |
-| $\Delta\phi^*$ | impulse | [impulse.md](impulse.md) | computed/rewarded in [[tru]] |
-| $\sigma$ | proof | [proof.md](proof.md) | constructed by [[zheng]] |
-| $h_0, h_1$ | inception, sealing | [signal.md](signal.md) / [intent.md](intent.md) | ordering in [[sync]] |
+| name | fields | deep mechanics |
+|---|---|---|
+| [subject](neuron.md) | $\nu$ | identity in [[mudra]] |
+| [network](network.md) | $\mathit{net}$ | — |
+| [links](cyberlink.md) | $\vec\ell$ | — |
+| [impulse](impulse.md) | $\Delta\phi^*$ | computed/rewarded in [[tru]] |
+| [proof](proof.md) | $\sigma$ | constructed by [[zheng]] |
+| [inception, sealing](signal.md) | $h_0, h_1$ | ordering in [[sync]]; pre-seal state in [[intent]] |
 
 ## cyberlink — link + box + valence
 
@@ -38,15 +38,15 @@ the five stored fields group into three concepts: a [[link]] (the edge), a [[box
 
 $$\text{cyberlink} \;=\; \text{link}(from,\,to) \;+\; \text{box}(coin,\,amount) \;+\; valence$$
 
-| concept | fields | article | type / deep mechanics |
-|---|---|---|---|
-| link | $from, to$ | [link.md](link.md) | [[card]] → [[card]] |
-| └ from | $from$ | [particle.md](particle.md) | the source — a [[card]] (a [[particle]] is a knowledge card) |
-| └ to | $to$ | [particle.md](particle.md) | the target — a [[card]] |
-| box | $coin, amount$ | [box.md](box.md) | [[coin]] (token layer [[tok]]) × amount; mutator set in [[bbg]] |
-| └ amount | $a$ | [amount.md](amount.md) | the box magnitude |
-| └ coin | $token$ | [token.md](token.md) | the denomination (a coin; a card for transfers) |
-| valence | $v$ | [valence.md](valence.md) | BTS / markets in [[tru]] |
+| name | fields | deep mechanics |
+|---|---|---|
+| [link](link.md) | $from, to$ | [[card]] → [[card]] |
+| └ [from](particle.md) | $from$ | the source — a [[card]] (a [[particle]] is a knowledge card) |
+| └ [to](particle.md) | $to$ | the target — a [[card]] |
+| [box](box.md) | $coin, amount$ | [[coin]] (token layer [[tok]]) × amount; mutator set in [[bbg]] |
+| └ [amount](amount.md) | $a$ | the box magnitude |
+| └ [coin](token.md) | $token$ | the denomination (a coin; a card for transfers) |
+| [valence](valence.md) | $v$ | BTS / markets in [[tru]] |
 
 ## emergents — what appears when you read or group the structure
 
