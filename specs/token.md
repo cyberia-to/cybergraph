@@ -1,59 +1,23 @@
 # token
 
-the third field of a [[cyberlink]]: $\tau \in \mathcal{T}$. the denomination in which conviction is expressed
+the third field of a [[cyberlink]]: $\tau \in \mathcal{T}$. the denomination in which conviction is expressed — paired with [[amount]] `a` it forms the [[box]] a cyberlink moves.
 
-a [[cyberlink]] without a [[token]] denomination is a structural assertion with no economic weight. the token field is what makes a link a bet — it selects which scarce resource the [[neuron]] stakes against the claim
+a [[cyberlink]] without a denomination is a structural assertion with no economic weight. the token field selects which scarce resource the [[neuron]] stakes against the claim.
 
 ## definition
 
-$\mathcal{T}$ is the set of valid token denominations in the [[cybergraph]]. each denomination has a rate function $r: \mathcal{T} \to \mathbb{R}_+$ that converts to a common scale for the adjacency operator:
+$\mathcal{T}$ is the set of valid token denominations. each has a rate function $r: \mathcal{T} \to \mathbb{R}_+$ that converts to a common scale for the adjacency operator:
 
 $$A_{pq} = \sum_{\substack{\ell \in L \\ \operatorname{src}(\ell)=p,\; \operatorname{tgt}(\ell)=q}} r(\tau(\ell)) \cdot a(\ell)$$
 
-the rate function $r(\tau)$ normalizes across denominations so that conviction in different [[tokens]] is commensurable in the [[tri-kernel]]
-
-## protocol tokens
-
-| token | ticker | role |
-|-------|--------|------|
-| CYB | [[$CYB]] | root consensus token. staked for security, locked for [[will]], burned for permanent φ*-weight, spent as fees |
-| HYDROGEN | [[$H]] | liquidity engine. paired with [[$CYB]] via [[bonding curves]]. provides the external price signal |
-
-## the four token types
-
-from [[token theory]] — two axes (fungible/unique × movable/immovable):
-
-| type | properties | role |
-|------|-----------|------|
-| [[coin]] | fungible, movable | [[$CYB]], [[$H]] — stake, fees, economic commitment |
-| [[card]] | unique, movable | provenance binding to a [[particle]]. every [[cyberlink]] is a card |
-| [[score]] | fungible, immovable | [[karma]], [[will]] — reputation and capacity |
-| [[badge]] | unique, immovable | achievements, proofs |
-
-## card as network identity
-
-a [[card]] id can denote a [[network]] — a shard of the [[cybergraph]] a
-[[signal]] is delivered to. this is the economic sharding dimension of
-[[cyber/hierarchy]] realized as a discrete, unique, ownable label: a network is
-unique (not a fungible denomination), owned (the card's owner is its governance),
-and transferable. the default network is the neuron's private network. see
-[[network]].
+$r(\tau)$ normalizes across denominations so conviction in different tokens is commensurable in the [[tri-kernel]].
 
 ## multi-denomination staking
 
-the same structural link $(p, q)$ can carry conviction in multiple denominations. a [[neuron]] who creates:
+the same structural link $(p, q)$ can carry conviction in multiple denominations — two signals staking CYB and H on the same edge create two [[box|boxes]], two [[card|cards]], two yield streams. the adjacency weight $A_{pq}$ sums both via $r(\tau)$.
 
-- $(\nu, p, q, \text{CYB}, 100, +1, t_1)$
-- $(\nu, p, q, \text{H}, 50, +1, t_2)$
+## token model lives in the value layer
 
-expresses conviction in two currencies. the adjacency weight $A_{pq}$ sums both via $r(\tau)$. each creates a separate box, a separate card, a separate yield stream
+token *types* (coin, card, score, badge), the TSP standards, protocol tokens (CYB, H), bonding curves, and skills are the value layer — specified in [[tok]] (TSP-1 coins, TSP-2 cards) and [[plumb]] (the five operations). cybergraph uses tokens as cyberlink denominations; it does not define the token programming model.
 
-## token as costly signal
-
-the choice of denomination carries information. staking [[$CYB]] (scarce, governance-weighted) signals higher conviction than staking a liquid pair token. the market reads denomination choice as a signal of commitment depth
-
-## permanent weight tokens
-
-burning [[$CYB]] creates [[eternal particles]] (permanent φ*-weight on a [[particle]]) or [[eternal cyberlinks]] (permanent edge weight). burned tokens exit circulation permanently — the strongest possible conviction signal
-
-see [[cyberlink]] for the full 5-tuple. see [[amount]] for the stake quantity. see [[cybernomics]] for the economic theory
+see [[box]] for the conviction unit · [[amount]] for the magnitude · [[plumb]] for the value operations · [[cybernomics]] for the economic theory.

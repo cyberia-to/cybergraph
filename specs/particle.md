@@ -21,7 +21,7 @@ Hemera = Poseidon2(
 
 every parameter is a power of 2. the [[Goldilocks field]] gives native 64-bit CPU arithmetic — a field multiplication is a single instruction. the S-box exponent $d = 7$ is the minimum invertible exponent for this field ($\gcd(7, p-1) = 1$; both 3 and 5 divide $p-1$)
 
-capacity 8 (256-bit) provides 256-bit classical collision resistance, 170-bit quantum collision resistance (BHT), and algebraic degree $7^{64} \approx 2^{180}$. production systems use capacity 4 (128-bit) because their hashes are ephemeral — trace commitments that live seconds. particle addresses live decades. the parameter choice matches the lifetime
+capacity 8 (256-bit) provides 256-bit classical collision resistance and 170-bit quantum collision resistance (BHT); its algebraic degree is specified in [[hemera]] (the S-box and round structure live there, not here). production systems use capacity 4 (128-bit) because their hashes are ephemeral — trace commitments that live seconds. particle addresses live decades. the parameter choice matches the lifetime
 
 one mode only: sponge. no compression mode. two modes producing the same 64-byte output from different inputs would break the address space as a function
 
@@ -58,14 +58,13 @@ different uses of Hemera are separated at the input:
 
 | prefix | domain |
 |--------|--------|
+| (none) | particle content addressing — bare content in, address out |
 | `0x01` | edge hashing |
 | `0x02` | record commitments |
 | `0x03` | nullifier derivation |
 | `0x04` | Merkle internal nodes (NMT, MMR) |
-| `0x05` | Fiat-Shamir challenges (Brakedown) |
-| `0x06` | proof transcript binding |
 
-`H_edge(x) = Hemera(0x01 || x)`. particle content addressing uses no prefix — bare content in, address out. the particle address space is the default
+`H_edge(x) = Hemera(0x01 || x)`. particle content addressing uses no prefix — the particle address space is the default. proof-system prefixes (Fiat-Shamir, transcript binding) belong to [[zheng]]/[[lens]], not the particle domain; the full prefix registry is in [[hemera]].
 
 ## output format
 

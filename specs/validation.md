@@ -128,4 +128,8 @@ bbg.insert(signal)
 cybergraph advances SignalChain (prev_hash = H(signal))
 ```
 
-see [[cybergraph/structural-sync]] for the 5-layer sync protocol. see [[bbg/state]] for the BBG_poly update effects. see [[cybergraph/chain]] for the SignalChain (hash chain + VDF). see [[bbg/privacy]] for the polynomial mutator set (A(x), N(x)).
+## proof boundary
+
+cybergraph validates the proof; it never constructs one. the σ field of a [[signal]] is a single [[zheng]] proof covering the whole batch atomically — cyberlink validity, box movements, and the [[impulse]] $\Delta\phi^*$ — and the check is `verify(σ, signal, bbg_root) → bool`, $O(\log n)$, no re-execution. proof construction, the circuit, and the proof-type taxonomy are [[zheng]]'s. cybergraph owns only the accept/reject decision at the submission boundary.
+
+see [[sync]] for the 5-layer structural-sync protocol and the SignalChain (hash chain + VDF). see [[bbg/state]] for the BBG_poly update effects. see [[bbg/privacy]] for the polynomial mutator set (A(x), N(x)). see [[zheng/proof-types]] for the proof taxonomy.
