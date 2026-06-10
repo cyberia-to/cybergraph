@@ -65,3 +65,4 @@ cybergraph specs cover exactly three things: the data structure, the signal life
 ### query interface
 
 - [query.md](specs/query.md) — relations cybergraph exposes to [[inf]]. schema only; language lives in [[inf/README]]
+- [attention.md](specs/attention.md) — the result of `query(from, to)`: how much focus a neuron projects onto a target. value comes from [[tru]]
