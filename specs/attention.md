@@ -1,26 +1,19 @@
 ---
-alias: cyber/attention, attention
-tags: cyber, core
+alias: cyber/attention query, attention query
+tags: cyber, cybergraph
 crystal-type: measure
 crystal-domain: cyber
-crystal-size: bridge
 ---
-# attention
+# attention (query)
 
-the result of `query(from=neuron, to=particle)` — how much [[focus]] a given [[neuron]] projects onto a target [[particle]] or [[axon]].
+`query(from, to)` reads how much [[focus]] a [[neuron]] projects onto a target — its [[attention]]. this page is the query-interface view; the quantity itself is a focus concept defined in [[tru]] (see [[tru/specs/attention]]).
 
-not a stored field. not a property of the graph. a derived read: attention is what the query engine returns when you ask "how much of this neuron's weight lands here?"
-
-## as a query
+a derived read, never a stored field: cybergraph runs the query over committed state, the value comes from tru's focus computation.
 
 ```
-query(from: ν, to: p)  →  attention(ν → p)
+query(from: ν, to: p)  →  attention(ν → p)        one neuron's weight on one target
 query(from: ν)         →  attention distribution across all targets
-query(to: p)           →  all neurons attending to p (backlink set with weights)
+query(to: p)           →  all neurons attending to p (weighted backlink set)
 ```
 
-produced by two write paths inside `submit()`:
-- [[staking]] via [[will]] — broad, auto-distributed across all of a neuron's cyberlinks
-- fine-tuning — explicit per-target weight in the cyberlink's `amount` field
-
-see [[cybergraph/specs/staking]] for how attention is written. see [[tru/reference/focus]] for how individual attention aggregates into collective $\phi^*$.
+the two write paths that produce attention — [[will]] (broad, auto-distributed) and per-link conviction ([[box]] in the cyberlink's `amount`) — are described in [[staking]]. how individual attention aggregates into collective $\phi^*$ is in [[tru/specs/attention]].
