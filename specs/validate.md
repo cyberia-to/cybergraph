@@ -14,7 +14,22 @@ validate(signal) → ok | reject
   focus, impulse) against the committed root
 ```
 
-cybergraph does not construct the proof and does not re-execute anything — it calls `decide(σ)`, $O(\log n)$, and reads the verdict. construction, the circuit, and the proof taxonomy are [[zheng]]'s; what σ attests is the [[proof]] field.
+cybergraph does not construct the proof and does not re-execute anything — it calls `decide(σ)`, $O(\log n)$, and reads the verdict. construction, the circuit, and the proof taxonomy are [[zheng]]'s; the conditions σ attests — content addressing, signature, box unspent/owned, conservation, focus sufficiency, impulse correctness — are spelled out in the [[proof]] field. any one failing rejects the signal.
+
+## reject reasons
+
+every criterion that can fail is a reject reason — the verdicts the gate returns:
+
+| reason | failed criterion | from |
+|---|---|---|
+| `BadProof` | σ does not verify, or any condition it attests fails | [[proof]] / [[zheng]] |
+| `Unresolved` | a particle does not resolve to its preimage | [[proof]] (content addressing) |
+| `InsufficientFocus` | $\text{focus}(\nu) < \sum_\ell \text{cost}(\ell)$ | [[proof]] (focus sufficiency) |
+| `BadOwnership` / `DoubleSpend` | box not owned by ν / nullifier reused | [[proof]] / [[bbg]] |
+| `Equivocation` / `StepNotSequential` / `PrevMismatch` | chain violations | [[order]] / [[sync]] |
+| `WrongNetwork` | resolved net ≠ the serving node's | [[network]] |
+
+reject is total: bbg never sees an invalid signal.
 
 mechanism, not decision: validate is a fixed check, the same for every signal. the loop that *decided* to produce this signal — and what to compute before sealing it — is the [[soma]] control loop above cybergraph, not part of this verb.
 
