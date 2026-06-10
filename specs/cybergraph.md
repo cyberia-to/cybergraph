@@ -1,4 +1,5 @@
 ---
+title: cybergraph spec
 tags: cyber, core, reference
 alias: cybergraph spec, cybergraph reference
 ---
