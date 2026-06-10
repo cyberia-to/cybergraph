@@ -59,7 +59,8 @@ cybergraph is exactly its structure — `cybergraph ← signals ← cyberlinks`,
 - cyberlink fields — [particle](specs/particle.md), [token](specs/token.md), [amount](specs/amount.md), [box](specs/box.md), [valence](specs/valence.md)
 - emergents — [axon](specs/axon.md), [attention](specs/attention.md)
 - reads — [query](specs/query.md), [staking](specs/staking.md)
-- the umbrella operation — [validation](specs/validation.md): routes each check to its owning component, then `bbg.insert`
+
+validation is not a separate spec — verifying the [proof](specs/proof.md) field σ *is* the gate (it covers links, boxes, conservation, focus, impulse atomically); only chain-ordering and network checks route out, to [[sync]] and [[network]].
 
 ## companion repos
 

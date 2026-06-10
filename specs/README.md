@@ -49,11 +49,9 @@ $$\ell = (from,\; to,\; token,\; a,\; v) \;\longrightarrow\; (from,\; to,\; \und
 - [axon.md](axon.md) — the bundle of all cyberlinks between two particles (groups links; homoiconic, axiom A6)
 - [attention.md](attention.md) — the focus a neuron projects onto a target (a read; `query(from, to)`). complete form in [[tru]]
 
-## the umbrella operation — routing
+## validation is not separate — it is the proof field
 
-cybergraph is umbrella and routing: it names the checks and routes each to the component that owns the complete criterion.
-
-- [validation.md](validation.md) — the submit gate. routes A1–A6 + focus/box/conservation checks to [[hemera]], [[zheng]], [[sync]], [[tru]], [[bbg]]; aggregates the verdict; then `bbg.insert`. not a field — the routing operation itself.
+verifying the [[proof]] field σ **is** the signal's validation: one zheng proof covers cyberlink validity, box ownership, conservation, focus sufficiency, and impulse correctness atomically. the only checks σ does not cover are chain ordering (→ [[sync]]) and network routing (→ [[network]]). there is no `validation` article — see [proof.md](proof.md) for the gate.
 
 ## staking — placing weight
 
