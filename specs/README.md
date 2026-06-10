@@ -72,7 +72,7 @@ a signal's life is a promise then a proof: [intent.md](intent.md) `intend(scope)
 
 ## what cybergraph does NOT do — orchestration is soma's
 
-cybergraph and [[soma]] are one processor: cybergraph is the dumb half (store · events · commit-gate), soma the smart half (the runtime). the *decision* loop — read an [[intent]], collect recomputed state from [[bbg]], run it through [[nox]], judge what is left to compute, iterate, and only then emit a signal — is dynamic control, not a static pipeline. it falls out, upward, to soma. soma *calls* cybergraph's four verbs and drives the fetch→execute→prove→commit cycle; it is not one of the verbs. cybergraph is fast, correct, stateless; soma is the mind that drives it. see [docs/whitepaper.md](../docs/whitepaper.md).
+cybergraph and [[soma]] are one processor: cybergraph is the dumb half (store · events · commit-gate), soma the smart half (the runtime). the *decision* loop — read an [[intent]], collect recomputed state from [[bbg]], run it through [[nox]], judge what is left to compute, iterate, and only then emit a signal — is dynamic control, not a static pipeline. it falls out, upward, to soma. soma *calls* cybergraph's four verbs and drives the fetch→execute→prove→commit cycle; it is not one of the verbs. cybergraph is fast, correct, stateless; soma is the mind that drives it. see the [whitepaper](../docs/README.md).
 
 ## staking — placing weight
 
