@@ -6,27 +6,18 @@ alias: proof, signal proof, submission proof, zheng proof
 ---
 # proof
 
-the σ field of a [[signal]]: a single [[zheng]] proof covering the whole batch atomically. it is what makes a signal checkable without re-execution — a verifier holding only the root decides `decide(σ)` in $O(\log n)$.
+the σ field of a [[signal]]: a single [[zheng]] proof. it is the signal's **evidence** — one proof, covering the whole batch atomically, that lets anyone holding only the root accept the signal without re-executing it and without trusting the sender.
 
-## what σ attests — the validation criteria
+## what it is
 
-one verification certifies all of these together. these are *what must hold* for a signal to be valid — not separate checks cybergraph runs, but the conditions the proof carries. each has a precise criterion and a complete-form owner:
+σ is produced by the neuron at sealing, taken over the [[nox]] execution of the [[intent]]'s scope, and verified by anyone in $O(\log n)$ via `decide(σ)`. it is a **content proof** — it attests the signal's computation is correct against the committed root. it is not the identity signature (separate), and not a chain-position fact (that is [[order]]'s).
 
-| criterion | what must hold | owner |
-|---|---|---|
-| content addressing | every particle in $\vec\ell$ resolves to its preimage — $p = H(\text{bytes})$ | [[hemera]] |
-| signature | valid signature from ν over $H(\vec\ell \,\|\, \Delta\phi^* \,\|\, t)$ | [[mudra]] |
-| cyberlink validity | each $\ell \in \vec\ell$ has valid particle references and is well-formed | [[hemera]] |
-| box unspent | each spent [[box]]'s nullifier is live — $N(n) \neq 0$ (opening into $N(x)$) | [[bbg]] |
-| box ownership | the spender owns it — $A(c)$ resolves to ν's key (opening into $A(x)$) | [[bbg]] |
-| conservation | $\sum$ box inputs $= \sum$ outputs $+$ fee, across all box movements | [[tru]] |
-| focus sufficiency | $\text{focus}(\nu) \geq \sum_{\ell} \text{cost}(\ell)$, where $\text{cost}(\ell) = a(\ell) + \text{base\_fee}$, against $\text{BBG\_poly}(\text{neurons}, \nu, t)$ | [[tru]] |
-| impulse correctness | $\Delta\phi^*$ is the true tri-kernel shift computed against the current root | [[tru]] ([[impulse]]) |
+## what it attests
 
-box unspent is the structural double-spend invariant ($N(n)=0 \Rightarrow$ reject); box ownership is the semantic layer on top — the *right* neuron is spending, not just that the box is unspent.
+σ covers, atomically, the validity conditions a signal must satisfy — signature, cyberlink validity, box movements, conservation, focus sufficiency, impulse correctness. the precise list of *what must hold*, and how each condition is checked, is the validation page: see [[validate]]. **proof is the object; validation is the check.** a few conditions sit outside σ (availability, ordering, network) and are listed there too.
 
 ## boundary
 
-cybergraph never constructs proofs — that is [[zheng]]'s (the circuit, the proof system, the [[zheng/proof-types]] taxonomy). checking this field is the [[validate]] verb; verifying σ **is** the signal's validation. the one thing σ does not cover — chain position — is the [[order]] verb's, routed to [[sync]].
+cybergraph never constructs proofs — that is [[zheng]]'s (the circuit, the proof system, the [[zheng/proof-types]] taxonomy). cybergraph only verifies; checking σ is the [[validate]] verb.
 
-see [[validate]] for the verb that checks σ · [[zheng]] for construction · [[signal]] for the field's slot.
+see [[validate]] for the conditions σ must attest · [[zheng]] for construction · [[signal]] for the field's slot · [[intent]] for what σ is taken over.
