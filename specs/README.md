@@ -10,7 +10,7 @@ cybergraph is exactly its structure, nothing more and nothing less:
 cybergraph  ←  signals  ←  cyberlinks
 ```
 
-a cybergraph is built from signals; a signal is built from cyberlinks; each has a fixed, finite set of fields. these specs define those fields — one article per field — plus the two emergents that appear when you read or group the structure ([[axon]], [[attention]]) and the [[query]] interface that reads it. deep mechanics of a field live in the repo that owns them ([[zheng]] proof construction, [[tru]] focus/impulse, [[plumb]] value ops, [[mudra]] identity, [[sync]] ordering); cybergraph defines the field and references them.
+a cybergraph is built from signals; a signal is built from cyberlinks; each has a fixed, finite set of fields. these specs define those fields — one article per field — plus the two emergents that appear when you read or group the structure ([[axon]], [[attention]]) and the [[query]] interface that reads it. deep mechanics of a field live in the repo that owns them ([[zheng]] proof construction, [[tru]] focus/impulse, [[tok]] tokens / [[plumb]] value ops, [[mudra]] identity, [[sync]] ordering); cybergraph defines the field and references them.
 
 ## the structure
 
@@ -41,7 +41,7 @@ $$\text{cyberlink} \;=\; \text{link}(from,\,to) \;+\; \text{box}(coin,\,amount) 
 | concept | fields | article | type / deep mechanics |
 |---|---|---|---|
 | link | $from, to$ | [link.md](link.md) | [[card]] → [[card]] — a [[particle]] is a knowledge card |
-| box | $coin, amount$ | [box.md](box.md) | [[coin]] (value layer [[plumb]]) × amount; mutator set in [[bbg]] |
+| box | $coin, amount$ | [box.md](box.md) | [[coin]] (token layer [[tok]]) × amount; mutator set in [[bbg]] |
 | └ amount | $a$ | [amount.md](amount.md) | the box magnitude |
 | └ coin | $token$ | [token.md](token.md) | the denomination (a coin; a card for transfers) |
 | valence | $v$ | [valence.md](valence.md) | BTS / markets in [[tru]] |

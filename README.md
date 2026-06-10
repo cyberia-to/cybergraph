@@ -4,7 +4,7 @@ the local-first cyberlink processor. signal in, graph out.
 
 cybergraph is the component that turns a neuron's signed, proven [[signal]]s into an authenticated knowledge graph and lets anything read it. it validates the proof on each signal, orders signals into a per-neuron causal chain, applies their [[cyberlink]]s to state, and exposes the result to queries. it is local-first: one instance processes whatever cyberlinks it is pointed at — a single neuron, an avatar, a shared network — at whatever scope it is configured for.
 
-it owns the *lifecycle* of a cyberlink. it does not compute focus (that is [[tru]]), store state (that is [[bbg]]), move bytes (that is [[sync]] / [[radio]]), or define value (that is [[plumb]]). it is the spine those attach to.
+it owns the *lifecycle* of a cyberlink. it does not compute focus (that is [[tru]]), store state (that is [[bbg]]), move bytes (that is [[sync]] / [[radio]]), or define value (that is [[tok]], via the [[plumb]] operations). it is the spine those attach to.
 
 ```
                           soma / apps / agents
@@ -71,7 +71,7 @@ validation is not a separate spec — verifying the [proof](specs/proof.md) fiel
 | [[tru]] | focus φ\*, the tri-kernel, karma, rewards |
 | [[zheng]] | proof construction and verification |
 | [[inf]] | the query language over cybergraph relations |
-| [[plumb]] | the token/value layer (TSP-1/2, the five operations) |
+| [[tok]] | the token/value layer — TSP-1 coins, TSP-2 cards (operations via the [[plumb]] framework) |
 | [[mudra]] | identity, the crypto primitives |
 
 cybergraph defines the graph; the companions give it state, order, dynamics, proofs, queries, value, and identity.
