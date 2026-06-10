@@ -55,8 +55,8 @@ not yet: network distribution, STARK proof enforcement at seal, conviction `box_
 cybergraph is exactly its structure — `cybergraph ← signals ← cyberlinks`, a fixed set of fields plus the emergents that appear when you read it. the [specs/](specs/) directory has one article per field, mapped in [specs/README.md](specs/README.md):
 
 - the structure — [cybergraph](specs/cybergraph.md), [signal](specs/signal.md), [cyberlink](specs/cyberlink.md), [intent](specs/intent.md)
+- a cyberlink is `link + box + valence` — [link](specs/link.md) (from [card] → to [card]), [box](specs/box.md) ([coin] + [amount](specs/amount.md)), [valence](specs/valence.md); the node a card can be is the [particle](specs/particle.md)
 - signal fields — [neuron](specs/neuron.md), [network](specs/network.md), [impulse](specs/impulse.md), [proof](specs/proof.md)
-- cyberlink fields — [particle](specs/particle.md), [token](specs/token.md), [amount](specs/amount.md), [box](specs/box.md), [valence](specs/valence.md)
 - emergents — [axon](specs/axon.md), [attention](specs/attention.md)
 - reads — [query](specs/query.md), [staking](specs/staking.md)
 

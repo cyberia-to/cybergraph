@@ -1,26 +1,24 @@
 # cyberlink
 
-the atomic unit of the [[cybergraph]]. two [[tokens]] bound by a staked assertion — from and to can be [[particles]], [[neurons]], [[cards]], or [[coins]]. every cyberlink is simultaneously an economic act, a semantic assertion, and an epistemic prediction. who made it and when belong to the [[signal]] that carries it.
+the atomic unit of the [[cybergraph]]. a cyberlink **links** two [[card|cards]] and **moves a box** of conviction between them, carrying an epistemic **valence**:
 
-## the five fields
+$$\text{cyberlink} \;=\; \underbrace{\text{link}(from,\,to)}_{\text{structural}} \;+\; \underbrace{\text{box}(coin,\,amount)}_{\text{economic}} \;+\; \underbrace{valence}_{\text{epistemic}}$$
 
-$$\ell \;=\; (from,\; to,\; token,\; a,\; v) \;\in\; \text{TokenId} \times \text{TokenId} \times \text{TokenId} \times \mathbb{R}_{+} \times \{-1,\,0,\,+1\}$$
+| part | fields | type | what it is |
+|---|---|---|---|
+| [[link]] | $from$, $to$ | [[card]] → [[card]] | the directed edge — what connects to what (a [[particle]] is a knowledge card) |
+| [[box]] | $coin$, $amount$ | [[coin]] × $\mathbb{R}_+$ | the conviction moved — a denomination and a quantity |
+| [[valence]] | $v$ | $\{-1,0,+1\}$ | the [[Bayesian Truth Serum\|BTS]] prediction |
 
-| field | name | type | layer | semantics | question |
-|-------|------|------|-------|-----------|----------|
-| $from$ | source | $\text{TokenId}$ | structural | source token — authorizes the spend (plumb auth on this token's leaf) | what initiates? |
-| $to$ | destination | $\text{TokenId}$ | structural | destination token — receives the moved token | what receives? |
-| $token$ | moved token | $\text{TokenId}$ | economic | what moves (coin denomination or card id) | what moves? |
-| $a$ | [[amount]] | $\mathbb{R}_+$ | economic | stake amount (1 for non-fungible cards) | how much conviction? |
-| $v$ | [[valence]] | $\{-1,0,+1\}$ | epistemic | [[Bayesian Truth Serum\|BTS]] meta-prediction | what is the epistemic prediction? |
+five stored fields, three concepts. who made it and when belong to the [[signal]] that carries it.
 
-three layers in one atomic record. structural $(from, to)$ is binary — the connection either exists or it does not. epistemic $v$ is ternary — the neuron's prediction of how the [[inversely coupled bonding surface|ICBS]] market on this edge will converge. economic $(token, a)$ is continuous over $\mathbb{R}_+$. see [[two three paradox]] for why this layering is not arbitrary
+## the three layers
 
-the five stored fields group into four concepts — the economic pair $(token, a)$ is one object, a [[box]]:
+- **structural** — the [[link]] $(from, to)$ is binary: the connection between two [[card|cards]] either exists or it does not. its endpoints authorize the move (plumb auth on each card's leaf).
+- **economic** — the [[box]] $(coin, amount)$ is the bet: the [[coin]] selects which denomination moves, [[amount]] declares how much. a link with a zero box is structurally identical to one with a maximum box — the link is binary, the box prices it. (a non-fungible transfer is the special case where the box holds a [[card]] with $amount = 1$ instead of a coin.)
+- **epistemic** — the [[valence]] is ternary: the neuron's prediction of how the [[inversely coupled bonding surface|ICBS]] market on this edge converges.
 
-$$(from,\; to,\; token,\; a,\; v) \;\longrightarrow\; (from,\; to,\; \underbrace{(token,\,a)}_{\text{box}},\; v)$$
-
-the [[box]] is the pair that turns an assertion into a bet: token selects what moves, [[amount]] declares the magnitude. a link with a zero box is structurally identical to a link with a maximum box — the structural layer is binary, the box prices it. see [[box]] for the full conviction model.
+see [[two three paradox]] for why this layering is not arbitrary. see [[box]] for the conviction model, [[link]] for the edge, [[valence]] for the prediction.
 
 cyberlinks are bundled into [[signal|signals]] for broadcast. the [[signal]] adds the provenance layer: the signing [[neuron]] $\nu$, block height $t$, the destination [[network]] $\mathit{net}$, an [[cyber/impulse]] ($\Delta\phi^*$ — the proven [[focus]] shift), and a recursive [[stark]] proof covering the entire batch. the network is a signal-envelope concern — where the assertion is delivered — not a cyberlink field.
 

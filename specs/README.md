@@ -32,17 +32,21 @@ $$s = (\nu,\; \mathit{net},\; \vec\ell,\; \Delta\phi^*,\; \sigma,\; h_0,\; h_1)$
 | $\sigma$ | proof | [proof.md](proof.md) | constructed by [[zheng]] |
 | $h_0, h_1$ | inception, sealing | [signal.md](signal.md) / [intent.md](intent.md) | ordering in [[sync]] |
 
-## cyberlink fields
+## cyberlink — link + box + valence
 
-$$\ell = (from,\; to,\; token,\; a,\; v) \;\longrightarrow\; (from,\; to,\; \underbrace{(token,\,a)}_{\text{box}},\; v)$$
+the five stored fields group into three concepts: a [[link]] (the edge), a [[box]] (the conviction), a [[valence]] (the prediction).
 
-| field | name | article | deep mechanics |
+$$\text{cyberlink} \;=\; \text{link}(from,\,to) \;+\; \text{box}(coin,\,amount) \;+\; valence$$
+
+| concept | fields | article | type / deep mechanics |
 |---|---|---|---|
-| $from, to$ | source, destination | [particle.md](particle.md) | hash in [[hemera]] |
-| $token$ | denomination | [token.md](token.md) | value layer in [[plumb]] |
-| $a$ | amount | [amount.md](amount.md) | — |
-| $(token, a)$ | box | [box.md](box.md) | mutator set in [[bbg]] |
-| $v$ | valence | [valence.md](valence.md) | BTS/markets in [[tru]] |
+| link | $from, to$ | [link.md](link.md) | [[card]] → [[card]] — a [[particle]] is a knowledge card |
+| box | $coin, amount$ | [box.md](box.md) | [[coin]] (value layer [[plumb]]) × amount; mutator set in [[bbg]] |
+| └ amount | $a$ | [amount.md](amount.md) | the box magnitude |
+| └ coin | $token$ | [token.md](token.md) | the denomination (a coin; a card for transfers) |
+| valence | $v$ | [valence.md](valence.md) | BTS / markets in [[tru]] |
+
+the endpoints are [[card|cards]]; the content-addressed node a card can be is the [[particle]] ([particle.md](particle.md)).
 
 ## emergents — what appears when you read or group the structure
 

@@ -6,17 +6,17 @@ crystal-domain: cyber
 ---
 # box
 
-a box is conviction made concrete: `a` units of denomination `token`, owned by a [[neuron]], bound to a [[cyberlink]] record.
+a box is conviction made concrete: `amount` units of a [[coin]] denomination, owned by a [[neuron]], bound to a [[cyberlink]] record.
 
-$$\text{box} \;=\; (token,\; a) \;\in\; \text{TokenId} \times \mathbb{R}_+$$
+$$\text{box} \;=\; (coin,\; amount) \;\in\; \text{Coin} \times \mathbb{R}_+$$
 
-the pair is the unit. [[amount]] alone is a context-free number; [[token]] alone is a denomination. neither is conviction until paired. the pair is the conviction, and the conviction is the box.
+the pair is the unit. [[amount]] alone is a context-free number; a [[coin]] alone is a denomination. neither is conviction until paired. the pair is the conviction, and the conviction is the box.
 
-a [[cyberlink]]'s five stored fields group into four concepts:
+a [[cyberlink]] is a [[link]] carrying a box, with a [[valence]]:
 
-$$(from,\; to,\; token,\; a,\; v) \;\longrightarrow\; (from,\; to,\; \underbrace{(token,\,a)}_{\text{box}},\; v)$$
+$$(from,\; to,\; coin,\; amount,\; v) \;\longrightarrow\; \text{link}(from,\,to) + \underbrace{(coin,\,amount)}_{\text{box}} + \underbrace{v}_{\text{valence}}$$
 
-structural edge `(from, to)`, the box it moves, and the epistemic [[valence]] `v`.
+(a non-fungible transfer is the special case where the box holds a [[card]] with `amount = 1` rather than a coin — the same move, a unique token instead of a fungible quantity.)
 
 ## moving a box
 
