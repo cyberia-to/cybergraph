@@ -47,7 +47,13 @@ $$\ell = (from,\; to,\; token,\; a,\; v) \;\longrightarrow\; (from,\; to,\; \und
 ## emergents — what appears when you read or group the structure
 
 - [axon.md](axon.md) — the bundle of all cyberlinks between two particles (groups links; homoiconic, axiom A6)
-- [attention.md](attention.md) — the focus a neuron projects onto a target (a read; `query(from, to)`)
+- [attention.md](attention.md) — the focus a neuron projects onto a target (a read; `query(from, to)`). complete form in [[tru]]
+
+## the umbrella operation — routing
+
+cybergraph is umbrella and routing: it names the checks and routes each to the component that owns the complete criterion.
+
+- [validation.md](validation.md) — the submit gate. routes A1–A6 + focus/box/conservation checks to [[hemera]], [[zheng]], [[sync]], [[tru]], [[bbg]]; aggregates the verdict; then `bbg.insert`. not a field — the routing operation itself.
 
 ## staking — placing weight
 
