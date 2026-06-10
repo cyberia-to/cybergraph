@@ -22,12 +22,18 @@ it owns the *lifecycle* of a cyberlink. it does not compute focus (that is [[tru
 
 ## what it does
 
+four verbs of mechanism — each a static handoff to one companion. no decisions.
+
 | step | cybergraph | hands off to |
 |---|---|---|
-| validate | check the [[proof]] σ covers the whole signal against the current root | verify only — [[zheng]] constructs |
-| order | append to the neuron's [[signal]] chain; reject equivocation | [[sync]] (hash chain, VDF) |
-| apply | move each cyberlink's [[box]] into state — particle energy, axon weights, focus debit | [[bbg]] (`insert`, the mutator set) |
-| expose | answer reads over the committed graph | [[inf]] (datalog), [[tru]] (focus) |
+| [validate](specs/validate.md) | check the [[proof]] σ covers the whole signal against the current root | verify only — [[zheng]] constructs |
+| [order](specs/order.md) | append to the neuron's [[signal]] chain; reject equivocation | [[sync]] (hash chain, VDF) |
+| [apply](specs/apply.md) | move each cyberlink's [[box]] into state — particle energy, axon weights, focus debit | [[bbg]] (`insert`, the mutator set) |
+| [expose](specs/expose.md) | answer reads over the committed graph | [[inf]] (datalog), [[tru]] (focus) |
+
+## what it does NOT do
+
+the decision loop — read an intent, collect recomputed state from [[bbg]], run it through [[nox]], judge what is left to compute, iterate, and only then emit a signal — is dynamic control, not a static pipeline. that orchestration is the [[soma]] cognitive loop, above cybergraph. soma *calls* the four verbs; it is not one of them. cybergraph is the fast, correct, stateless processor; soma is the mind that drives it.
 
 ## API
 
@@ -58,6 +64,7 @@ cybergraph is exactly its structure — `cybergraph ← signals ← cyberlinks`,
 - a cyberlink is `link + box + valence` — [link](specs/link.md) (from [card] → to [card]), [box](specs/box.md) ([coin] + [amount](specs/amount.md)), [valence](specs/valence.md); the node a card can be is the [particle](specs/particle.md)
 - signal fields — [neuron](specs/neuron.md), [network](specs/network.md), [impulse](specs/impulse.md), [proof](specs/proof.md)
 - emergents — [axon](specs/axon.md), [attention](specs/attention.md)
+- process (mechanism) — [validate](specs/validate.md), [order](specs/order.md), [apply](specs/apply.md), [expose](specs/expose.md)
 - reads — [query](specs/query.md), [staking](specs/staking.md)
 
 validation is not a separate spec — verifying the [proof](specs/proof.md) field σ *is* the gate (it covers links, boxes, conservation, focus, impulse atomically); only chain-ordering and network checks route out, to [[sync]] and [[network]].

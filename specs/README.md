@@ -53,9 +53,22 @@ the endpoints are [[card|cards]]; the content-addressed node a card can be is th
 - [axon.md](axon.md) — the bundle of all cyberlinks between two particles (groups links; homoiconic, axiom A6)
 - [attention.md](attention.md) — the focus a neuron projects onto a target (a read; `query(from, to)`). complete form in [[tru]]
 
-## validation is not separate — it is the proof field
+## process — what cybergraph does (mechanism)
 
-verifying the [[proof]] field σ **is** the signal's validation: one zheng proof covers cyberlink validity, box ownership, conservation, focus sufficiency, and impulse correctness atomically. the only checks σ does not cover are chain ordering (→ [[sync]]) and network routing (→ [[network]]). there is no `validation` article — see [proof.md](proof.md) for the gate.
+the structure above is what cybergraph *is*; these four verbs are what it *does*. each is a static handoff to one companion — deterministic mechanism, no decisions.
+
+| verb | does | routes to |
+|---|---|---|
+| [validate.md](validate.md) | verify the [[proof]] σ against the root | [[zheng]] |
+| [order.md](order.md) | place in the neuron's chain; reject equivocation | [[sync]] |
+| [apply.md](apply.md) | move each [[box]] into state | [[bbg]] |
+| [expose.md](expose.md) | answer reads over the committed graph | [[inf]], [[tru]] |
+
+validate→order→apply is the write path (inside `link`/`seal`); expose is the read (`query`).
+
+## what cybergraph does NOT do — orchestration is soma's
+
+the *decision* loop — read an [[intent]], collect recomputed state from [[bbg]], run it through [[nox]], judge what is left to compute, make internal calls, iterate, and only then emit a signal — is dynamic control, not a static pipeline. it falls out, upward, to the [[soma]] cognitive loop. soma *calls* cybergraph's four verbs; it is not one of them. cybergraph is the fast, correct, stateless processor; soma is the mind that drives it.
 
 ## staking — placing weight
 

@@ -2,50 +2,26 @@
 tags: cyber, cybergraph
 crystal-type: entity
 crystal-domain: cyber
-alias: proof, signal proof, submission proof, zheng proof, validation, submit gate
+alias: proof, signal proof, submission proof, zheng proof
 ---
 # proof
 
-the $\sigma$ field of a [[signal]]: a single [[zheng]] proof that `submit` verifies before any [[cyberlink]] enters the graph. verifying this field **is** the signal's validation — it covers the whole batch atomically, so there is no separate validation step, only this one check plus two residual routed ones.
+the σ field of a [[signal]]: a single [[zheng]] proof covering the whole batch atomically. it is what makes a signal checkable without re-execution — a verifier holding only the root decides `decide(σ)` in $O(\log n)$.
 
-cybergraph does not construct proofs — that is [[zheng]]'s. it enforces one rule at the boundary:
+## what σ attests
 
-> a signal is accepted iff $\sigma$ is a valid [[zheng]] proof over the whole signal, against the current root.
+one verification certifies all of these together — they are what the field carries, not separate checks:
 
-## what σ covers (the validation surface)
-
-one verification certifies all of these together — they are not separate checks cybergraph runs, they are what the proof attests:
-
-| covered by σ | meaning | complete criterion in |
+| attested | meaning | complete criterion in |
 |---|---|---|
-| cyberlink validity | valid particle references, well-formed links | [[hemera]] (hashing) |
-| box ownership + movement | each spent [[box]] is unspent and owned by ν; outputs created | [[bbg]] (mutator set A(x)/N(x)) |
+| cyberlink validity | valid particle references, well-formed links | [[hemera]] |
+| box ownership + movement | each spent [[box]] is unspent and owned by ν; outputs created | [[bbg]] (mutator set) |
 | conservation | $\sum$ box inputs $= \sum$ outputs $+$ fee | [[tru]] |
 | focus sufficiency | $\text{focus}(\nu) \geq \sum_\ell \text{cost}(\ell)$ | [[tru]] |
 | impulse correctness | $\Delta\phi^*$ is the true tri-kernel shift against the root | [[tru]] ([[impulse]]) |
 
-`decide(σ)` runs in $O(\log n)$ — no re-execution. one proof, everything at once.
-
-## the two checks σ does not cover
-
-| check | why it's separate | routed to |
-|---|---|---|
-| chain ordering | step sequential, prev matches, no equivocation — a position-in-chain fact, not a computation | [[sync]] (the signal chain, VDF) |
-| network routing | the resolved $\mathit{net}$ matches the serving node | [[network]] |
-
-## the gate
-
-```
-submit(signal):
-  verify σ                         ← this field; covers the table above
-  check chain ordering             → sync
-  check network                    → network
-  first failure → reject (bbg never sees it)
-  all pass → bbg.insert(signal) → new root ; advance the chain
-```
-
-reject reasons: `BadProof` (σ fails — the common one), `Equivocation`/`StepNotSequential`/`PrevMismatch` (chain, from [[sync]]), `WrongNetwork`, and `DoubleSpend` (structural, from [[bbg]] at insert).
-
 ## boundary
 
-cybergraph owns the check — `verify(σ, signal, root) → bool` — and the routing of the two residual checks. [[zheng]] owns proof construction, the circuit, and the proof-type taxonomy ([[zheng/proof-types]]). cybergraph never constructs, only decides accept/reject.
+cybergraph never constructs proofs — that is [[zheng]]'s (the circuit, the proof system, the [[zheng/proof-types]] taxonomy). checking this field is the [[validate]] verb; verifying σ **is** the signal's validation. the one thing σ does not cover — chain position — is the [[order]] verb's, routed to [[sync]].
+
+see [[validate]] for the verb that checks σ · [[zheng]] for construction · [[signal]] for the field's slot.
