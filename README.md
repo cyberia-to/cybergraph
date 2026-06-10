@@ -66,7 +66,8 @@ UTXO management is internal to `submit()`: conviction UTXOs created and spent pe
 
 ### cyberlink fields
 
-- [amount.md](specs/amount.md) — $a$: stake quantity. conviction UTXO, adjacency weight
+- [box.md](specs/box.md) — the conviction unit: $(token, a)$. lifecycle (move/transfer/withdraw/spend), adjacency weight, yield
+- [amount.md](specs/amount.md) — $a$: the box magnitude field
 - [valence.md](specs/valence.md) — $v \in \{-1,0,+1\}$: epistemic prediction. BTS, ICBS markets
 - [time.md](specs/time.md) — $t$: block height. ordering, decay, discovery premium
 

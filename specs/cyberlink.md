@@ -16,13 +16,17 @@ $$\ell \;=\; (from,\; to,\; token,\; a,\; v) \;\in\; \text{TokenId} \times \text
 
 three layers in one atomic record. structural $(from, to)$ is binary — the connection either exists or it does not. epistemic $v$ is ternary — the neuron's prediction of how the [[inversely coupled bonding surface|ICBS]] market on this edge will converge. economic $(token, a)$ is continuous over $\mathbb{R}_+$. see [[two three paradox]] for why this layering is not arbitrary
 
-conviction = ($token$, $a$): the pair that turns an assertion into a bet. token selects what moves, [[amount]] declares the stake. a link with zero conviction is structurally identical to a link with maximum conviction — the structural layer is binary. the conviction layer prices it
+the five stored fields group into four concepts — the economic pair $(token, a)$ is one object, a [[box]]:
+
+$$(from,\; to,\; token,\; a,\; v) \;\longrightarrow\; (from,\; to,\; \underbrace{(token,\,a)}_{\text{box}},\; v)$$
+
+the [[box]] is the pair that turns an assertion into a bet: token selects what moves, [[amount]] declares the magnitude. a link with a zero box is structurally identical to a link with a maximum box — the structural layer is binary, the box prices it. see [[box]] for the full conviction model.
 
 cyberlinks are bundled into [[signal|signals]] for broadcast. the [[signal]] adds the provenance layer: the signing [[neuron]] $\nu$, block height $t$, the destination [[network]] $\mathit{net}$, an [[cyber/impulse]] ($\Delta\phi^*$ — the proven [[focus]] shift), and a recursive [[stark]] proof covering the entire batch. the network is a signal-envelope concern — where the assertion is delivered — not a cyberlink field.
 
 the [[cybergraph]] is append-only. [[time]] (block height from the containing signal) distinguishes every record: the same author linking from→to in two signals at $t_1$ and $t_2 > t_1$ produces two separate entries in $L$. this enables reinforcement (higher [[amount]] on a new record), [[valence]] updates (new $v$ at a new signal), and multi-denomination staking (same structural link in different tokens)
 
-see [[token]] for token types and standards. see [[amount]] for conviction mechanics. see [[valence]] for epistemic prediction. see [[time]] for temporal ordering.
+see [[token]] for token types and standards. see [[box]] for conviction mechanics. see [[amount]] for the magnitude field. see [[valence]] for epistemic prediction. see [[time]] for temporal ordering.
 
 ## examples
 
@@ -38,14 +42,7 @@ the from/to pair forms the structural edge in the knowledge graph. the token/amo
 
 ## box model
 
-conviction is a box. creating a cyberlink is a transaction: the author moves $a$ units of $token$ from the source ($from$) box to a new output bound to the cyberlink record. funds always move from one object to another
-
-the conviction output can itself be spent:
-
-- transfer: spend the conviction box to a new owner. the structural record stays in $L$; beneficial ownership moves. this is how the card's transferability operates at the protocol level
-- withdraw: spend the conviction box back to the author's wallet. the economic position closes. the structural record remains
-
-the non-fungibility of the card (5-tuple content + signal provenance) and the fungibility of the [[token]] (transferable box) coexist: the assertion is non-fungible, the economic position is a standard box
+the economic pair $(token, a)$ a cyberlink carries is a [[box]]. creating a cyberlink moves that box from the source $from$ to a new output bound to the record; the box can later be transferred to a new owner or withdrawn to the author's wallet. the non-fungible assertion and the fungible box coexist in one record and are separable. see [[box]] for the full lifecycle and graph effects.
 
 ## CRUD operations
 
