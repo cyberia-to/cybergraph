@@ -13,7 +13,7 @@
 //! Exposed relations (column order matches the inf demo conventions so example
 //! queries run unchanged):
 //!
-//!   particles { cid,  energy, pi_star, weight }
+//!   particles { particle, energy, pi_star, weight }
 //!   neurons   { id,   focus,  karma,   stake  }
 //!   axons     { from, to,     weight_sum      }
 //!   focus     { particle, score }              -- particle → pi_star
@@ -49,7 +49,7 @@ fn int(v: u64) -> Value {
 impl<'a> RelationSource for BbgSource<'a> {
     fn schema(&self, rel: &str) -> Option<Schema> {
         let cols: &[&str] = match rel {
-            "particles" => &["cid", "energy", "pi_star", "weight"],
+            "particles" => &["particle", "energy", "pi_star", "weight"],
             "neurons"   => &["id", "focus", "karma", "stake"],
             "axons"     => &["from", "to", "weight_sum"],
             "focus"     => &["particle", "score"],
@@ -62,8 +62,8 @@ impl<'a> RelationSource for BbgSource<'a> {
 
     fn scan<'b>(&'b self, rel: &str) -> Box<dyn Iterator<Item = Tuple> + 'b> {
         match rel {
-            "particles" => Box::new(self.state.particles.iter().map(|(cid, r)| {
-                vec![Value::hash(*cid), int(r.energy), int(r.pi_star), int(r.weight)]
+            "particles" => Box::new(self.state.particles.iter().map(|(particle, r)| {
+                vec![Value::hash(*particle), int(r.energy), int(r.pi_star), int(r.weight)]
             })),
             "neurons" => Box::new(self.state.neurons.iter().map(|(id, r)| {
                 vec![Value::hash(*id), int(r.focus), int(r.karma), int(r.stake)]
@@ -72,8 +72,8 @@ impl<'a> RelationSource for BbgSource<'a> {
                 let weight = self.state.particles.get(axon_id).map_or(0, |p| p.weight);
                 vec![Value::hash(*from), Value::hash(*to), int(weight)]
             })),
-            "focus" => Box::new(self.state.particles.iter().map(|(cid, r)| {
-                vec![Value::hash(*cid), int(r.pi_star)]
+            "focus" => Box::new(self.state.particles.iter().map(|(particle, r)| {
+                vec![Value::hash(*particle), int(r.pi_star)]
             })),
             "karma" => Box::new(self.state.neurons.iter().map(|(id, r)| {
                 vec![Value::hash(*id), int(r.karma)]

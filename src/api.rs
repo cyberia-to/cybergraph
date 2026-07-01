@@ -460,8 +460,8 @@ mod tests {
         g.link(one_link_signal(n(1), 0, [0u8; 32], p(2), p(3))).unwrap();
 
         // particles relation exposes every materialized particle.
-        let out = g.query("?[cid, energy] := particles{cid, energy}").expect("query runs");
-        assert_eq!(out.columns, vec!["cid", "energy"]);
+        let out = g.query("?[particle, energy] := particles{particle, energy}").expect("query runs");
+        assert_eq!(out.columns, vec!["particle", "energy"]);
         // target p3 (energy 1) + axon-particle H(2,3) both materialize.
         assert!(!out.rows.is_empty(), "query returns the materialized particles");
     }
