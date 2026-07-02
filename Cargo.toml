@@ -15,7 +15,7 @@ bbg    = { path = "../bbg/rs" }
 cyber-sync = { path = "../sync", default-features = false }
 hemera = { package = "cyber-hemera", path = "../hemera/rs" }
 nebu   = { package = "cyb-nebu", path = "../strata/nebu/rs" }
-zheng  = { path = "../zheng" }
+zheng  = { path = "../zheng/rs" }
 
 # inf query engine — the local query path runs inf IR over a bbg-backed source.
 inf-value  = { path = "../inf/rs/value" }
