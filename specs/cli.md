@@ -20,7 +20,7 @@ use `bbg` to debug state; use `cybergraph` to drive and query the graph. it does
 
 ## store — signal-first, the canonical envelope log
 
-cybergraph state is a fold of the signal log (see [[bbg/specs/storage|storage]]), and the log is **[[tape]] frames** — here the *envelope* [[signal]] (neuron, links, prev, step, network), the canonical wire form [[sync]] mints and [[radio]] carries:
+cybergraph state is a fold of the signal log (see [[bbg/specs/storage|storage]]), and the log is **[[tape]] frames** — here the *envelope* [[signal]] (neuron, links, prev, step, network), the canonical wire form [[foculus]] mints and [[radio]] carries:
 
 ```
 cybergraph --store <dir> <command>
@@ -28,7 +28,7 @@ cybergraph --store <dir> <command>
   <dir>/checkpoint latest root + height cache
 ```
 
-`open` replays the log through the processor — each signal frame goes through `link` (chain_append → `bbg.insert`), rebuilding both the chains and the state; intent frames replay through `intend`; finalize markers advance the block. this reuses [[sync]]'s frame codec (`decode_signals` / `encode_signal_frame`) — the envelope shape, distinct from the `bbg` CLI's lower state-application log. JSON appears only as a `--json` output view, never the log.
+`open` replays the log through the processor — each signal frame goes through `link` (chain_append → `bbg.insert`), rebuilding both the chains and the state; intent frames replay through `intend`; finalize markers advance the block. this reuses [[foculus]]'s frame codec (`decode_signals` / `encode_signal_frame`) — the envelope shape, distinct from the `bbg` CLI's lower state-application log. JSON appears only as a `--json` output view, never the log.
 
 ## commands
 
@@ -72,7 +72,7 @@ cybergraph stats     graph statistics (node_count, relation_sizes, max_degree, d
 
 ## implementable now vs deferred
 
-buildable against today's API: `intend`, `link`, `seal`, `query`, `chain`, `intents`, `root`, `stats`. it reuses [[sync]]'s tape codec (envelope frames) and the inf evaluator cybergraph already wires (`inf-eval` over `BbgSource`). deps: cybergraph + cyber-sync (frames, `default-features = false` — no network stack) + clap.
+buildable against today's API: `intend`, `link`, `seal`, `query`, `chain`, `intents`, `root`, `stats`. it reuses [[foculus]]'s tape codec (envelope frames) and the inf evaluator cybergraph already wires (`inf-eval` over `BbgSource`). deps: cybergraph + foculus (frames, `default-features = false` — no network stack) + clap.
 
 deferred:
 - **`watch <filter>`** — subscribe is in-process; a one-shot CLI cannot stream future events. this needs a `serve`/daemon mode, or a log-tail that replays and follows. left for a later release.
