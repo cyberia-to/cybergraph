@@ -1,0 +1,21 @@
+# ---
+# tags: cybergraph, cli, config
+# crystal-type: source
+# crystal-domain: cyber
+# ---
+[package]
+name = "cybergraph-cli"
+version = "0.1.0"
+edition = "2021"
+description = "cybergraph — the cyberlink processor, on the command line"
+license = "Cyber"
+
+[[bin]]
+name = "cybergraph"
+path = "src/main.rs"
+
+[dependencies]
+cybergraph = { path = ".." }
+cyber-sync = { path = "../../sync", default-features = false }
+inf-value  = { path = "../../inf/rs/value" }
+clap       = { version = "4", features = ["derive"] }
