@@ -278,7 +278,25 @@ dependencies = [
 ]
 
 [[package]]
-name = "cyber-sync"
+name = "cybergraph"
+version = "0.1.0"
+dependencies = [
+ "bbg",
+ "cyb-nebu",
+ "cyber-hemera",
+ "cyber-lens",
+ "foculus",
+ "inf-eval",
+ "inf-parse",
+ "inf-plan",
+ "inf-source",
+ "inf-value",
+ "nox",
+ "zheng",
+]
+
+[[package]]
+name = "foculus"
 version = "0.1.0"
 dependencies = [
  "anyhow",
@@ -290,24 +308,6 @@ dependencies = [
  "serde",
  "serde_json",
  "tape",
- "zheng",
-]
-
-[[package]]
-name = "cybergraph"
-version = "0.1.0"
-dependencies = [
- "bbg",
- "cyb-nebu",
- "cyber-hemera",
- "cyber-lens",
- "cyber-sync",
- "inf-eval",
- "inf-parse",
- "inf-plan",
- "inf-source",
- "inf-value",
- "nox",
  "zheng",
 ]
 

@@ -16,6 +16,6 @@ path = "src/main.rs"
 
 [dependencies]
 cybergraph = { path = ".." }
-cyber-sync = { path = "../../sync", default-features = false }
+foculus = { path = "../../foculus", default-features = false }
 inf-value  = { path = "../../inf/rs/value" }
 clap       = { version = "4", features = ["derive"] }

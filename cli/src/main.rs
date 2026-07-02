@@ -14,7 +14,7 @@
 use std::path::PathBuf;
 
 use clap::{Parser, Subcommand};
-use cyber_sync::{decode_events, encode_intent_frame, encode_signal_frame, CyberFrame};
+use foculus::{decode_events, encode_intent_frame, encode_signal_frame, CyberFrame};
 use cybergraph::{
     Cybergraph, CyberlinkRecord, Intent, IntentRecord, NeuronId, Particle, Scope, Signal,
 };

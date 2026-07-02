@@ -26,7 +26,7 @@
 use std::collections::BTreeMap;
 
 use bbg::{Bbg, IntentRecord, NeuronId, Particle};
-use cyber_sync::{ChainError, Signal, SignalChain};
+use foculus::{ChainError, Signal, SignalChain};
 use inf_eval::{eval, Ctx, Output};
 use inf_parse::parse;
 use inf_plan::plan;
@@ -231,7 +231,7 @@ impl Cybergraph {
 
         // Resolve the destination network: the SELF_NETWORK sentinel routes the
         // signal to the sender's private network.
-        let network = if signal.network == cyber_sync::SELF_NETWORK {
+        let network = if signal.network == foculus::SELF_NETWORK {
             private_network(&neuron)
         } else {
             signal.network
@@ -319,7 +319,7 @@ impl Default for Cybergraph {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use cyber_sync::CyberlinkRecord;
+    use foculus::CyberlinkRecord;
     use std::sync::{Arc, Mutex};
 
     fn n(seed: u8) -> NeuronId { [seed; 32] }
@@ -334,13 +334,13 @@ mod tests {
     }
 
     fn empty_signal(neuron: NeuronId, step: u64, prev: Particle) -> Signal {
-        Signal { neuron, network: cyber_sync::SELF_NETWORK, links: vec![], delta_pi: vec![], prev, step, height: 0, proof: None }
+        Signal { neuron, network: foculus::SELF_NETWORK, links: vec![], delta_pi: vec![], prev, step, height: 0, proof: None }
     }
 
     fn one_link_signal(neuron: NeuronId, step: u64, prev: Particle, from: Particle, to: Particle) -> Signal {
         Signal {
             neuron,
-            network: cyber_sync::SELF_NETWORK,
+            network: foculus::SELF_NETWORK,
             links: vec![CyberlinkRecord { neuron, from, to, token: p(0), amount: 1, valence: 1, height: 0 }],
             delta_pi: vec![],
             prev,

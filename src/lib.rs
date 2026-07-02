@@ -11,10 +11,10 @@
 //!
 //! Backends:
 //!   bbg          — authenticated state (store)
-//!   cyber-sync   — sync-protocol mechanics: chain, VDF, equivocation, DAS, CRDT
+//!   foculus   — sync-protocol mechanics: chain, VDF, equivocation, DAS, CRDT
 //!   radio        — wire transport
 //!
-//! Signal/chain/VDF types are re-exported from `cyber-sync` so downstream
+//! Signal/chain/VDF types are re-exported from `foculus` so downstream
 //! callers (soma, soft3 SDK) have a single import for the public API.
 
 pub mod api;
@@ -25,7 +25,7 @@ pub mod source;
 pub use bbg::{NeuronId, Particle, IntentRecord, SignalRecord};
 
 // Re-export the signal lifecycle primitives owned by sync.
-pub use cyber_sync::{
+pub use foculus::{
     ChainError, CyberlinkRecord, Signal, SignalChain, SELF_NETWORK,
     VdfProof, vdf_evaluate, vdf_verify, challenge_from_hash,
 };
