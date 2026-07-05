@@ -14,7 +14,7 @@ the full set of conditions a signal must satisfy. each is checked one way — at
 
 | criterion | what must hold | checked by | owner |
 |---|---|---|---|
-| availability | each referenced particle's content is published and retrievable (and hashes to its id) | availability proof (DAS) | [[sync]] (DAS), [[bbg]] files |
+| availability | each referenced particle's content is published and retrievable (and hashes to its id) | availability proof (DAS) | [[foculus]] (DAS), [[bbg]] files |
 | signature | valid signature from ν over $H(\vec\ell \,\|\, \Delta\phi^* \,\|\, t)$ | σ | [[mudra]] |
 | cyberlink validity | each $\ell \in \vec\ell$ has valid particle references and is well-formed | σ | [[hemera]] |
 | box unspent | each spent [[box]]'s nullifier is live — $N(n) \neq 0$ (opening into $N(x)$) | σ | [[bbg]] |
@@ -22,10 +22,10 @@ the full set of conditions a signal must satisfy. each is checked one way — at
 | conservation | $\sum$ box inputs $= \sum$ outputs $+$ fee | σ | [[tru]] |
 | focus sufficiency | $\text{focus}(\nu) \geq \sum_\ell \text{cost}(\ell)$, $\text{cost}(\ell) = a(\ell) + \text{base\_fee}$, against $\text{BBG\_poly}(\text{neurons}, \nu, t)$ | σ | [[tru]] |
 | impulse correctness | $\Delta\phi^*$ is the true tri-kernel shift against the current root | σ | [[tru]] ([[impulse]]) |
-| ordering | height = current, prev links, no equivocation, valid VDF | the chain | [[order]] → [[sync]] |
+| ordering | height = current, prev links, no equivocation, valid VDF | the chain | [[order]] → [[foculus]] |
 | network | the resolved $\mathit{net}$ matches the serving node | routing | [[network]] |
 
-the bulk is one verification — `decide(σ)`, $O(\log n)$, no re-execution. availability, ordering, and network are the conditions σ does not cover; their detail lives in [[order]] and [[network]], availability in the [[sync]] DA layer.
+the bulk is one verification — `decide(σ)`, $O(\log n)$, no re-execution. availability, ordering, and network are the conditions σ does not cover; their detail lives in [[order]] and [[network]], availability in the [[foculus]] DA layer.
 
 box unspent is the structural double-spend invariant ($N(n)=0 \Rightarrow$ reject); box ownership is the semantic layer on top — the *right* neuron is spending, not just that the box is unspent.
 

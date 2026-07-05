@@ -278,29 +278,13 @@ dependencies = [
 ]
 
 [[package]]
-name = "cyber-sync"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "bbg",
- "clap",
- "cyb-nebu",
- "cyber-hemera",
- "rand",
- "serde",
- "serde_json",
- "tape",
- "zheng",
-]
-
-[[package]]
 name = "cybergraph"
 version = "0.1.0"
 dependencies = [
  "bbg",
  "cyb-nebu",
  "cyber-hemera",
- "cyber-sync",
+ "foculus",
  "inf-eval",
  "inf-parse",
  "inf-plan",
@@ -314,9 +298,25 @@ name = "cybergraph-cli"
 version = "0.1.0"
 dependencies = [
  "clap",
- "cyber-sync",
  "cybergraph",
+ "foculus",
  "inf-value",
+]
+
+[[package]]
+name = "foculus"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "bbg",
+ "clap",
+ "cyb-nebu",
+ "cyber-hemera",
+ "rand",
+ "serde",
+ "serde_json",
+ "tape",
+ "zheng",
 ]
 
 [[package]]
