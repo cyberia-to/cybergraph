@@ -111,7 +111,7 @@ fn run(cli: Cli) -> i32 {
             match cg.link(signal.clone()) {
                 Ok(()) => {
                     append(cli.store.as_ref(), &encode_signal_frame(&signal));
-                    println!("{}", hex(&cg.bbg.state.root));
+                    println!("{}", hex(&cg.bbg.state.root()));
                 }
                 Err(e) => return rejected(e),
             }
@@ -125,7 +125,7 @@ fn run(cli: Cli) -> i32 {
             match cg.seal(key, signal.clone()) {
                 Ok(()) => {
                     append(cli.store.as_ref(), &encode_signal_frame(&signal));
-                    println!("{}", hex(&cg.bbg.state.root));
+                    println!("{}", hex(&cg.bbg.state.root()));
                 }
                 Err(e) => return rejected(e),
             }
@@ -138,10 +138,10 @@ fn run(cli: Cli) -> i32 {
         Command::Finalize => {
             cg.bbg.finalize_block();
             bump_blocks(cli.store.as_ref());
-            println!("height {}  root {}", cg.bbg.state.height, hex(&cg.bbg.state.root));
+            println!("height {}  root {}", cg.bbg.state.height, hex(&cg.bbg.state.root()));
         }
 
-        Command::Root => println!("{}", hex(&cg.bbg.state.root)),
+        Command::Root => println!("{}", hex(&cg.bbg.state.root())),
         Command::Stats => {
             let s = cg.bbg.statistics();
             println!("node_count      {}", s.node_count);
