@@ -397,9 +397,9 @@ mod tests {
     #[test]
     fn link_moves_the_root() {
         let mut g = Cybergraph::new();
-        let before = g.bbg.state.root;
+        let before = g.bbg.state.root();
         g.link(one_link_signal(n(1), 0, [0u8; 32], p(2), p(3))).unwrap();
-        assert_ne!(g.bbg.state.root, before, "applying cyberlinks advances BBG_root");
+        assert_ne!(g.bbg.state.root(), before, "applying cyberlinks advances BBG_root");
     }
 
     #[test]

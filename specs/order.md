@@ -19,8 +19,8 @@ the second verb: place a validated signal in its [[neuron]]'s causal chain, and 
 
 equivocation is not just rejected — both conflicting signals are rejected, the neuron's focus is **slashed**, and the evidence is committed to the signals dimension. the VDF is what prevents timestamp manipulation: a signal claiming $t \gg$ actual time cannot produce a valid proof without actually waiting.
 
-cybergraph routes all of this to [[sync]] (the SignalChain — hash chain, VDF, equivocation detection); the mechanics live there, cybergraph calls them and reads the verdict.
+cybergraph routes all of this to [[foculus]] (the SignalChain — hash chain, VDF, equivocation detection); the mechanics live there, cybergraph calls them and reads the verdict.
 
 mechanism, not decision: order is a fixed rule over chain position. it does not choose what to order — [[soma]] does, by producing signals.
 
-see [[validate]] for the prior verb · [[apply]] for the next · [[sync]] for the chain · [[signal]] / [[intent]] for the temporal fields.
+see [[validate]] for the prior verb · [[apply]] for the next · [[foculus]] for the chain · [[signal]] / [[intent]] for the temporal fields.

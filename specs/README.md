@@ -10,7 +10,7 @@ cybergraph is exactly its structure, nothing more and nothing less:
 cybergraph  ←  signals  ←  cyberlinks
 ```
 
-a cybergraph is built from signals; a signal is built from cyberlinks; each has a fixed, finite set of fields. these specs define those fields — one article per field — plus the two emergents that appear when you read or group the structure ([[axon]], [[attention]]) and the [[query]] interface that reads it. deep mechanics of a field live in the repo that owns them ([[zheng]] proof construction, [[tru]] focus/impulse, [[tok]] tokens / [[plumb]] value ops, [[mudra]] identity, [[sync]] ordering); cybergraph defines the field and references them.
+a cybergraph is built from signals; a signal is built from cyberlinks; each has a fixed, finite set of fields. these specs define those fields — one article per field — plus the two emergents that appear when you read or group the structure ([[axon]], [[attention]]) and the [[query]] interface that reads it. deep mechanics of a field live in the repo that owns them ([[zheng]] proof construction, [[tru]] focus/impulse, [[tok]] tokens / [[plumb]] value ops, [[mudra]] identity, [[foculus]] ordering); cybergraph defines the field and references them.
 
 ## the structure
 
@@ -30,7 +30,7 @@ $$s = (\nu,\; \mathit{net},\; \vec\ell,\; \Delta\phi^*,\; \sigma,\; h_0,\; h_1)$
 | [links](cyberlink.md) | $\vec\ell$ | — |
 | [impulse](impulse.md) | $\Delta\phi^*$ | computed/rewarded in [[tru]] |
 | [proof](proof.md) | $\sigma$ | constructed by [[zheng]] |
-| [inception, sealing](signal.md) | $h_0, h_1$ | ordering in [[sync]]; pre-seal state in [[intent]] |
+| [inception, sealing](signal.md) | $h_0, h_1$ | ordering in [[foculus]]; pre-seal state in [[intent]] |
 
 ## cyberlink — link + box + valence
 
@@ -60,7 +60,7 @@ the structure above is what cybergraph *is*; these four verbs are what it *does*
 | verb | does | routes to |
 |---|---|---|
 | [validate.md](validate.md) | verify the [[proof]] σ against the root | [[zheng]] |
-| [order.md](order.md) | place in the neuron's chain; reject equivocation | [[sync]] |
+| [order.md](order.md) | place in the neuron's chain; reject equivocation | [[foculus]] |
 | [apply.md](apply.md) | move each [[box]] into state | [[bbg]] |
 | [expose.md](expose.md) | answer reads over the committed graph | [[inf]], [[tru]] |
 

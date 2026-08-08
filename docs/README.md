@@ -99,8 +99,8 @@ once the mind hands over a proven signal, cybergraph's own work is four static h
 
 | verb | the machine | hands to |
 |---|---|---|
-| [validate](../specs/validate.md) | check the conditions a signal must satisfy | the proof σ ([[zheng]]), an availability proof ([[sync]] DAS), the chain ([[sync]]), routing ([[network]]) |
-| [order](../specs/order.md) | place the signal in the neuron's causal chain; reject equivocation | [[sync]] (hash chain, VDF) |
+| [validate](../specs/validate.md) | check the conditions a signal must satisfy | the proof σ ([[zheng]]), an availability proof ([[foculus]] DAS), the chain ([[foculus]]), routing ([[network]]) |
+| [order](../specs/order.md) | place the signal in the neuron's causal chain; reject equivocation | [[foculus]] (hash chain, VDF) |
 | [apply](../specs/apply.md) | move each cyberlink's box into authenticated state | [[bbg]] (`insert`, the mutator set) |
 | [expose](../specs/expose.md) | answer reads over the committed graph | [[inf]] (datalog), [[tru]] (focus) |
 
@@ -118,7 +118,7 @@ the decision loop — read an intent, collect recomputed state from [[bbg]], run
 
 ## 7. local-first, at any scope
 
-cybergraph is local-first: one instance processes whatever cyberlinks it is pointed at — a single neuron, an avatar across bodies, a regional aggregate, the planetary union — at whatever scope it is configured for. the four verbs and the seal binding hold identically at every scope. distribution, when present, is [[sync]]'s; finality, when present, is [[foculus]]'s. cybergraph itself does not change. a researcher querying their own links and a planetary validator run the same machine over different amounts of data.
+cybergraph is local-first: one instance processes whatever cyberlinks it is pointed at — a single neuron, an avatar across bodies, a regional aggregate, the planetary union — at whatever scope it is configured for. the four verbs and the seal binding hold identically at every scope. distribution and finality, when present, are [[foculus]]'s. cybergraph itself does not change. a researcher querying their own links and a planetary validator run the same machine over different amounts of data.
 
 ---
 
@@ -130,7 +130,7 @@ cybergraph is the spine. it stays dumb by design so the mind that drives it can 
 |---|---|
 | [[soma]] | the runtime — decides, executes, proves, drives the lifecycle |
 | [[bbg]] | authenticated state, the mutator set, query proofs |
-| [[sync]] | signal ordering, hash chain, VDF, availability, distribution |
+| [[foculus]] | signal ordering, hash chain, VDF, availability, distribution |
 | [[tru]] | focus φ\*, the tri-kernel, karma, rewards |
 | [[zheng]] | proof construction and verification |
 | [[nox]] | execution — runs a scope to a proven result |

@@ -50,12 +50,12 @@ fn finalize_block_updates_root_and_look_proof_consistent() {
     bbg.state.neurons.insert(n, NeuronRecord { focus: 100_000, karma: 0, stake: 0 });
     bbg.insert(&one_link(n, particle(2), particle(3), 0)).unwrap();
 
-    let root_before = bbg.state.root;
+    let root_before = bbg.state.root();
     bbg.finalize_block();
 
     // finalize_block records time[0]=root_before, recomputes root, increments height.
     assert_eq!(bbg.state.height, 1);
-    assert_ne!(bbg.state.root, root_before, "root must change after finalize");
+    assert_ne!(bbg.state.root(), root_before, "root must change after finalize");
     assert!(bbg.state.time.contains_key(&0), "time[0] must exist after finalize");
 
     // Build look proof against the post-finalize state.
@@ -117,7 +117,7 @@ fn checkpoint_tracks_state_after_finalize() {
 
     bbg.finalize_block();
 
-    assert_eq!(bbg.checkpoint.root, bbg.state.root,
+    assert_eq!(bbg.checkpoint.root, bbg.state.root(),
         "checkpoint.root must match state.root after finalize");
     assert_eq!(bbg.checkpoint.height, bbg.state.height,
         "checkpoint.height must match state.height after finalize");

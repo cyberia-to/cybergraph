@@ -54,7 +54,7 @@ pub fn bbg_object_from_state<const N: usize>(
     order: &mut Order<N>,
     state: &bbg::BbgState,
 ) -> OrderId {
-    make_bbg_object(order, bbg::dim::goldilocks_from_bytes32(&state.root))
+    make_bbg_object(order, bbg::dim::goldilocks_from_bytes32(&state.root()))
 }
 
 /// Build `[17 [[1 ns] [1 key]]]` — look formula with quoted ns and key.

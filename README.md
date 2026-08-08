@@ -4,7 +4,7 @@ the local-first cyberlink processor. signal in, graph out.
 
 cybergraph turns a neuron's signed, proven [[signal]]s into an authenticated knowledge graph and lets anything read it. the unit it processes is the **signal**; the [[cyberlink]]s a signal carries are what land in the graph. it validates each signal's proof, orders signals into a per-neuron causal chain, applies their cyberlinks to state, and exposes the result to queries. local-first: one instance processes whatever it is pointed at — a single neuron, an avatar, a shared network — at whatever scope it is configured for.
 
-it owns the **signal lifecycle** — declare, complete, commit. it does not compute focus ([[tru]]), store state ([[bbg]]), move bytes ([[sync]] / [[radio]]), define value ([[tok]] via the [[plumb]] operations), or construct proofs ([[zheng]]). it is the spine those attach to.
+it owns the **signal lifecycle** — declare, complete, commit. it does not compute focus ([[tru]]), store state ([[bbg]]), move bytes ([[foculus]] / [[radio]]), define value ([[tok]] via the [[plumb]] operations), or construct proofs ([[zheng]]). it is the spine those attach to.
 
 the architecture is laid out in the [whitepaper](docs/README.md); the precise structure in [specs/](specs/README.md).
 
@@ -53,7 +53,7 @@ each is a static handoff to one companion. no decisions.
 | step | cybergraph | hands off to |
 |---|---|---|
 | [validate](specs/validate.md) | check the [[proof]] σ covers the signal against the root | verify only — [[zheng]] constructs |
-| [order](specs/order.md) | append to the neuron's [[signal]] chain; reject equivocation | [[sync]] (hash chain, VDF) |
+| [order](specs/order.md) | append to the neuron's [[signal]] chain; reject equivocation | [[foculus]] (hash chain, VDF) |
 | [apply](specs/apply.md) | move each cyberlink's [[box]] into state — particle energy, axon weights, focus debit | [[bbg]] (`insert`, the mutator set) |
 | [expose](specs/expose.md) | answer reads over the committed graph | [[inf]] (datalog), [[tru]] (focus) |
 
@@ -101,7 +101,7 @@ cybergraph defines the graph; the companions give it state, order, dynamics, pro
 |---|---|
 | [[soma]] | the runtime — decides, executes, proves, drives the lifecycle |
 | [[bbg]] | authenticated state, the mutator set, query proofs |
-| [[sync]] | signal ordering, hash chain, VDF, distribution |
+| [[foculus]] | signal ordering, hash chain, VDF, distribution |
 | [[tru]] | focus φ\*, the tri-kernel, karma, rewards |
 | [[zheng]] | proof construction and verification |
 | [[nox]] | execution — runs a scope to a proven result |
