@@ -3,15 +3,6 @@
 version = 4
 
 [[package]]
-name = "acpu"
-version = "0.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "81089272e2a248781b1e2c38ad7247a98bea63a602c0a445dc63e955b2035375"
-dependencies = [
- "unimem",
-]
-
-[[package]]
 name = "aho-corasick"
 version = "1.1.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -146,21 +137,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1d07550c9036bf2ae0c684c4297d503f838287c83c53686d05370d0e139ae570"
 
 [[package]]
-name = "crossbeam-queue"
-version = "0.3.12"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0f58bbc28f91df819d0aa2a2c00cd19754769c2fad90579b3592b1c9ba7a3115"
-dependencies = [
- "crossbeam-utils",
-]
-
-[[package]]
-name = "crossbeam-utils"
-version = "0.8.21"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d0a5c400df2834b80a4c3327b3aad3a4c4cd4de0629063962b03235697506a28"
-
-[[package]]
 name = "cyb-genies"
 version = "0.1.0"
 dependencies = [
@@ -247,7 +223,6 @@ dependencies = [
 name = "cyb-nebu"
 version = "0.1.0"
 dependencies = [
- "acpu",
  "strata-compute",
  "strata-core",
  "strata-ext",
@@ -310,10 +285,12 @@ dependencies = [
  "clap",
  "cyb-nebu",
  "cyber-hemera",
+ "cyber-lens",
  "rand",
  "serde",
  "serde_json",
  "tape",
+ "tok",
  "tru",
  "zheng",
 ]
@@ -429,12 +406,6 @@ checksum = "d1219ed1b7f229ee7104d281dd01d6802fe28bb6e95d292942c4daacdeb798c0"
 dependencies = [
  "libc",
 ]
-
-[[package]]
-name = "mutants"
-version = "0.0.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bc0287524726960e07b119cebd01678f852f147742ae0d925e6a520dca956126"
 
 [[package]]
 name = "nox"
@@ -665,6 +636,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "tok"
+version = "0.1.0"
+dependencies = [
+ "cyber-hemera",
+ "tru",
+]
+
+[[package]]
 name = "toml"
 version = "0.8.23"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -722,16 +701,6 @@ name = "unicode-ident"
 version = "1.0.24"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e6e4313cd5fcd3dad5cafa179702e2b244f760991f45397d14d4ebf38247da75"
-
-[[package]]
-name = "unimem"
-version = "0.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a91794fe345844d09b134c55fde134bc9d51593964b906dde2f667162e49918d"
-dependencies = [
- "crossbeam-queue",
- "mutants",
-]
 
 [[package]]
 name = "utf8parse"

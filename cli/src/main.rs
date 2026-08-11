@@ -162,7 +162,7 @@ fn build_signal(cg: &Cybergraph, neuron: &str, from: &str, to: &str, token: &str
         neuron: n,
         network: SELF_NETWORK,
         links: vec![CyberlinkRecord { neuron: n, from: f, to: t, token: tok, amount, valence, height: 0 }],
-        delta_pi: vec![],
+        delta_pi: vec![], box_moves: vec![],
         prev,
         step,
         height: 0,

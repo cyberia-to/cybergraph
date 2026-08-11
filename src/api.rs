@@ -27,7 +27,7 @@ use std::collections::BTreeMap;
 
 use bbg::{Bbg, IntentRecord, NeuronId, Particle};
 use foculus::{ChainError, Signal, SignalChain};
-use inf_eval::{eval, Ctx, Output};
+use inf_eval::{Ctx, Output, eval};
 use inf_parse::parse;
 use inf_plan::plan;
 
@@ -38,16 +38,17 @@ use crate::source::BbgSource;
 /// Encoding is dialect-specific; cybergraph stores its scope_hash (Hemera).
 #[derive(Clone)]
 pub struct Scope {
-    pub target:      Particle,
-    pub predicate:   Vec<u8>,
-    pub deadline:    Option<u64>,
+    pub target: Particle,
+    pub predicate: Vec<u8>,
+    pub deadline: Option<u64>,
     pub constraints: Vec<u8>,
 }
 
 impl Scope {
     /// Canonical hash of the scope = H(target ‖ predicate ‖ deadline ‖ constraints).
     pub fn hash(&self) -> Particle {
-        let mut buf: Vec<u8> = Vec::with_capacity(32 + self.predicate.len() + 8 + self.constraints.len());
+        let mut buf: Vec<u8> =
+            Vec::with_capacity(32 + self.predicate.len() + 8 + self.constraints.len());
         buf.extend_from_slice(&self.target);
         buf.extend_from_slice(&self.predicate);
         buf.extend_from_slice(&self.deadline.unwrap_or(0).to_le_bytes());
@@ -63,9 +64,9 @@ impl Scope {
 /// A declared intent: neuron + scope + identity proof.
 /// At declare time there is no STARK — only the signature over (ν ‖ h0 ‖ scope_hash).
 pub struct Intent {
-    pub neuron:    NeuronId,
-    pub h0:        u64,
-    pub scope:     Scope,
+    pub neuron: NeuronId,
+    pub h0: u64,
+    pub scope: Scope,
     pub signature: [u8; 64],
 }
 
@@ -80,9 +81,20 @@ pub enum Filter {
 /// Events emitted by cybergraph.
 #[derive(Clone)]
 pub enum Event {
-    IntentDeclared { key: Particle, neuron: NeuronId, h0: u64 },
-    SignalSealed   { intent_key: Particle, neuron: NeuronId, step: u64 },
-    Linked         { neuron: NeuronId, step: u64 },
+    IntentDeclared {
+        key: Particle,
+        neuron: NeuronId,
+        h0: u64,
+    },
+    SignalSealed {
+        intent_key: Particle,
+        neuron: NeuronId,
+        step: u64,
+    },
+    Linked {
+        neuron: NeuronId,
+        step: u64,
+    },
 }
 
 /// Errors from the public API.
@@ -128,20 +140,20 @@ pub enum QueryError {
 /// it sees, at whatever scope it is configured for. Sync fans out distribution
 /// to peers when present.
 pub struct Cybergraph {
-    pub bbg:         Bbg,
-    pub chains:      BTreeMap<NeuronId, SignalChain>,
+    pub bbg: Bbg,
+    pub chains: BTreeMap<NeuronId, SignalChain>,
     /// The network this node serves. `None` accepts any network (local-first
     /// dev default); `Some(n)` enforces that each signal's resolved network is `n`.
-    pub network:     Option<Particle>,
-    subscribers:     Vec<(Filter, Box<dyn Fn(&Event) + Send + Sync>)>,
+    pub network: Option<Particle>,
+    subscribers: Vec<(Filter, Box<dyn Fn(&Event) + Send + Sync>)>,
 }
 
 impl Cybergraph {
     pub fn new() -> Self {
         Self {
-            bbg:         Bbg::new(),
-            chains:      BTreeMap::new(),
-            network:     None,
+            bbg: Bbg::new(),
+            chains: BTreeMap::new(),
+            network: None,
             subscribers: Vec::new(),
         }
     }
@@ -149,20 +161,27 @@ impl Cybergraph {
     /// A node serving exactly one network — rejects any signal whose resolved
     /// destination network differs from `network`.
     pub fn serving(network: Particle) -> Self {
-        Self { network: Some(network), ..Self::new() }
+        Self {
+            network: Some(network),
+            ..Self::new()
+        }
     }
 
     /// intend — declare an unsealed intent. Persists the record and emits
     /// `IntentDeclared`. Sync layer would broadcast in a networked deployment.
     pub fn intend(&mut self, intent: Intent) -> Result<Particle, ApiError> {
         let record = IntentRecord {
-            neuron:     intent.neuron,
-            h0:         intent.h0,
+            neuron: intent.neuron,
+            h0: intent.h0,
             scope_hash: intent.scope.hash(),
-            signature:  intent.signature,
+            signature: intent.signature,
         };
         let key = self.bbg.apply_intent(&record);
-        self.emit(Event::IntentDeclared { key, neuron: intent.neuron, h0: intent.h0 });
+        self.emit(Event::IntentDeclared {
+            key,
+            neuron: intent.neuron,
+            h0: intent.h0,
+        });
         Ok(key)
     }
 
@@ -173,7 +192,11 @@ impl Cybergraph {
             return Err(ApiError::UnknownIntent(intent_key));
         }
         let (neuron, step) = self.commit_signal(signal)?;
-        self.emit(Event::SignalSealed { intent_key, neuron, step });
+        self.emit(Event::SignalSealed {
+            intent_key,
+            neuron,
+            step,
+        });
         Ok(())
     }
 
@@ -239,7 +262,10 @@ impl Cybergraph {
         // Routing gate: a node serving a specific network rejects foreign signals.
         if let Some(serving) = self.network {
             if network != serving {
-                return Err(ApiError::WrongNetwork { expected: serving, got: network });
+                return Err(ApiError::WrongNetwork {
+                    expected: serving,
+                    got: network,
+                });
             }
         }
 
@@ -248,15 +274,20 @@ impl Cybergraph {
         // 1. ordering gate
         self.chain_append(signal)?;
         // 2. apply cyberlinks to authenticated state
-        self.bbg.insert(&bbg_signal).map_err(ApiError::BbgRejected)?;
+        self.bbg
+            .insert(&bbg_signal)
+            .map_err(ApiError::BbgRejected)?;
         // 3. record the signal header
-        self.bbg.apply_signal_record(step, bbg::SignalRecord {
-            neuron,
-            network,
-            link_count,
-            block_height: height,
-            proof_hash: [0u8; 32],
-        });
+        self.bbg.apply_signal_record(
+            step,
+            bbg::SignalRecord {
+                neuron,
+                network,
+                link_count,
+                block_height: height,
+                proof_hash: [0u8; 32],
+            },
+        );
 
         Ok((neuron, step))
     }
@@ -287,10 +318,8 @@ impl Cybergraph {
 
 /// Convert a sync signal into a bbg signal for state application.
 ///
-/// Maps each `CyberlinkRecord` to a `bbg::Cyberlink` (from, to, token, amount,
-/// valence). Release 0 limitation: `CyberlinkRecord` carries no box movements,
-/// so `box_moves` is empty — the local path applies cyberlinks only; conviction
-/// spends arrive in Release 1.
+/// Maps each `CyberlinkRecord` to a `bbg::Cyberlink` and each
+/// `BoxMoveRecord` to a `bbg::BoxMove` (nullifier double-spend gate).
 fn bridge_to_bbg(signal: &Signal) -> bbg::Signal {
     bbg::Signal {
         neuron: signal.neuron,
@@ -305,7 +334,14 @@ fn bridge_to_bbg(signal: &Signal) -> bbg::Signal {
                 valence: l.valence,
             })
             .collect(),
-        box_moves: Vec::new(),
+        box_moves: signal
+            .box_moves
+            .iter()
+            .map(|m| bbg::BoxMove {
+                nullifier: m.nullifier,
+                commitment: m.commitment,
+            })
+            .collect(),
         height: signal.height,
     }
 }
@@ -322,27 +358,66 @@ mod tests {
     use foculus::CyberlinkRecord;
     use std::sync::{Arc, Mutex};
 
-    fn n(seed: u8) -> NeuronId { [seed; 32] }
-    fn p(seed: u8) -> Particle { [seed; 32] }
+    fn n(seed: u8) -> NeuronId {
+        [seed; 32]
+    }
+    fn p(seed: u8) -> Particle {
+        [seed; 32]
+    }
 
     fn scope(target: Particle) -> Scope {
-        Scope { target, predicate: b"do-thing".to_vec(), deadline: Some(100), constraints: vec![] }
+        Scope {
+            target,
+            predicate: b"do-thing".to_vec(),
+            deadline: Some(100),
+            constraints: vec![],
+        }
     }
 
     fn intent(neuron: NeuronId, h0: u64, target: Particle) -> Intent {
-        Intent { neuron, h0, scope: scope(target), signature: [0u8; 64] }
+        Intent {
+            neuron,
+            h0,
+            scope: scope(target),
+            signature: [0u8; 64],
+        }
     }
 
     fn empty_signal(neuron: NeuronId, step: u64, prev: Particle) -> Signal {
-        Signal { neuron, network: foculus::SELF_NETWORK, links: vec![], delta_pi: vec![], prev, step, height: 0, proof: None }
-    }
-
-    fn one_link_signal(neuron: NeuronId, step: u64, prev: Particle, from: Particle, to: Particle) -> Signal {
         Signal {
             neuron,
             network: foculus::SELF_NETWORK,
-            links: vec![CyberlinkRecord { neuron, from, to, token: p(0), amount: 1, valence: 1, height: 0 }],
+            links: vec![],
             delta_pi: vec![],
+            box_moves: vec![],
+            prev,
+            step,
+            height: 0,
+            proof: None,
+        }
+    }
+
+    fn one_link_signal(
+        neuron: NeuronId,
+        step: u64,
+        prev: Particle,
+        from: Particle,
+        to: Particle,
+    ) -> Signal {
+        Signal {
+            neuron,
+            network: foculus::SELF_NETWORK,
+            links: vec![CyberlinkRecord {
+                neuron,
+                from,
+                to,
+                token: p(0),
+                amount: 1,
+                valence: 1,
+                height: 0,
+            }],
+            delta_pi: vec![],
+            box_moves: vec![],
             prev,
             step,
             height: 0,
@@ -388,18 +463,34 @@ mod tests {
         let s = one_link_signal(n(1), 0, [0u8; 32], p(2), p(3));
         g.link(s).unwrap();
         // The cyberlink (p2 → p3, amount 1) must reach bbg state, not just the header.
-        let target = g.bbg.state.particles.get(&p(3)).expect("target particle materialized");
+        let target = g
+            .bbg
+            .state
+            .particles
+            .get(&p(3))
+            .expect("target particle materialized");
         assert_eq!(target.energy, 1, "target energy reflects the staked link");
-        assert!(g.bbg.state.axons_out.get(&p(2)).is_some(), "outgoing axon recorded");
-        assert!(g.bbg.state.axons_in.get(&p(3)).is_some(), "incoming axon recorded");
+        assert!(
+            g.bbg.state.axons_out.get(&p(2)).is_some(),
+            "outgoing axon recorded"
+        );
+        assert!(
+            g.bbg.state.axons_in.get(&p(3)).is_some(),
+            "incoming axon recorded"
+        );
     }
 
     #[test]
     fn link_moves_the_root() {
         let mut g = Cybergraph::new();
         let before = g.bbg.state.root();
-        g.link(one_link_signal(n(1), 0, [0u8; 32], p(2), p(3))).unwrap();
-        assert_ne!(g.bbg.state.root(), before, "applying cyberlinks advances BBG_root");
+        g.link(one_link_signal(n(1), 0, [0u8; 32], p(2), p(3)))
+            .unwrap();
+        assert_ne!(
+            g.bbg.state.root(),
+            before,
+            "applying cyberlinks advances BBG_root"
+        );
     }
 
     #[test]
@@ -431,8 +522,8 @@ mod tests {
         g.subscribe(Filter::All, move |e| {
             let tag = match e {
                 Event::IntentDeclared { .. } => "intent",
-                Event::SignalSealed { .. }   => "seal",
-                Event::Linked { .. }         => "link",
+                Event::SignalSealed { .. } => "seal",
+                Event::Linked { .. } => "link",
             };
             log2.lock().unwrap().push(tag);
         });
@@ -447,7 +538,9 @@ mod tests {
         let mut g = Cybergraph::new();
         let counter: Arc<Mutex<usize>> = Arc::new(Mutex::new(0));
         let c2 = counter.clone();
-        g.subscribe(Filter::ByNeuron(n(1)), move |_| { *c2.lock().unwrap() += 1; });
+        g.subscribe(Filter::ByNeuron(n(1)), move |_| {
+            *c2.lock().unwrap() += 1;
+        });
         g.link(empty_signal(n(1), 0, [0u8; 32])).unwrap();
         g.link(empty_signal(n(2), 0, [0u8; 32])).unwrap();
         assert_eq!(*counter.lock().unwrap(), 1);
@@ -457,13 +550,19 @@ mod tests {
     fn query_runs_inf_over_bbg_state() {
         // Seed two particles via a link, then query the focus relation.
         let mut g = Cybergraph::new();
-        g.link(one_link_signal(n(1), 0, [0u8; 32], p(2), p(3))).unwrap();
+        g.link(one_link_signal(n(1), 0, [0u8; 32], p(2), p(3)))
+            .unwrap();
 
         // particles relation exposes every materialized particle.
-        let out = g.query("?[particle, energy] := particles{particle, energy}").expect("query runs");
+        let out = g
+            .query("?[particle, energy] := particles{particle, energy}")
+            .expect("query runs");
         assert_eq!(out.columns, vec!["particle", "energy"]);
         // target p3 (energy 1) + axon-particle H(2,3) both materialize.
-        assert!(!out.rows.is_empty(), "query returns the materialized particles");
+        assert!(
+            !out.rows.is_empty(),
+            "query returns the materialized particles"
+        );
     }
 
     #[test]
