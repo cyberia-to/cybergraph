@@ -13,7 +13,7 @@ $$i \;=\; (\nu,\; h_0,\; \Sigma,\; \pi_\text{id})$$
 | $\Sigma$ | [[scope]] | $S$ | structured description of the intended action: target particle, predicate, deadline, constraints |
 | $\pi_\text{id}$ | identity proof | $\text{Sig}$ | [[neuron]]'s signature over $(\nu \;\|\; h_0 \;\|\; \Sigma)$ |
 
-an intent carries an identity proof (the neuron's signature over the declared scope) but no content STARK. the STARK is produced at sealing — it proves the neuron actually *ran* the scope. the intent commits to what will be computed; the signal proves it was.
+an intent carries an identity proof (the neuron's signature over the declared scope) but no content proof. the [[zheng]] proof is produced at sealing — it proves the neuron actually *ran* the scope. the intent commits to what will be computed; the signal proves it was.
 
 ## lifecycle
 

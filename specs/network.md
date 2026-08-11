@@ -59,7 +59,7 @@ is authenticated, provable history.
 [[bbg]] state is network-local: one bbg instance holds one network's state — one
 root, one local [[focus]], per [[cyber/hierarchy]]'s "each shard computes local
 focus independently". a [[cyberlink]] whose endpoints live in two networks is a
-cross-network link, relayed by STARK [[proof]] — see [[3c]]. intra-network
+cross-network link, relayed by [[zheng]] [[proof]] — see [[3c]]. intra-network
 delivery is assumed by the signal path.
 
 see [[signal]] for the $\mathit{net}$ field. see [[card]] for the token type. see

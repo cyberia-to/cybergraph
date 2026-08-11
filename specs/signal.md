@@ -28,7 +28,7 @@ $\mathit{net}$ names the [[network]] the signal is delivered to. a network is id
 
 the default is the sender's private network: the zero card (`SELF_NETWORK`) resolves to $\text{private\_network}(\nu) = H(\texttt{"network:"} \,\|\, \nu)$ at the cybergraph boundary. every [[neuron]] writes to its own sovereign private network by default; joining a shared network is the explicit act of setting $\mathit{net}$ to that network's card id. `$CYB` is a [[coin]], so it is never a network — there is no privileged global default.
 
-$\mathit{net}$ is bound into the signal hash, so the destination is tamper-evident in relay. links whose $p$/$q$ live in another network are cross-network — see [[3c]] for STARK proof-relay; intra-network delivery is assumed here. see [[network]] for the full model.
+$\mathit{net}$ is bound into the signal hash, so the destination is tamper-evident in relay. links whose $p$/$q$ live in another network are cross-network — see [[3c]] for [[zheng]] proof-relay; intra-network delivery is assumed here. see [[network]] for the full model.
 
 ## zheng proof coverage
 

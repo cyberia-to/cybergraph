@@ -133,7 +133,7 @@ The [[cybergraph]] is the protocol. Every core function runs through the same fi
 |---|---|
 | identity | [[particles]] as public keys, graph as PKI -- see [[cyber/identity]] |
 | key exchange | CSIDH curves as [[particles]], non-interactive -- see [[dCTIDH]] |
-| authentication | [[stark]] proofs of [[Hemera]] preimage knowledge -- see [[cyber/proofs]] |
+| authentication | [[zheng]] proofs of [[Hemera]] preimage knowledge -- see [[cyber/proofs]] |
 | consensus | finalized subgraph IS the state -- see [[foculus]] |
 | fork choice | $\phi^*$ from graph [[topology]], not voting -- see [[foculus]] |
 | finality | $\phi^*_i > \tau$, threshold adapts to graph density -- see [[foculus]] |

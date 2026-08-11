@@ -41,7 +41,7 @@ cybergraph link   --neuron H --from H --to H        atomic one-shot submit
 cybergraph seal   --intent KEY --neuron H --from H --to H [...]   seal a declared intent
 ```
 
-`link` and `seal` build a signal from the cyberlink flags; the CLI **auto-fills** the chain fields — `step` = the neuron's chain length, `prev` = its head hash, `network` = the neuron's private network — so the operator supplies only content. the signal is ordered (equivocation / step / prev) then applied. Release 0: no STARK, `box_moves` empty; the seal binding (`σ ⊢ scope`) is not yet enforced (see the whitepaper).
+`link` and `seal` build a signal from the cyberlink flags; the CLI **auto-fills** the chain fields — `step` = the neuron's chain length, `prev` = its head hash, `network` = the neuron's private network — so the operator supplies only content. the signal is ordered (equivocation / step / prev) then applied. Release 0: no [[zheng]] proof, `box_moves` empty; the seal binding (`σ ⊢ scope`) is not yet enforced (see the whitepaper).
 
 ### read
 

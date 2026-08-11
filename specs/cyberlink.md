@@ -20,7 +20,7 @@ five stored fields, three concepts. who made it and when belong to the [[signal]
 
 see [[two three paradox]] for why this layering is not arbitrary. see [[box]] for the conviction model, [[link]] for the edge, [[valence]] for the prediction.
 
-cyberlinks are bundled into [[signal|signals]] for broadcast. the [[signal]] adds the provenance layer: the signing [[neuron]] $\nu$, block height $t$, the destination [[network]] $\mathit{net}$, an [[cyber/impulse]] ($\Delta\phi^*$ — the proven [[focus]] shift), and a recursive [[stark]] proof covering the entire batch. the network is a signal-envelope concern — where the assertion is delivered — not a cyberlink field.
+cyberlinks are bundled into [[signal|signals]] for broadcast. the [[signal]] adds the provenance layer: the signing [[neuron]] $\nu$, block height $t$, the destination [[network]] $\mathit{net}$, an [[cyber/impulse]] ($\Delta\phi^*$ — the proven [[focus]] shift), and a recursive [[zheng]] proof covering the entire batch. the network is a signal-envelope concern — where the assertion is delivered — not a cyberlink field.
 
 the [[cybergraph]] is append-only. [[time]] (block height from the containing signal) distinguishes every record: the same author linking from→to in two signals at $t_1$ and $t_2 > t_1$ produces two separate entries in $L$. this enables reinforcement (higher [[amount]] on a new record), [[valence]] updates (new $v$ at a new signal), and multi-denomination staking (same structural link in different tokens)
 

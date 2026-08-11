@@ -152,7 +152,7 @@ writes to `focus` and `karma` from inf are rejected — these are read-only proj
 
 ## query provability
 
-an inf query is a derivation tree over the relations above. for queries that need cryptographic guarantees, the tree is compiled through [[zheng]] into a STARK proof: relation reads become [[bbg]] [[Lens]] openings; rule application becomes circuit constraints. see [[inf/cybergraph]] for the provable-query path and [[bbg/specs/query]] for the proof construction.
+an inf query is a derivation tree over the relations above. for queries that need cryptographic guarantees, the tree is compiled through [[zheng]] into a proof: relation reads become [[bbg]] [[Lens]] openings; rule application becomes circuit constraints. see [[inf/cybergraph]] for the provable-query path and [[bbg/specs/query]] for the proof construction.
 
 interactive queries skip the proof step and run directly through CozoDB. the same inf script produces the same answer either way — provability is an opt-in cost at submission time.
 

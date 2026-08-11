@@ -80,7 +80,7 @@ reads run [[inf]] (datalog) over a snapshot of [[bbg]] state; the focus a query 
 
 working today: `intend` / `seal` / `link` apply cyberlinks to [[bbg]] state and advance the root; `query` runs the [[inf]] engine over local aggregate relations; `subscribe` delivers events in-process.
 
-not yet: network distribution, the seal binding (`σ ⊢ scope` enforcement) and STARK verification at seal, conviction `box_moves` (the local path carries cyberlinks only), provable queries (Lens openings over the root). these arrive as the stack matures around the same API.
+not yet: network distribution, the seal binding (`σ ⊢ scope` enforcement) and [[zheng]] verification at seal, conviction `box_moves` (the local path carries cyberlinks only), provable queries (Lens openings over the root). these arrive as the stack matures around the same API.
 
 ## structure
 
