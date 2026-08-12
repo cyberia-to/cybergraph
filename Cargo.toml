@@ -1,29 +1,27 @@
-# ---
-# tags: cybergraph, config
-# crystal-type: source
-# crystal-domain: cyber
-# ---
 [package]
 name = "cybergraph"
 version = "0.1.0"
 edition = "2024"
-description = "local-first cyberlink processor — unified API over bbg + sync + radio"
-license = "Cyber"
+description = "local-first cyberlink processor — unified API over bbg + foculus"
+license-file = "LICENSE"
+repository = "https://github.com/cyberia-to/cybergraph"
+keywords = ["cyber", "graph", "cyberlink"]
+categories = ["data-structures"]
 
 [dependencies]
-bbg    = { path = "../bbg/rs" }
-foculus = { path = "../foculus", default-features = false }
-hemera = { package = "cyber-hemera", path = "../hemera/rs" }
-nebu   = { package = "cyb-nebu", path = "../strata/nebu/rs" }
-zheng  = { path = "../zheng/rs" }
-
-# inf query engine — the local query path runs inf IR over a bbg-backed source.
-inf-value  = { path = "../inf/rs/value" }
-inf-source = { path = "../inf/rs/source" }
-inf-parse  = { path = "../inf/rs/parse" }
-inf-plan   = { path = "../inf/rs/plan" }
-inf-eval   = { path = "../inf/rs/eval" }
+bbg = { version = "0.1", path = "../bbg/rs" }
+foculus = { version = "0.1", path = "../foculus", default-features = false }
+hemera = { package = "cyber-hemera", version = "0.3", path = "../hemera/rs" }
+nebu = { package = "cyb-nebu", version = "0.1", path = "../strata/nebu/rs" }
+zheng = { version = "0.1", path = "../zheng/rs" }
+inf-value = { version = "0.1", path = "../inf/rs/value" }
+inf-source = { version = "0.1", path = "../inf/rs/source" }
+inf-parse = { version = "0.1", path = "../inf/rs/parse" }
+inf-plan = { version = "0.1", path = "../inf/rs/plan" }
+inf-eval = { version = "0.1", path = "../inf/rs/eval" }
 
 [dev-dependencies]
-nox  = { path = "../nox/rs" }
-lens = { package = "cyber-lens", path = "../lens/src" }
+nox = { package = "cyber-nox", version = "0.1", path = "../nox/rs" }
+lens = { package = "cyb-lens", version = "0.1", path = "../lens/src" }
+
+[workspace]
