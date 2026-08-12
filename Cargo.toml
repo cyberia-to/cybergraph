@@ -1,6 +1,6 @@
 [package]
 name = "cybergraph"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
 description = "local-first cyberlink processor — unified API over bbg + foculus"
 license-file = "LICENSE"
@@ -9,11 +9,11 @@ keywords = ["cyber", "graph", "cyberlink"]
 categories = ["data-structures"]
 
 [dependencies]
-bbg = { version = "0.1", path = "../bbg/rs" }
-foculus = { version = "0.1", path = "../foculus", default-features = false }
+bbg = { version = "0.1.1", path = "../bbg/rs" }
+foculus = { version = "0.1.1", path = "../foculus", default-features = false }
 hemera = { package = "cyber-hemera", version = "0.3", path = "../hemera/rs" }
-nebu = { package = "cyb-nebu", version = "0.1", path = "../strata/nebu/rs" }
-zheng = { version = "0.1", path = "../zheng/rs" }
+nebu = { package = "strata-nebu", version = "0.1", path = "../strata/nebu/rs" }
+zheng = { version = "0.1.1", path = "../zheng/rs" }
 inf-value = { version = "0.1", path = "../inf/rs/value" }
 inf-source = { version = "0.1", path = "../inf/rs/source" }
 inf-parse = { version = "0.1", path = "../inf/rs/parse" }
@@ -21,7 +21,7 @@ inf-plan = { version = "0.1", path = "../inf/rs/plan" }
 inf-eval = { version = "0.1", path = "../inf/rs/eval" }
 
 [dev-dependencies]
-nox = { package = "cyber-nox", version = "0.1", path = "../nox/rs" }
-lens = { package = "cyb-lens", version = "0.1", path = "../lens/src" }
+nox = { package = "cyber-nox", version = "0.1.1", path = "../nox/rs" }
+lens = { package = "cyb-lens", version = "0.1.1", path = "../lens/src" }
 
 [workspace]
