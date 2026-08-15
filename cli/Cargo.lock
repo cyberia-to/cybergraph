@@ -80,7 +80,7 @@ checksum = "2a4385e2e34eb35d6b3efe798b9eb88096925d87726c0798709bf56d9ed84af3"
 name = "bbg"
 version = "0.1.0"
 dependencies = [
- "cyb-nebu",
+ "strata-nebu",
  "cyber-hemera",
  "cyber-lens",
  "nox",
@@ -161,7 +161,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d0a5c400df2834b80a4c3327b3aad3a4c4cd4de0629063962b03235697506a28"
 
 [[package]]
-name = "cyb-genies"
+name = "strata-genies"
 version = "0.1.0"
 dependencies = [
  "strata-core",
@@ -170,15 +170,15 @@ dependencies = [
 ]
 
 [[package]]
-name = "cyb-jali"
+name = "strata-jali"
 version = "0.1.0"
 dependencies = [
- "cyb-nebu",
+ "strata-nebu",
  "strata-core",
 ]
 
 [[package]]
-name = "cyb-kuro"
+name = "strata-kuro"
 version = "0.1.0"
 dependencies = [
  "strata-core",
@@ -192,15 +192,15 @@ version = "0.1.0"
 dependencies = [
  "cyb-lens-brakedown",
  "cyb-lens-core",
- "cyb-nebu",
- "cyb-trop",
+ "strata-nebu",
+ "strata-trop",
 ]
 
 [[package]]
 name = "cyb-lens-binius"
 version = "0.1.0"
 dependencies = [
- "cyb-kuro",
+ "strata-kuro",
  "cyb-lens-core",
  "cyber-hemera",
 ]
@@ -210,7 +210,7 @@ name = "cyb-lens-brakedown"
 version = "0.1.0"
 dependencies = [
  "cyb-lens-core",
- "cyb-nebu",
+ "strata-nebu",
  "cyber-hemera",
 ]
 
@@ -218,7 +218,7 @@ dependencies = [
 name = "cyb-lens-core"
 version = "0.1.0"
 dependencies = [
- "cyb-nebu",
+ "strata-nebu",
  "cyber-hemera",
  "strata-core",
  "strata-proof",
@@ -228,23 +228,23 @@ dependencies = [
 name = "cyb-lens-ikat"
 version = "0.1.0"
 dependencies = [
- "cyb-jali",
+ "strata-jali",
  "cyb-lens-brakedown",
  "cyb-lens-core",
- "cyb-nebu",
+ "strata-nebu",
 ]
 
 [[package]]
 name = "cyb-lens-porphyry"
 version = "0.1.0"
 dependencies = [
- "cyb-genies",
+ "strata-genies",
  "cyb-lens-core",
  "cyber-hemera",
 ]
 
 [[package]]
-name = "cyb-nebu"
+name = "strata-nebu"
 version = "0.1.0"
 dependencies = [
  "acpu",
@@ -255,7 +255,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "cyb-trop"
+name = "strata-trop"
 version = "0.1.0"
 dependencies = [
  "strata-core",
@@ -282,7 +282,7 @@ name = "cybergraph"
 version = "0.1.0"
 dependencies = [
  "bbg",
- "cyb-nebu",
+ "strata-nebu",
  "cyber-hemera",
  "foculus",
  "inf-eval",
@@ -316,7 +316,7 @@ dependencies = [
  "anyhow",
  "bbg",
  "clap",
- "cyb-nebu",
+ "strata-nebu",
  "cyber-hemera",
  "rand",
  "serde",
@@ -450,7 +450,7 @@ version = "0.1.0"
 dependencies = [
  "cyb-lens-brakedown",
  "cyb-lens-core",
- "cyb-nebu",
+ "strata-nebu",
  "cyber-hemera",
 ]
 
@@ -717,7 +717,7 @@ checksum = "5d99f8c9a7727884afe522e9bd5edbfc91a3312b36a77b5fb8926e4c31a41801"
 name = "tru"
 version = "0.1.0"
 dependencies = [
- "cyb-nebu",
+ "strata-nebu",
  "cyber-hemera",
  "memmap2",
  "serde",
@@ -810,7 +810,7 @@ dependencies = [
 name = "zheng"
 version = "0.1.0"
 dependencies = [
- "cyb-nebu",
+ "strata-nebu",
  "cyber-hemera",
  "cyber-lens",
  "nox",
