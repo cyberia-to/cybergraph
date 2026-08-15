@@ -22,6 +22,6 @@ inf-eval = { version = "0.1", path = "../inf/rs/eval" }
 
 [dev-dependencies]
 nox = { package = "cyber-nox", version = "0.1.1", path = "../nox/rs" }
-lens = { package = "cyb-lens", version = "0.1.1", path = "../lens/src" }
+lens = { package = "cyber-lens", version = "0.1.1", path = "../lens/src" }
 
 [workspace]
