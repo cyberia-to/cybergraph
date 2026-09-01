@@ -80,4 +80,4 @@ cybergraph and [[soma]] are one processor: cybergraph is the dumb half (store ·
 
 ## query
 
-- [query.md](query.md) — the relations cybergraph exposes to [[inf]]. schema only; the language lives in [[inf/README]]
+- [query.md](query.md) — the relations cybergraph exposes to [[inf]]. schema only; the language lives in [[inf]]

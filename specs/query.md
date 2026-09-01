@@ -7,7 +7,7 @@ crystal-domain: cyber
 
 cybergraph does not define its own query language. it exposes a set of stored relations and delegates query execution to [[inf]] — cyber's declarative datalog layer, implemented via CozoDB.
 
-this spec defines only the **relation schema** that cybergraph commits to exposing. the language semantics (rules, recursion, aggregation, fixed rules) live in [[inf/README]] and the deep-dive files [[inf/queries]], [[inf/algorithms]], [[inf/stored relations]], [[inf/functions]], [[inf cybergraph]].
+this spec defines only the **relation schema** that cybergraph commits to exposing. the language semantics (rules, recursion, aggregation, fixed rules) live in [[inf]] and the deep-dive files [[inf queries]], [[inf algorithms]], [[inf stored relations]], [[inf functions]], [[inf cybergraph]].
 
 ## scope split
 
@@ -24,7 +24,7 @@ cybergraph guarantees that the relations below exist and are kept in sync with t
 
 ## implementation status (Release 0)
 
-`Cybergraph::query(inf_script)` is wired to the inf engine: `parse → plan → eval` over a `BbgSource` that projects local bbg aggregate state into inf relations. The bootstrap path runs the native inf evaluator (`inf-eval`), not CozoDB — CozoDB is inf's differential oracle, and shrinks to zero as inf self-hosts (see [[inf/README]]).
+`Cybergraph::query(inf_script)` is wired to the inf engine: `parse → plan → eval` over a `BbgSource` that projects local bbg aggregate state into inf relations. The bootstrap path runs the native inf evaluator (`inf-eval`), not CozoDB — CozoDB is inf's differential oracle, and shrinks to zero as inf self-hosts (see [[inf]]).
 
 `BbgSource` exposes the relations bbg actually holds as public aggregate state:
 
@@ -43,7 +43,7 @@ Release 0 reads run over the local snapshot and are not yet provable (`BbgSource
 
 ## exposed relations
 
-every relation is a stored CozoDB relation keyed by content-addressed identifiers. types follow [[inf/stored relations]] conventions.
+every relation is a stored CozoDB relation keyed by content-addressed identifiers. types follow [[inf stored relations]] conventions.
 
 ### `cyberlinks`
 
@@ -158,8 +158,8 @@ interactive queries skip the proof step and run directly through CozoDB. the sam
 
 ## what is NOT in this spec
 
-- language syntax (rules, atoms, `:=`, `<~`, `?`, query options) — [[inf/queries]]
-- built-in functions (math, string, vector, JSON, aggregation) — [[inf/functions]]
-- fixed rules (PageRank, Dijkstra, Louvain, BFS) — [[inf/algorithms]]
+- language syntax (rules, atoms, `:=`, `<~`, `?`, query options) — [[inf queries]]
+- built-in functions (math, string, vector, JSON, aggregation) — [[inf functions]]
+- fixed rules (PageRank, Dijkstra, Louvain, BFS) — [[inf algorithms]]
 - query-to-proof compilation — [[zheng]] + [[inf cybergraph]]
-- storage backend, persistence, time-travel — [[bbg]] for authenticated state, [[inf/stored relations]] for query-layer semantics
+- storage backend, persistence, time-travel — [[bbg]] for authenticated state, [[inf stored relations]] for query-layer semantics
