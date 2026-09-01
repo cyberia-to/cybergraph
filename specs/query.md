@@ -7,7 +7,7 @@ crystal-domain: cyber
 
 cybergraph does not define its own query language. it exposes a set of stored relations and delegates query execution to [[inf]] — cyber's declarative datalog layer, implemented via CozoDB.
 
-this spec defines only the **relation schema** that cybergraph commits to exposing. the language semantics (rules, recursion, aggregation, fixed rules) live in [[inf/README]] and the deep-dive files [[inf/queries]], [[inf/algorithms]], [[inf/stored relations]], [[inf/functions]], [[inf/cybergraph]].
+this spec defines only the **relation schema** that cybergraph commits to exposing. the language semantics (rules, recursion, aggregation, fixed rules) live in [[inf/README]] and the deep-dive files [[inf/queries]], [[inf/algorithms]], [[inf/stored relations]], [[inf/functions]], [[inf cybergraph]].
 
 ## scope split
 
@@ -152,7 +152,7 @@ writes to `focus` and `karma` from inf are rejected — these are read-only proj
 
 ## query provability
 
-an inf query is a derivation tree over the relations above. for queries that need cryptographic guarantees, the tree is compiled through [[zheng]] into a proof: relation reads become [[bbg]] [[Lens]] openings; rule application becomes circuit constraints. see [[inf/cybergraph]] for the provable-query path and [[bbg/specs/query]] for the proof construction.
+an inf query is a derivation tree over the relations above. for queries that need cryptographic guarantees, the tree is compiled through [[zheng]] into a proof: relation reads become [[bbg]] [[Lens]] openings; rule application becomes circuit constraints. see [[inf cybergraph]] for the provable-query path and [[bbg/specs/query]] for the proof construction.
 
 interactive queries skip the proof step and run directly through CozoDB. the same inf script produces the same answer either way — provability is an opt-in cost at submission time.
 
@@ -161,5 +161,5 @@ interactive queries skip the proof step and run directly through CozoDB. the sam
 - language syntax (rules, atoms, `:=`, `<~`, `?`, query options) — [[inf/queries]]
 - built-in functions (math, string, vector, JSON, aggregation) — [[inf/functions]]
 - fixed rules (PageRank, Dijkstra, Louvain, BFS) — [[inf/algorithms]]
-- query-to-proof compilation — [[zheng]] + [[inf/cybergraph]]
+- query-to-proof compilation — [[zheng]] + [[inf cybergraph]]
 - storage backend, persistence, time-travel — [[bbg]] for authenticated state, [[inf/stored relations]] for query-layer semantics
