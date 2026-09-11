@@ -19,9 +19,13 @@ inf-source = { version = "0.1", path = "../inf/rs/source" }
 inf-parse = { version = "0.1", path = "../inf/rs/parse" }
 inf-plan = { version = "0.1", path = "../inf/rs/plan" }
 inf-eval = { version = "0.1", path = "../inf/rs/eval" }
+nox = { package = "cyber-nox", version = "0.2", path = "../nox/rs" }
 
 [dev-dependencies]
-nox = { package = "cyber-nox", version = "0.1.1", path = "../nox/rs" }
+redb = "2"
 lens = { package = "cyber-lens", version = "0.1.1", path = "../lens/src" }
+
+[features]
+local-storage = ["bbg/backend-hdd"]
 
 [workspace]
