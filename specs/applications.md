@@ -6,7 +6,16 @@ status: implementation
 # application graph sessions
 
 The local-storage feature exposes application namespaces over BBG's atomic
-ApplicationStore. Content identity uses the existing nox Model B encoding for
+ApplicationStore and enables its Fjall SSD backend. ApplicationGraph::open
+accepts a database directory. ApplicationGraph::from_database accepts an
+already opened BBG Database, sharing its writer lock, failure state and backend
+with other views. Database and Backend are re-exported by this module; Backend
+selects Ssd or Hdd explicitly when the corresponding BBG feature is enabled.
+Backend selection belongs to the database owner. Application records and
+polynomial shards retain distinct schemas within the shared transaction engine.
+Sharing an owner does not itself combine separate calls into one transaction.
+
+Content identity uses the existing nox Model B encoding for
 data nodes (8-byte field, 64-byte child particles) and hemera byte hashing for
 blob artifacts. A stored framing byte selects the codec and is outside content
 identity. Noncanonical field limbs in child particles are rejected.
@@ -31,3 +40,14 @@ commit batches to 131072 entries and 16 MiB encoded content. Required references
 are retained; the initial implementation performs no garbage collection.
 The content store is private to the local authority. Exposing queries to remote
 readers requires a namespace/disclosure adapter and is unsupported by this API.
+
+## legacy import
+
+The optional legacy-redb-migration feature enables the HDD backend in addition
+to local-storage. ApplicationGraph::migrate_redb(source, destination) imports
+an old application redb file into a fresh Fjall directory through BBG's bounded
+migration API. The source is retained. Content, conditional heads, history,
+global claims and request fingerprints retain their identities. Incomplete
+destinations cannot be opened as successful sessions; completion is recorded
+only after import succeeds. Normal open never performs implicit migration or
+overwrites an existing file of another format.

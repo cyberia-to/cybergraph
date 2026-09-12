@@ -1,6 +1,8 @@
 #![cfg(feature = "local-storage")]
-use cybergraph::application::{ApplicationGraph, Error, Head, Proposal};
+use bbg::storage::ShardStore;
+use cybergraph::application::{ApplicationGraph, Backend, Database, Error, Head, Proposal};
 use cybergraph::content::{Codec, Content, ContentError};
+use nebu::Goldilocks;
 use std::sync::atomic::{AtomicUsize, Ordering};
 struct Directory(std::path::PathBuf);
 impl Directory {
@@ -15,7 +17,7 @@ impl Directory {
         Self(path)
     }
     fn open(&self) -> ApplicationGraph {
-        ApplicationGraph::open(self.0.join("graph.redb")).unwrap()
+        ApplicationGraph::open(self.0.join("bbg")).unwrap()
     }
 }
 impl Drop for Directory {
@@ -108,17 +110,17 @@ fn corruption_is_reported_on_read_without_reinitializing_history() {
     let graph = dir.open();
     graph.commit(&p, |_| Ok(())).unwrap();
     drop(graph);
-    let db = redb::Database::open(dir.0.join("graph.redb")).unwrap();
-    let tx = db.begin_write().unwrap();
-    {
-        let table: redb::TableDefinition<&[u8], &[u8]> =
-            redb::TableDefinition::new("application_content");
-        tx.open_table(table)
-            .unwrap()
-            .insert(a.id().as_slice(), [0u8; 9].as_slice())
-            .unwrap();
-    }
-    tx.commit().unwrap();
+    let db = fjall::Config::new(dir.0.join("bbg")).open().unwrap();
+    let content = db
+        .open_partition(
+            "application_content",
+            fjall::PartitionCreateOptions::default(),
+        )
+        .unwrap();
+    let mut batch = db.batch().durability(Some(fjall::PersistMode::SyncAll));
+    batch.insert(&content, a.id(), [0u8; 9]);
+    batch.commit().unwrap();
+    drop(content);
     drop(db);
     let graph = dir.open();
     assert!(matches!(
@@ -126,4 +128,37 @@ fn corruption_is_reported_on_read_without_reinitializing_history() {
         Err(Error::Content(ContentError::IdentityMismatch))
     ));
     assert_eq!(graph.head(&p.namespace).unwrap(), Some(p.head));
+}
+
+#[test]
+fn application_views_share_one_database_owner_and_receipts() {
+    let dir = Directory::new();
+    let database = Database::open(dir.0.join("bbg"), Backend::Ssd).unwrap();
+    let mut shards = database.shards();
+    let writer = ApplicationGraph::from_database(database.clone());
+    let reader = ApplicationGraph::from_database(database);
+    let content = Content::atom(7).unwrap();
+    let p = proposal(vec![content.clone()], content.id());
+    writer.commit(&p, |_| Ok(())).unwrap();
+    assert_eq!(reader.head(&p.namespace).unwrap(), Some(p.head));
+    assert_eq!(
+        reader.resolve(&p.namespace, &p.request).unwrap(),
+        Some(p.head)
+    );
+    assert_eq!(
+        reader.get(&content.id()).unwrap().unwrap().id(),
+        content.id()
+    );
+    shards.put(0, [8; 32], vec![Goldilocks::ONE]).unwrap();
+    shards.commit().unwrap();
+    assert_eq!(
+        shards.read(0, &[8; 32], 1).unwrap(),
+        Some(vec![Goldilocks::ONE])
+    );
+    assert_eq!(reader.head(&p.namespace).unwrap(), Some(p.head));
+    assert!(ApplicationGraph::open(dir.0.join("bbg")).is_err());
+    drop(writer);
+    drop(reader);
+    drop(shards);
+    assert_eq!(dir.open().head(&p.namespace).unwrap(), Some(p.head));
 }

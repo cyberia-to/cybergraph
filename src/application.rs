@@ -9,6 +9,7 @@ use crate::{
 };
 use bbg::storage::application::{ApplicationStore, Write};
 pub use bbg::storage::application::{Error as StorageError, Head};
+pub use bbg::storage::database::{Backend, Database};
 
 #[derive(Debug)]
 pub enum Error {
@@ -51,10 +52,25 @@ pub struct ApplicationGraph {
     store: ApplicationStore,
 }
 impl ApplicationGraph {
+    /// Open the default Fjall database directory.
     pub fn open(path: impl AsRef<Path>) -> Result<Self, Error> {
         Ok(Self {
             store: ApplicationStore::open(path)?,
         })
+    }
+    /// Share the database's writer lock, backend and failure state with other views.
+    pub fn from_database(database: Database) -> Self {
+        Self {
+            store: ApplicationStore::from_database(database),
+        }
+    }
+    /// Import a legacy application redb file into a fresh Fjall directory.
+    #[cfg(feature = "legacy-redb-migration")]
+    pub fn migrate_redb(
+        source: impl AsRef<Path>,
+        destination: impl AsRef<Path>,
+    ) -> Result<(), Error> {
+        Ok(ApplicationStore::migrate_redb(source, destination)?)
     }
     pub fn head(&self, namespace: &Particle) -> Result<Option<Head>, Error> {
         Ok(self.store.head(namespace)?)
