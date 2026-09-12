@@ -75,6 +75,7 @@ dependencies = [
  "cyber-lens",
  "cyber-nox",
  "fjall",
+ "neuron-id",
  "redb",
  "strata-nebu",
  "zheng",
@@ -283,6 +284,7 @@ version = "0.1.1"
 dependencies = [
  "cyber-hemera",
  "cyber-tru",
+ "neuron-id",
 ]
 
 [[package]]
@@ -393,6 +395,7 @@ dependencies = [
  "bbg",
  "clap",
  "cyber-hemera",
+ "cyber-lens",
  "cyber-tape",
  "cyber-tok",
  "cyber-tru",
@@ -592,6 +595,10 @@ checksum = "d1219ed1b7f229ee7104d281dd01d6802fe28bb6e95d292942c4daacdeb798c0"
 dependencies = [
  "libc",
 ]
+
+[[package]]
+name = "neuron-id"
+version = "0.1.0"
 
 [[package]]
 name = "once_cell"

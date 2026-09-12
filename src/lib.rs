@@ -21,6 +21,8 @@ pub mod api;
 #[cfg(feature = "local-storage")]
 pub mod application;
 pub mod content;
+#[cfg(feature = "local-storage")]
+pub mod native;
 pub mod source;
 
 // Re-export foundational identity types so downstream crates don't need a
