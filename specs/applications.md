@@ -5,6 +5,12 @@ status: implementation
 ---
 # application graph sessions
 
+Semantic migration uses `commit_migration`: the proposal fingerprint additionally
+binds the manifest and sorted source namespaces/exact heads. BBG publishes the
+target write and source writer fences atomically. Read/export and exact historical
+request resolution stay available. Content/schema/authority checks precede this
+transaction; mutable source-head validation and fence activation occur inside it.
+
 The local-storage feature exposes application namespaces over BBG's atomic
 ApplicationStore and enables its Fjall SSD backend. ApplicationGraph::open
 accepts a database directory. ApplicationGraph::from_database accepts an
@@ -51,3 +57,9 @@ global claims and request fingerprints retain their identities. Incomplete
 destinations cannot be opened as successful sessions; completion is recorded
 only after import succeeds. Normal open never performs implicit migration or
 overwrites an existing file of another format.
+# Fresh publication
+
+`commit_fresh` validates the canonical proposal like `commit`, and requires a
+fresh request at BBG's atomic boundary. Identical prior receipts conflict. It is
+used before an external dispatch where replaying a successful commit receipt
+must never execute a callback again. This changes no content or hash encoding.

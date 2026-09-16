@@ -1,4 +1,8 @@
 //! Local graph application transactions, backed by BBG storage.
+mod transfer;
+mod archive;
+pub use archive::{Archive, ArchiveSeal, ArchiveSummary, MAX_INSPECTION_ROWS, MAX_INSPECTION_BYTES};
+pub use transfer::{Transfer, TransferProgress};
 use std::collections::BTreeMap;
 use std::fmt;
 use std::path::Path;
@@ -8,8 +12,8 @@ use crate::{
     content::{Content, ContentError, MAX_CONTENT_BYTES},
 };
 use bbg::storage::application::{ApplicationStore, Write};
-pub use bbg::storage::application::{Error as StorageError, Head};
-pub use bbg::storage::database::{Backend, Database};
+pub use bbg::storage::application::{Error as StorageError, Head,NamespaceMigration,MigrationTarget};
+pub use bbg::storage::database::{Backend, Database, ReaderGeneration};
 
 #[derive(Debug)]
 pub enum Error {
@@ -100,6 +104,20 @@ impl ApplicationGraph {
         proposal: &Proposal,
         validate: impl FnOnce(&Self) -> Result<(), Error>,
     ) -> Result<Head, Error> {
+        self.commit_inner(proposal,None,false,validate)
+    }
+    pub fn commit_fresh(&self, proposal: &Proposal, validate: impl FnOnce(&Self) -> Result<(), Error>) -> Result<Head, Error> {
+        self.commit_inner(proposal, None, true, validate)
+    }
+    pub fn migration_target(&self,namespace:&Particle)->Result<Option<MigrationTarget>,Error>{
+        Ok(self.store.migration_target(namespace)?)
+    }
+    pub fn commit_migration(&self,proposal:&Proposal,migration:&NamespaceMigration<'_>,
+        validate:impl FnOnce(&Self)->Result<(),Error>)->Result<Head,Error>{
+        self.commit_inner(proposal,Some(migration),false,validate)
+    }
+    fn commit_inner(&self,proposal:&Proposal,migration:Option<&NamespaceMigration<'_>>,fresh:bool,
+        validate:impl FnOnce(&Self)->Result<(),Error>)->Result<Head,Error>{
         if proposal.content.len() > 131_072
             || proposal.required.len() > 131_072
             || proposal.claims.len() > 4096
@@ -116,8 +134,18 @@ impl ApplicationGraph {
                 return Err(Error::InvalidProposal);
             }
         }
-        let fingerprint = fingerprint(proposal, &content);
+        let mut fingerprint = fingerprint(proposal, &content);
+        if let Some(migration)=migration {
+            if migration.sources.is_empty() || migration.sources.len()>256
+                || migration.sources.windows(2).any(|w|w[0].0>=w[1].0)
+                || migration.sources.iter().any(|(id,_)|*id==proposal.namespace){return Err(Error::InvalidProposal);}
+            let mut hash=hemera::Hasher::new();hash.update(b"cybergraph/namespace-migration/1\0");
+            hash.update(&fingerprint);hash.update(&migration.manifest);hash.update(&(migration.sources.len() as u64).to_le_bytes());
+            for (id,head) in migration.sources{hash.update(id);hash.update(&head.index.to_le_bytes());hash.update(&head.commit);}
+            fingerprint=*hash.finalize().as_bytes();
+        }
         if let Some((prior, head)) = self.store.resolve(&proposal.namespace, &proposal.request)? {
+            if fresh { return Err(Error::Storage(bbg::storage::application::Error::Conflict)); }
             return if prior == fingerprint {
                 Ok(head)
             } else {
@@ -145,7 +173,7 @@ impl ApplicationGraph {
             .into_iter()
             .map(|(id, value)| (id, value.stored()))
             .collect();
-        Ok(self.store.apply(&Write {
+        let write=Write {
             namespace: proposal.namespace,
             request: proposal.request,
             fingerprint,
@@ -153,7 +181,8 @@ impl ApplicationGraph {
             head: proposal.head,
             content: &stored,
             claims: &proposal.claims,
-        })?)
+        };
+        Ok(match migration {Some(migration)=>self.store.apply_migration(&write,migration)?,None if fresh=>self.store.apply_once(&write)?,None=>self.store.apply(&write)?})
     }
 }
 

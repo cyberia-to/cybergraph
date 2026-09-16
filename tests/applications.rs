@@ -75,6 +75,33 @@ fn missing_closure_and_application_rejection_publish_nothing() {
 }
 
 #[test]
+fn fresh_publication_allows_one_winner_even_after_both_preflight_reads() {
+    let dir = Directory::new();
+    let graph = dir.open();
+    let value = Content::atom(19).unwrap();
+    let p = proposal(vec![value.clone()], value.id());
+    let barrier = std::sync::Barrier::new(2);
+    let winners = AtomicUsize::new(0);
+    std::thread::scope(|scope| {
+        for _ in 0..2 {
+            scope.spawn(|| {
+                let result = graph.commit_fresh(&p, |_| { barrier.wait(); Ok(()) });
+                match result {
+                    Ok(head) => { assert_eq!(head, p.head); winners.fetch_add(1, Ordering::SeqCst); }
+                    Err(Error::Storage(bbg::storage::application::Error::Conflict)) => {}
+                    other => panic!("unexpected fresh-claim result: {other:?}"),
+                }
+            });
+        }
+    });
+    assert_eq!(winners.load(Ordering::SeqCst), 1);
+    drop(graph);
+    let graph = dir.open();
+    assert!(graph.commit_fresh(&p, |_| panic!("old receipt is never fresh")).is_err());
+    assert_eq!(graph.commit(&p, |_| panic!("ordinary retry resolves")).unwrap(), p.head);
+}
+
+#[test]
 fn retained_application_references_are_required_and_fingerprint_binds_claims() {
     let dir = Directory::new();
     let graph = dir.open();
