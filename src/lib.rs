@@ -18,20 +18,29 @@
 //! callers (soma, soft3 SDK) have a single import for the public API.
 
 pub mod api;
+#[cfg(feature = "local-storage")]
+pub mod application;
+#[cfg(feature = "local-storage")]
+pub mod text_archive;
+#[cfg(feature = "local-storage")]
+pub mod legacy_file;
+pub mod content;
+#[cfg(feature = "local-storage")]
+pub mod native;
 pub mod source;
 
 // Re-export foundational identity types so downstream crates don't need a
 // direct dependency on bbg just to name a Particle or NeuronId.
-pub use bbg::{NeuronId, Particle, IntentRecord, SignalRecord};
+pub use bbg::{IntentRecord, NeuronId, Particle, SignalRecord};
 
 // Re-export the signal lifecycle primitives owned by sync.
 pub use foculus::{
-    ChainError, CyberlinkRecord, Signal, SignalChain, SELF_NETWORK,
-    VdfProof, vdf_evaluate, vdf_verify, challenge_from_hash,
+    ChainError, CyberlinkRecord, SELF_NETWORK, Signal, SignalChain, VdfProof, challenge_from_hash,
+    vdf_evaluate, vdf_verify,
 };
 
 // The five-verb public API.
-pub use api::{ApiError, Cybergraph, Event, Filter, Intent, private_network, QueryError, Scope};
+pub use api::{ApiError, Cybergraph, Event, Filter, Intent, QueryError, Scope, private_network};
 pub use source::BbgSource;
 
 // inf query result type, re-exported so callers don't depend on inf-eval directly.

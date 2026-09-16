@@ -17,38 +17,45 @@
 
 mod common;
 
-use common::{zero_statement, default_params};
+use common::{default_params, zero_statement};
 
 use nebu::Goldilocks;
-use nox::{reduce, Order, Tag, VecTrace, NullCalls};
-use zheng::{commit, verify, HashAux};
+use nox::{NullCalls, Reduction, VecTrace, reduce};
+use zheng::{HashAux, commit, verify};
 
 const ORDER_SIZE: usize = 1024;
 
 /// Full pipeline: hash(quote(42)) → 26-row trace → HashAux → zheng commit → verify.
 #[test]
 fn hash_poseidon2_single_atom_roundtrip() {
-    let mut order = Order::<ORDER_SIZE>::new();
-    let s     = order.atom(Goldilocks::new(42), Tag::Field).unwrap();
-    let tag1  = order.atom(Goldilocks::new(1),  Tag::Field).unwrap();
-    let tag15 = order.atom(Goldilocks::new(15), Tag::Field).unwrap();
-    let quote_f = order.cell(tag1,  s).unwrap();        // [1 s]
-    let hash_f  = order.cell(tag15, quote_f).unwrap();  // [15 [1 s]]
+    let mut order = Reduction::<ORDER_SIZE>::new();
+    let s = order.atom(Goldilocks::new(42)).unwrap();
+    let tag1 = order.atom(Goldilocks::new(1)).unwrap();
+    let tag15 = order.atom(Goldilocks::new(15)).unwrap();
+    let quote_f = order.pair(tag1, s).unwrap(); // [1 s]
+    let hash_f = order.pair(tag15, quote_f).unwrap(); // [15 [1 s]]
 
     let mut trace = VecTrace::default();
-    reduce(&mut order, s, hash_f, 100, &NullCalls, &mut trace);
+    let output = common::result(reduce(&mut order, s, hash_f, 100, &NullCalls, &mut trace));
+    common::verify_public_execution(&order, s, hash_f, output);
     // 1 quote row + 24 Poseidon2 round rows + 1 squeeze row
     assert_eq!(trace.0.len(), 26, "hash trace must be 26 rows");
 
     // Rate = structural digest of s (4 field elements), zero-padded to sponge width 8.
     let in_digest = *order.digest(s).unwrap();
     let rate = [
-        in_digest[0], in_digest[1], in_digest[2], in_digest[3],
-        Goldilocks::ZERO, Goldilocks::ZERO, Goldilocks::ZERO, Goldilocks::ZERO,
+        in_digest[0],
+        in_digest[1],
+        in_digest[2],
+        in_digest[3],
+        Goldilocks::ZERO,
+        Goldilocks::ZERO,
+        Goldilocks::ZERO,
+        Goldilocks::ZERO,
     ];
     let hash_aux = HashAux { rate };
 
-    let stmt  = zero_statement();
+    let stmt = zero_statement();
     let proof = commit(&trace, &[hash_aux], &[], &[], &stmt, &default_params()).unwrap();
     verify(&proof, &stmt, &default_params()).expect("hash proof must verify");
 }
@@ -60,28 +67,53 @@ fn hash_poseidon2_single_atom_roundtrip() {
 #[test]
 fn hash_two_independent_inputs_both_verify() {
     let run_hash = |input_val: u64| {
-        let mut order = Order::<ORDER_SIZE>::new();
-        let s     = order.atom(Goldilocks::new(input_val), Tag::Field).unwrap();
-        let tag1  = order.atom(Goldilocks::new(1),         Tag::Field).unwrap();
-        let tag15 = order.atom(Goldilocks::new(15),        Tag::Field).unwrap();
-        let quote_f = order.cell(tag1,  s).unwrap();
-        let hash_f  = order.cell(tag15, quote_f).unwrap();
+        let mut order = Reduction::<ORDER_SIZE>::new();
+        let s = order.atom(Goldilocks::new(input_val)).unwrap();
+        let tag1 = order.atom(Goldilocks::new(1)).unwrap();
+        let tag15 = order.atom(Goldilocks::new(15)).unwrap();
+        let quote_f = order.pair(tag1, s).unwrap();
+        let hash_f = order.pair(tag15, quote_f).unwrap();
 
         let mut trace = VecTrace::default();
-        reduce(&mut order, s, hash_f, 100, &NullCalls, &mut trace);
+        let output = common::result(reduce(&mut order, s, hash_f, 100, &NullCalls, &mut trace));
+        common::verify_public_execution(&order, s, hash_f, output);
 
         let in_digest = *order.digest(s).unwrap();
         let rate = [
-            in_digest[0], in_digest[1], in_digest[2], in_digest[3],
-            Goldilocks::ZERO, Goldilocks::ZERO, Goldilocks::ZERO, Goldilocks::ZERO,
+            in_digest[0],
+            in_digest[1],
+            in_digest[2],
+            in_digest[3],
+            Goldilocks::ZERO,
+            Goldilocks::ZERO,
+            Goldilocks::ZERO,
+            Goldilocks::ZERO,
         ];
         (trace, HashAux { rate })
     };
 
     let (trace_a, aux_a) = run_hash(100);
     let (trace_b, aux_b) = run_hash(999);
+    assert_ne!(
+        aux_a.rate, aux_b.rate,
+        "structural hashes must bind distinct inputs"
+    );
+    assert!(
+        matches!(
+            commit(
+                &trace_a,
+                &[HashAux { rate: aux_b.rate }],
+                &[],
+                &[],
+                &zero_statement(),
+                &default_params()
+            ),
+            Err(zheng::CommitError::HashBinding)
+        ),
+        "another input's rate cannot prove this trace"
+    );
 
-    let stmt   = zero_statement();
+    let stmt = zero_statement();
     let params = default_params();
 
     let proof_a = commit(&trace_a, &[aux_a], &[], &[], &stmt, &params).unwrap();

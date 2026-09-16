@@ -76,6 +76,10 @@ query(inf_script)        run an inf query over the graph's relations
 
 reads run [[inf]] (datalog) over a snapshot of [[bbg]] state; the focus a query returns is [[tru]]'s.
 
+[Verifiable private retrieval](docs/private-retrieval.md) describes the standard
+read-service direction for wallet recovery, private inboxes and notifications:
+complete queries over committed history, executed by local or delegated workers.
+
 ## status — Release 0 (local-first)
 
 working today: `intend` / `seal` / `link` apply cyberlinks to [[bbg]] state and advance the root; `query` runs the [[inf]] engine over local aggregate relations; `subscribe` delivers events in-process.
