@@ -20,13 +20,19 @@ inf-parse = { version = "0.1", path = "../inf/rs/parse" }
 inf-plan = { version = "0.1", path = "../inf/rs/plan" }
 inf-eval = { version = "0.1", path = "../inf/rs/eval" }
 nox = { package = "cyber-nox", version = "0.3", path = "../nox/rs" }
+serde = { version = "1", features = ["derive"], optional = true }
+serde_json = { version = "1", optional = true }
+tempfile = { version = "3", optional = true }
+
+[target.'cfg(unix)'.dependencies]
+rustix = { version = "1", features = ["fs"], optional = true }
 
 [dev-dependencies]
 fjall = { version = "2", path = "../bbg/rs/vendor/fjall" }
 lens = { package = "cyber-lens", version = "0.2", path = "../lens/src" }
 
 [features]
-local-storage = ["bbg/backend-ssd"]
+local-storage = ["bbg/backend-ssd", "dep:serde", "dep:serde_json", "dep:tempfile", "dep:rustix"]
 legacy-redb-migration = ["local-storage", "bbg/backend-hdd"]
 
 [workspace]

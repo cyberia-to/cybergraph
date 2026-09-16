@@ -272,13 +272,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "cyber-tape"
-version = "0.1.0"
-dependencies = [
- "bytes",
-]
-
-[[package]]
 name = "cyber-tok"
 version = "0.1.1"
 dependencies = [
@@ -314,7 +307,11 @@ dependencies = [
  "inf-plan",
  "inf-source",
  "inf-value",
+ "rustix",
+ "serde",
+ "serde_json",
  "strata-nebu",
+ "tempfile",
  "zheng",
 ]
 
@@ -396,13 +393,13 @@ dependencies = [
  "clap",
  "cyber-hemera",
  "cyber-lens",
- "cyber-tape",
  "cyber-tok",
  "cyber-tru",
  "rand",
  "serde",
  "serde_json",
  "strata-nebu",
+ "tade",
  "zheng",
 ]
 
@@ -502,6 +499,9 @@ dependencies = [
 [[package]]
 name = "inf-value"
 version = "0.1.0"
+dependencies = [
+ "neuron-id",
+]
 
 [[package]]
 name = "interval-heap"
@@ -951,6 +951,13 @@ dependencies = [
  "proc-macro2",
  "quote",
  "unicode-ident",
+]
+
+[[package]]
+name = "tade"
+version = "0.1.0"
+dependencies = [
+ "bytes",
 ]
 
 [[package]]
