@@ -9,14 +9,14 @@
 //!   SignalChain           — layer-2 ordering: hash chain + equivocation detection
 //!   VDF                   — timing primitive derived from signal hash
 //!   Signal → BbgState     — conversion and insertion into authenticated state
-//!   BbgState → look proof — ProofLookProvider + zheng commit/verify
+//!   BbgState → look proof — complete native authentication + public StateStatement
 //!
 //! The cybergraph layer owns signal ordering (L2); BBG owns authenticated state (L3).
 //! Tests here verify they compose correctly end-to-end.
 
 mod common;
 
-use common::{bbg_object_from_state, default_params, make_look_formula, zero_statement};
+use common::{bbg_object_from_state, make_look_formula};
 
 use bbg::ProofLookProvider;
 use bbg::types::NeuronRecord;
@@ -24,8 +24,7 @@ use bbg::{BbgState, Cyberlink as BbgCyberlink, NeuronId, Particle, Signal as Bbg
 use cybergraph::{
     SELF_NETWORK, Signal, SignalChain, challenge_from_hash, vdf_evaluate, vdf_verify,
 };
-use nox::{Order, Outcome, VecTrace, reduce};
-use zheng::{commit, verify};
+use nox::{Outcome, Reduction, VecTrace, reduce};
 
 const ORDER_SIZE: usize = 1024;
 
@@ -132,24 +131,34 @@ fn vdf_different_challenges_produce_different_outputs() {
 
 // ── signal → BbgState → look → zheng proof ───────────────────────────────────
 
-/// Full path: cybergraph Signal → BbgState insert → look(Time) → zheng commit → verify.
+/// Signal → BbgState insert → look(Time) → public state execution proof.
 ///
 /// Exercises the boundary between the cybergraph coordinator (L2) and BBG state (L3):
 /// signals are ordered by SignalChain, converted to bbg::Signal, inserted into BbgState,
 /// and the resulting authenticated state is queried via the nox look pattern to produce
-/// a full zheng proof.
+/// a verifier-derived public zheng execution proof with exact-root authentication.
+/// The legacy recursive-opening fold remains explicitly unsupported.
 #[test]
 fn signal_to_bbg_state_to_look_proof() {
     // Layer 2: build a signal chain.
     let n = neuron(1);
     let mut chain = SignalChain::new();
-    let s0 = make_signal(n, 0, [0u8; 32]);
-    chain.append(s0).unwrap();
+    let mut s0 = make_signal(n, 0, [0u8; 32]);
+    s0.links.push(cybergraph::CyberlinkRecord {
+        neuron: n,
+        from: particle(2),
+        to: particle(3),
+        token: particle(0),
+        amount: 1,
+        valence: 1,
+        height: 0,
+    });
+    chain.append(s0.clone()).unwrap();
     assert_eq!(chain.entries.len(), 1);
 
-    // Layer 3: insert into BBG state (conversion from cybergraph::Signal to bbg::Signal).
-    let mut state = BbgState::new();
-    state.neurons.insert(
+    // Exercise the actual coordinator bridge with exactly that same Signal.
+    let mut graph = cybergraph::Cybergraph::new();
+    graph.bbg.state.neurons.insert(
         n,
         NeuronRecord {
             focus: 100_000,
@@ -157,29 +166,24 @@ fn signal_to_bbg_state_to_look_proof() {
             stake: 0,
         },
     );
-    state
-        .insert(&BbgSignal {
-            neuron: n,
-            links: vec![BbgCyberlink {
-                from: particle(2),
-                to: particle(3),
-                token: particle(0),
-                amount: 1,
-                valence: 1,
-            }],
-            box_moves: vec![],
-            height: 0,
-        })
-        .unwrap();
+    graph.link(s0).unwrap();
+    assert_eq!(
+        graph.chains[&n].entries[&0].hash(),
+        chain.entries[&0].hash()
+    );
+    assert_eq!(graph.bbg.state.particles[&particle(3)].energy, 1);
+    let mut state = graph.bbg.state;
     // Add a time snapshot so the look(Time, 0) has something to find.
     state.time.insert(0, particle(42));
+    state.refresh_root();
 
     // Look pattern: execute look(Time, height=0) with ProofLookProvider.
     let prov = ProofLookProvider::new(&state);
 
-    let mut order = Order::<ORDER_SIZE>::new();
+    let mut order = Reduction::<ORDER_SIZE>::new();
     let obj = bbg_object_from_state(&mut order, &state);
-    let formula = make_look_formula(&mut order, 8, 0); // Dim::Time = 8, height = 0
+    let index = bbg::prove_time(&state, 0).unwrap().context.unwrap().index;
+    let formula = make_look_formula(&mut order, 8, index);
 
     let mut trace = VecTrace::default();
     let outcome = reduce(&mut order, obj, formula, 1000, &prov, &mut trace);
@@ -188,10 +192,15 @@ fn signal_to_bbg_state_to_look_proof() {
     let look_openings = prov.take_look_openings();
     assert_eq!(look_openings.len(), 1);
 
-    // Generate and verify the zheng proof.
-    let stmt = zero_statement();
-    let proof = commit(&trace, &[], &[], &look_openings, &stmt, &default_params()).unwrap();
-    verify(&proof, &stmt, &default_params()).expect("signal→bbg→look proof must verify");
+    let output = common::result(outcome);
+    common::verify_look_openings(&state, &trace, &look_openings);
+    common::verify_state_execution(
+        &order,
+        formula,
+        &state,
+        &common::noun_leaves(&order, output),
+    );
+    common::refuse_recursive_look(&trace, &state, &look_openings);
 }
 
 /// Multiple signals from the same neuron → all inserted into BbgState → state is consistent.
