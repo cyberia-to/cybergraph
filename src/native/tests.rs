@@ -94,3 +94,29 @@ fn missing_live_history_or_block_is_corruption() {
     drop(node);
     std::fs::remove_dir_all(path).unwrap();
 }
+
+#[test]
+fn local_credit_staging_failure_rolls_back_and_retry_preserves_receipt() {
+    let path = std::env::temp_dir().join(format!("native-credit-failure-{}", std::process::id()));
+    std::fs::create_dir(&path).unwrap();
+    let db = path.join("bbg");
+    let mut node = NativeNode::open(&db, b"genesis").unwrap();
+    let root = node.root();
+    let request = || Operation::Events(vec![Event::LocalCredit {
+        neuron: [1;32], token: [2;32], amount: 42, focus: 84, reason: [3;32],
+    }]);
+    FAIL_AFTER_STAGING.set(true);
+    assert!(node.accept(Some([4;32]), request(), 0).is_err());
+    assert_eq!(node.root(), root);
+    assert!(node.graph().bbg.state.balances.is_empty());
+    assert!(node.graph().bbg.state.neurons.is_empty());
+    let receipt = node.accept(Some([4;32]), request(), 0).unwrap();
+    drop(node);
+    let mut node = NativeNode::open(&db, b"genesis").unwrap();
+    assert_eq!(node.accept(Some([4;32]), request(), 10).unwrap(), receipt);
+    assert_eq!(node.graph().bbg.state.balances[&bbg::balance_key(&[1;32], &[2;32])], 42);
+    assert_eq!(node.graph().bbg.state.neurons[&[1;32]].focus, 84);
+    assert_eq!(node.height(), 0);
+    drop(node);
+    std::fs::remove_dir_all(path).unwrap();
+}

@@ -4,6 +4,7 @@ pub(super) struct Ledger {
     pub changes: BTreeMap<NeuronId, u64>,
     pub supply: u64,
     pub observations: Vec<(u64, u64)>,
+    pub skipped_payments: bool,
 }
 impl Ledger {
     pub fn prepare(node: &NativeNode, events: &[Event]) -> Result<Self, Error> {
@@ -11,6 +12,7 @@ impl Ledger {
             changes: BTreeMap::new(),
             supply: node.supply,
             observations: vec![],
+            skipped_payments: false,
         };
         let from = *hemera::hash(b"zheng").as_bytes();
         let to = *hemera::hash(b"pussy").as_bytes();
@@ -34,6 +36,8 @@ impl Ledger {
                     if balance >= *amount {
                         ledger.changes.insert(signal.neuron, balance - amount);
                         ledger.credit(node, *to, *amount)?;
+                    } else {
+                        ledger.skipped_payments = true;
                     }
                 }
             }

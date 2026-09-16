@@ -41,6 +41,14 @@ pub(super) fn operation(op: &Operation) -> Result<Vec<u8>, Error> {
                         out.push(1);
                         out.extend(intent(i));
                     }
+                    Event::LocalCredit { neuron, token, amount, focus, reason } => {
+                        out.push(2);
+                        out.extend(neuron);
+                        out.extend(token);
+                        u64_out(&mut out, *amount);
+                        u64_out(&mut out, *focus);
+                        out.extend(reason);
+                    }
                 }
                 if out.len() > MAX_OPERATION_BYTES {
                     return Err(invalid("operation byte limit"));
@@ -88,6 +96,8 @@ pub(super) fn decode_operation(bytes: &[u8]) -> Result<Operation, Error> {
                         scope_hash: r.array()?,
                         signature: r.array()?,
                     }),
+                    2 => Event::LocalCredit { neuron: r.array()?, token: r.array()?,
+                        amount: r.u64()?, focus: r.u64()?, reason: r.array()? },
                     _ => return Err(corrupt("event kind")),
                 });
             }

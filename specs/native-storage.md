@@ -98,3 +98,20 @@ IDs use the adapter's documented domain-separated mapping.
 This contract covers local SSD durability. Archive tier replication, power-cut
 qualification, authorization and distributed consensus have separate release
 criteria.
+# Local host credit events
+
+The local unsigned profile also records explicit `LocalCredit` events containing
+neuron, token, amount, focus increment and reason. They are host-only economic
+adjustments, not peer wire events or consensus mint proofs. The caller verifies
+settlement authorization before admission. Request IDs bind the reason and
+recipient; exact retries return the receipt, conflicting reuse rejects. Public
+balance/focus changes, refreshed root/checkpoint, history and request receipt
+publish in the same transaction. Overflow rolls back. No new block is implied.
+Legacy tape export stops before such an event, requiring full native history for
+complete state recovery. A/N contents and native chaosnet subsidy ledger remain
+separate. Existing signal/intent encodings are unchanged; event kind 2 encodes
+the bounded local credit fields. Old readers reject the unknown kind.
+
+`from_database(Database,genesis)` reuses the shared storage owner; `database()`
+returns a clone for application namespaces. It does not create a second native
+writer. A stale independently opened coordinator fails its existing head CAS.

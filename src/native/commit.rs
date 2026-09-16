@@ -41,7 +41,7 @@ impl NativeNode {
             .iter()
             .map(|e| match e {
                 Event::Signal(s) => Some(bridge(s)),
-                Event::Intent(_) => None,
+                Event::Intent(_) | Event::LocalCredit { .. } => None,
             })
             .collect();
         let mut signals = self.head.signals;
@@ -70,7 +70,7 @@ impl NativeNode {
                         },
                     ))
                 }
-                Event::Intent(_) => None,
+                Event::Intent(_) | Event::LocalCredit { .. } => None,
             });
         }
         let changes: Vec<_> = events
@@ -87,6 +87,8 @@ impl NativeNode {
                     }
                 }
                 Event::Intent(i) => NativeChange::Intent(i),
+                Event::LocalCredit { neuron, token, amount, focus, .. } =>
+                    NativeChange::LocalCredit { neuron, token, amount: *amount, focus: *focus },
             })
             .collect();
         let (wire, wire_blocked) =
@@ -283,7 +285,7 @@ fn bridge(s: &Signal) -> bbg::Signal {
             .collect(),
     }
 }
-fn check_retry(bytes: &[u8], fingerprint: &Particle, id: &Particle) -> Result<Receipt, Error> {
+pub(super) fn check_retry(bytes: &[u8], fingerprint: &Particle, id: &Particle) -> Result<Receipt, Error> {
     if bytes.len() < 32 {
         return Err(corrupt("receipt fingerprint"));
     }
@@ -348,6 +350,7 @@ fn wire_frames(
                     scope_hash: i.scope_hash,
                     signature: i.signature,
                 })]),
+                Event::LocalCredit { .. } => return Err(corrupt("local credit cannot have legacy wire")),
             };
             if codec::operation(&Operation::Events(mapped))? != codec::operation(&expected)? {
                 return Err(corrupt("legacy bytes differ from operation"));
@@ -366,6 +369,7 @@ fn wire_frames(
             }
             Event::Signal(s) => frames.push(foculus::encode_signal_frame(s)),
             Event::Intent(i) => frames.push(foculus::encode_intent_frame(i)),
+            Event::LocalCredit { .. } => return Ok((frames, true)),
         }
     }
     Ok((frames, false))

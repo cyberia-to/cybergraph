@@ -2,6 +2,13 @@ use super::*;
 use bbg::storage::database::{MAX_BYTES_VALUE, RecordLimits};
 
 impl NativeNode {
+    /// Resolve an exact command retry without preparing or applying it.
+    pub fn resolve(&self, request: Particle, operation: &Operation) -> Result<Option<Receipt>, Error> {
+        let command = codec::operation(operation)?;
+        let fingerprint = digest(b"cybergraph/native-command/v1\0", &[&self.instance, &command]);
+        self.db.read_record(D::NativeRequests, &request, 256)?
+            .map(|bytes| super::commit::check_retry(&bytes, &fingerprint, &request)).transpose()
+    }
     pub fn block(&self, height: u64) -> Result<Option<Block>, Error> {
         let Some(bytes) =
             self.db

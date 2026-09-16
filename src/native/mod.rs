@@ -5,6 +5,8 @@ mod economics;
 mod import;
 mod read;
 mod recovery;
+mod view;
+pub use view::HistoryView;
 #[cfg(test)]
 mod tests;
 
@@ -35,6 +37,8 @@ pub fn decode_operation(bytes: &[u8]) -> Result<Operation, Error> {
 pub enum Event {
     Signal(Signal),
     Intent(IntentRecord),
+    /// Trusted local host adjustment; never decoded from peer signal tape.
+    LocalCredit { neuron: NeuronId, token: Particle, amount: u64, focus: u64, reason: Particle },
 }
 pub enum Operation {
     Link {
@@ -136,6 +140,12 @@ pub struct NativeNode {
 }
 
 impl NativeNode {
+    pub fn from_database(db: Database, genesis: &[u8]) -> Result<Self, Error> {
+        Self::open_database(db, genesis, false)
+    }
+
+    pub fn database(&self) -> Database { self.db.clone() }
+
     pub fn open(path: &Path, genesis: &[u8]) -> Result<Self, Error> {
         let db = Database::open(path, Backend::Ssd)?;
         Self::open_database(db, genesis, false)
