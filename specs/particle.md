@@ -1,6 +1,6 @@
 # particle
 
-a content-addressed node — the name of a [[file]]. identity = [[Hemera]] hash of content. 64 raw bytes, no headers, no version prefix. one hash function, one address space, permanent
+a content-addressed node — the identity of a [[file]]. identity = [[Hemera]] hash of content. 64 raw bytes, no headers, no version prefix. one hash function, one address space, permanent
 
 the address is the identity. `Hemera(content)` — that is the particle. no registration, no authority, no namespace collision. two agents on opposite sides of the planet hashing the same content produce the same address. the first [[cyberlink]] to that address brings the particle into the [[cybergraph]]. a naked hash with no links never enters the graph (axiom A4)
 

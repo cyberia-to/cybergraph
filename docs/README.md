@@ -53,7 +53,7 @@ a cyberlink is the atomic unit of knowledge. its five fields group into three co
 
 $$\text{cyberlink} \;=\; \text{link}(from,\,to) \;+\; \text{box}(coin,\,amount) \;+\; valence$$
 
-- a [[link]] connects two [[card|cards]] — `from → to`. a [[particle]] (the name of a [[file]] — a content-addressed knowledge node) is a card; a [[neuron]] is a card; a network is a card. one mechanism covers a knowledge edge, a transfer, or a stake.
+- a [[link]] connects two [[card|cards]] — `from → to`. a [[particle]] (the identity of a [[file]] — a content-addressed knowledge node) is a card; a [[neuron]] is a card; a network is a card. one mechanism covers a knowledge edge, a transfer, or a stake.
 - a [[box]] is the conviction moved: `amount` units of a [[coin]] denomination. boxes move from one object to another — created, transferred, withdrawn, spent — never conjured. this is the economic layer.
 - a [[valence]] is the epistemic prediction (`-1 / 0 / +1`): where the neuron forecasts collective belief will settle.
 
