@@ -17,7 +17,7 @@ $$\mathbb{G} = (P,\; N,\; L)$$
 
 | symbol | set | element type |
 |---|---|---|
-| $P \subseteq \operatorname{Im}(H)$ | [[particles]] | content-addressed nodes |
+| $P \subseteq \operatorname{Im}(H)$ | [[particles]] | content-addressed nodes — the names of the [[files]] a cyberlink connects |
 | $N$ | [[neurons]] | authenticated agents |
 | $L$ | [[cyberlinks]] | labeled directed edges (multiset) |
 | $\mathcal{T}$ | [[tokens]] | conviction denominations (derived from $L$) |
