@@ -74,6 +74,10 @@ a signal's life is a promise then a proof: [intent.md](intent.md) `intend(scope)
 
 cybergraph and [[soma]] are one processor: cybergraph is the dumb half (store · events · commit-gate), soma the smart half (the runtime). the *decision* loop — read an [[intent]], collect recomputed state from [[bbg]], run it through [[nox]], judge what is left to compute, iterate, and only then emit a signal — is dynamic control, not a static pipeline. it falls out, upward, to soma. soma *calls* cybergraph's four verbs and drives the fetch→execute→prove→commit cycle; it is not one of the verbs. cybergraph is fast, correct, stateless; soma is the mind that drives it. see the [whitepaper](../docs/README.md).
 
+## genesis
+
+- [genesis-replay.md](genesis-replay.md) — bijective replay of the bostrom burial snapshot into genesis state; the contract behind [[cyber/launch|launch]] property 14
+
 ## staking — placing weight
 
 - [staking.md](staking.md) — the two write paths that produce attention: [[will]] (broad, → tru) and conviction (per-link [[box]])
