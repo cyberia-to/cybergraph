@@ -7,8 +7,10 @@ date: 2026-09-19
 
 property #19 of [the launch registry](https://github.com/cyberia-to/cyber/blob/master/launch.md)
 freezes `file::Particle` as the one type bbg, cybergraph, foculus and tru
-share. Before that decision lands, this is what exists in the checkout on
-2026-09-19: five independent representations, two incompatible byte widths,
+share. Before that decision lands, this is what exists in the owner's
+working trees on 2026-09-19 (which carry unpushed work; line numbers were
+re-verified against each repository's `origin/master` on 2026-09-22 and
+corrected where they differ): five independent representations, two incompatible byte widths,
 and no domain separation on the path that will address 3.1M migrated
 bostrom files. This document makes no decision; it lists what a decision
 must reconcile.
@@ -23,16 +25,19 @@ must reconcile.
 2. `bbg::Particle` — `bbg/rs/src/types.rs:9`. `pub type Particle = [u8;
    32]` — a bare alias, no newtype, no hex/debug helpers of its own.
    `ParticleRecord` at `types.rs:19` wraps it for storage. This is the
-   type cybergraph re-exports (`cybergraph/src/lib.rs:34`: `pub use
-   bbg::{IntentRecord, NeuronId, Particle, SignalRecord};`) and the type
+   type cybergraph re-exports (`cybergraph/src/lib.rs:25` on
+   `origin/master`, `:34` in the owner's working tree: `pub use
+   bbg::{NeuronId, Particle, IntentRecord, SignalRecord};`) and the type
    foculus imports directly in five modules (`conflict.rs:24`,
    `finality.rs:23`, `pay_proof.rs:24`, `finality_evidence.rs:11`,
    `reconcile.rs:23`, all `use bbg::Particle;`).
 
 3. A second, unrelated alias inside the same bbg crate —
-   `bbg/rs/src/storage/application.rs:14`: `pub type Particle = [u8;
-   32]`. Same shape as (2), declared independently in a different
-   module. Two type aliases with the same name and the same
+   `bbg/rs/src/storage/application.rs:9`: `pub type Particle = [u8;
+   32]`. This file is not on bbg `origin/master`; it arrives with the
+   owner's open bbg#9 (`feat/atomic-application-storage`, line 9 there,
+   line 14 in the owner's working tree). Same shape as (2), declared
+   independently in a different module. Two type aliases with the same name and the same
    representation, defined twice in one crate, is itself a finding
    independent of the cross-crate question: nothing stops the two from
    diverging in a future edit, and nothing today enforces that they stay
@@ -52,7 +57,8 @@ must reconcile.
    commitments and nullifiers with domain-separation prefixes (`0x01`
    edges, `0x02` records, `0x03` nullifiers, `0x04` Merkle internal
    nodes; particle content addressing itself uses no prefix, per the
-   domain table at `particle.md:66-76`). It also specifies a tree
+   domain table at `particle.md:56-64`, restated at `:66`; the 64-byte
+   output format is at `:70-73`). It also specifies a tree
    structure for content over 4KB (`particle.md:44-52`, left-balanced
    binary, `Hemera(chunk_bytes)` leaves) that none of the four code
    definitions above implement — every one of them hashes the full byte
