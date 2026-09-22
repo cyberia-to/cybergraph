@@ -292,3 +292,100 @@ fn h32(s: &str) -> Option<[u8; 32]> {
     }
     Some(out)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use inf_value::F;
+
+    #[test]
+    fn hex_encodes_empty() {
+        assert_eq!(hex(&[]), "");
+    }
+
+    #[test]
+    fn hex_encodes_bytes_lowercase_zero_padded() {
+        assert_eq!(hex(&[0x00, 0x0a, 0xff]), "000aff");
+    }
+
+    #[test]
+    fn h32_rejects_empty() {
+        assert_eq!(h32(""), None);
+    }
+
+    #[test]
+    fn h32_rejects_over_length() {
+        assert_eq!(h32(&"a".repeat(65)), None);
+    }
+
+    #[test]
+    fn h32_rejects_non_hex() {
+        assert_eq!(h32("not-hex-at-all-zz"), None);
+    }
+
+    #[test]
+    fn h32_rejects_non_ascii_without_panicking() {
+        // a multi-byte UTF-8 character must not reach the byte-index slice in
+        // the decode loop; the hexdigit gate must reject it first.
+        assert_eq!(h32("中"), None);
+        assert_eq!(h32(&format!("{}{}", "a".repeat(63), '中')), None);
+    }
+
+    #[test]
+    fn h32_left_pads_short_input() {
+        let mut want = [0u8; 32];
+        want[31] = 0xab;
+        assert_eq!(h32("ab"), Some(want));
+    }
+
+    #[test]
+    fn h32_strips_0x_prefix() {
+        assert_eq!(h32("0xab"), h32("ab"));
+    }
+
+    #[test]
+    fn h32_full_length_round_trips_hex() {
+        let want = [0x11u8; 32];
+        assert_eq!(h32(&hex(&want)), Some(want));
+    }
+
+    #[test]
+    fn h32_is_case_insensitive() {
+        assert_eq!(h32("AB"), h32("ab"));
+    }
+
+    #[test]
+    fn fmt_value_null_and_bool() {
+        assert_eq!(fmt_value(&Value::Null), "null");
+        assert_eq!(fmt_value(&Value::Bool(true)), "true");
+        assert_eq!(fmt_value(&Value::Bool(false)), "false");
+    }
+
+    #[test]
+    fn fmt_value_int() {
+        assert_eq!(fmt_value(&Value::Int(-7)), "-7");
+    }
+
+    #[test]
+    fn fmt_value_word() {
+        assert_eq!(fmt_value(&Value::Word(42)), "42");
+    }
+
+    #[test]
+    fn fmt_value_hash_and_bytes_go_through_hex() {
+        assert_eq!(fmt_value(&Value::Hash([0xabu8; 32])), hex(&[0xabu8; 32]));
+        assert_eq!(fmt_value(&Value::Bytes(vec![1, 2, 3])), hex(&[1, 2, 3]));
+    }
+
+    #[test]
+    fn fmt_value_list_joins_elements_with_commas() {
+        let v = Value::List(vec![Value::Int(1), Value::Bool(true), Value::Null]);
+        assert_eq!(fmt_value(&v), "[1,true,null]");
+    }
+
+    #[test]
+    fn fmt_value_field_uses_debug_format() {
+        let f = F::from_u64(9);
+        assert_eq!(fmt_value(&Value::Field(f)), format!("{f:?}"));
+    }
+}
