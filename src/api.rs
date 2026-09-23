@@ -26,7 +26,7 @@
 use std::collections::BTreeMap;
 
 use bbg::{Bbg, IntentRecord, NeuronId, Particle};
-use foculus::{ChainError, Signal, SignalChain};
+use foculus::{ChainError, CyberlinkRecord, Signal, SignalChain};
 use inf_eval::{Ctx, Output, eval};
 use inf_parse::parse;
 use inf_plan::plan;
@@ -208,6 +208,43 @@ impl Cybergraph {
         Ok(())
     }
 
+    /// register_book — the naming half of property 30 (`cyber/launch.md`):
+    /// `tok::BookRegistry` (plumb) derives a neuron's home-book token id
+    /// deterministically and claims it ledger-locally; this publishes that
+    /// claim into the graph as a cyberlink from the neuron's own particle
+    /// identity to the book token, so the registration is visible to every
+    /// reader of the graph, not just the ledger. One neuron may register at
+    /// most once per signal-chain step, same ordering discipline as `link`.
+    ///
+    /// Out of scope here: re-pointing the link at the book's current state
+    /// root as it settles (needs foculus domain finality, property 31) and
+    /// rejecting a second registration for the same neuron (needs the
+    /// one-home-book invariant `tok::BookRegistry::root` already enforces
+    /// ledger-side; cybergraph does not read tok state).
+    pub fn register_book(&mut self, neuron: NeuronId, book_token: Particle) -> Result<(), ApiError> {
+        let (step, prev) = self.next_step_prev(neuron);
+        let signal = Signal {
+            neuron,
+            network: foculus::SELF_NETWORK,
+            links: vec![CyberlinkRecord {
+                neuron,
+                from: neuron,
+                to: book_token,
+                token: book_token,
+                amount: 1,
+                valence: 1,
+                height: 0,
+            }],
+            delta_pi: vec![],
+            box_moves: vec![],
+            prev,
+            step,
+            height: 0,
+            proof: None,
+        };
+        self.link(signal)
+    }
+
     /// subscribe — register a handler over an event filter.
     pub fn subscribe<F>(&mut self, filter: Filter, handler: F)
     where
@@ -290,6 +327,29 @@ impl Cybergraph {
         );
 
         Ok((neuron, step))
+    }
+
+    /// The step and prev-hash a neuron's next signal must carry, per its
+    /// chain so far — the same computation `SignalChain::append` uses to
+    /// validate, exposed so a caller building a single-shot signal (like
+    /// `register_book`) does not have to track chain position itself.
+    fn next_step_prev(&self, neuron: NeuronId) -> (u64, Particle) {
+        match self.chains.get(&neuron) {
+            None => (0, [0u8; 32]),
+            Some(chain) => {
+                let step = chain.entries.len() as u64;
+                let prev = if step == 0 {
+                    [0u8; 32]
+                } else {
+                    chain
+                        .entries
+                        .get(&(step - 1))
+                        .map(|s| s.hash())
+                        .unwrap_or([0u8; 32])
+                };
+                (step, prev)
+            }
+        }
     }
 
     fn chain_append(&mut self, signal: Signal) -> Result<(), ApiError> {
@@ -570,5 +630,65 @@ mod tests {
         let g = Cybergraph::new();
         let err = g.query("this is not inf");
         assert!(matches!(err, Err(QueryError::Parse(_))));
+    }
+
+    // ── register_book (property 30, naming half) ───────────────────────────
+
+    #[test]
+    fn register_book_publishes_a_naming_link() {
+        let mut g = Cybergraph::new();
+        let neuron = n(1);
+        let book_token = p(42);
+        g.register_book(neuron, book_token).unwrap();
+
+        // The book token materializes as a particle in bbg state, same as
+        // any other link target.
+        let target = g
+            .bbg
+            .state
+            .particles
+            .get(&book_token)
+            .expect("book token particle materialized");
+        assert_eq!(target.energy, 1);
+        assert!(
+            g.bbg.state.axons_out.get(&neuron).is_some(),
+            "the neuron's own particle carries the outgoing naming axon"
+        );
+        assert!(g.bbg.state.axons_in.get(&book_token).is_some());
+    }
+
+    #[test]
+    fn register_book_is_queryable() {
+        let mut g = Cybergraph::new();
+        g.register_book(n(1), p(42)).unwrap();
+        let out = g
+            .query("?[particle, energy] := particles{particle, energy}")
+            .expect("query runs");
+        assert_eq!(out.columns, vec!["particle", "energy"]);
+        assert!(
+            !out.rows.is_empty(),
+            "the naming link's target is visible to a graph reader, not just the ledger"
+        );
+    }
+
+    #[test]
+    fn register_book_advances_the_neuron_chain_step() {
+        let mut g = Cybergraph::new();
+        let neuron = n(1);
+        g.register_book(neuron, p(42)).unwrap();
+        g.register_book(neuron, p(43)).unwrap();
+        // Two registrations from the same neuron chain sequentially (steps 0, 1)
+        // rather than colliding or requiring the caller to track step/prev.
+        let chain = g.chains.get(&neuron).expect("chain recorded");
+        assert_eq!(chain.entries.len(), 2);
+    }
+
+    #[test]
+    fn register_book_two_neurons_do_not_collide() {
+        let mut g = Cybergraph::new();
+        g.register_book(n(1), p(42)).unwrap();
+        g.register_book(n(2), p(43)).unwrap();
+        assert_eq!(g.bbg.state.particles.get(&p(42)).unwrap().energy, 1);
+        assert_eq!(g.bbg.state.particles.get(&p(43)).unwrap().energy, 1);
     }
 }
