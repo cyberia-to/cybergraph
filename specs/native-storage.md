@@ -58,24 +58,6 @@ BBG record set and ledger with disk. Missing, extra, malformed or inconsistent
 records prevent readiness. No record is skipped. Recovery does not acknowledge
 new operations or emit events.
 
-Before replay, the coordinator reads BBG's native metadata version. Current
-version 2 identifies both the record layout and current commitment semantics;
-unknown versions are refused with an unsupported-format diagnostic. Version 1
-is accepted provisionally: complete replay must reproduce every receipt, root
-and record, with only the metadata version word allowed to differ. A mismatch
-keeps the legacy store unchanged and reports the legacy compatibility boundary.
-Malformed or missing metadata also prevents readiness.
-
-Opening a compatible version-1 store and retrying an existing request leave its
-records unchanged. The next newly accepted operation updates the version word
-to 2 in the same transaction as the operation and receipt, even when that
-operation changes no root. Failure rolls back this update together with the
-operation. Previous writers reject version-2 metadata during exact recovery;
-rollback after this first new write requires a compatible binary. The version
-transition preserves genesis, instance identity, roots and historical receipts.
-The coordinator checks that its verified metadata has not changed before each
-new write, alongside the existing head compare-and-swap.
-
 Legacy tape import is explicit. The complete input must decode strictly before
 copying; historical complete encodings are accepted and malformed, unknown or
 truncated frames fail. The import pins a source digest and leaves a durable

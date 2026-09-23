@@ -87,18 +87,8 @@ impl NativeNode {
                     }
                 }
                 Event::Intent(i) => NativeChange::Intent(i),
-                Event::LocalCredit {
-                    neuron,
-                    token,
-                    amount,
-                    focus,
-                    ..
-                } => NativeChange::LocalCredit {
-                    neuron,
-                    token,
-                    amount: *amount,
-                    focus: *focus,
-                },
+                Event::LocalCredit { neuron, token, amount, focus, .. } =>
+                    NativeChange::LocalCredit { neuron, token, amount: *amount, focus: *focus },
             })
             .collect();
         let (wire, wire_blocked) =
@@ -186,15 +176,13 @@ impl NativeNode {
                 require_record(&self.db, D::NativeExport, key, value)?;
             }
         } else {
-            let committed = self
-                .db
+            self.db
                 .transaction::<_, Error>(|tx| {
                     if tx.read_record(D::NativeMetadata, b"head", 256)?.as_deref()
                         != Some(codec::head(&self.head).as_slice())
                     {
                         return Err(corrupt("coordinator head changed outside its owner"));
                     }
-                    super::format::require_unchanged(tx, &self.state_metadata)?;
                     for change in prepared.changes() {
                         match &change.value {
                             Some(value) => tx.put_record(D::NativeState, &change.key, value)?,
@@ -218,16 +206,14 @@ impl NativeNode {
                     )?;
                     insert(tx, D::NativeRequests, &id, &stored_receipt)?;
                     tx.put_record(D::NativeMetadata, b"head", &codec::head(&head))?;
-                    let metadata = super::format::promote(tx)?;
                     #[cfg(test)]
                     super::tests::after_staging()?;
-                    Ok(metadata)
+                    Ok(())
                 })
                 .map_err(|error| match error {
                     Error::Storage(StorageError::Limit(limit)) => Error::Limit(limit.into()),
                     error => error,
                 })?;
-            self.state_metadata = committed.value;
         }
         prepared.publish();
         for event in events {
@@ -299,11 +285,7 @@ fn bridge(s: &Signal) -> bbg::Signal {
             .collect(),
     }
 }
-pub(super) fn check_retry(
-    bytes: &[u8],
-    fingerprint: &Particle,
-    id: &Particle,
-) -> Result<Receipt, Error> {
+pub(super) fn check_retry(bytes: &[u8], fingerprint: &Particle, id: &Particle) -> Result<Receipt, Error> {
     if bytes.len() < 32 {
         return Err(corrupt("receipt fingerprint"));
     }
@@ -368,9 +350,7 @@ fn wire_frames(
                     scope_hash: i.scope_hash,
                     signature: i.signature,
                 })]),
-                Event::LocalCredit { .. } => {
-                    return Err(corrupt("local credit cannot have legacy wire"));
-                }
+                Event::LocalCredit { .. } => return Err(corrupt("local credit cannot have legacy wire")),
             };
             if codec::operation(&Operation::Events(mapped))? != codec::operation(&expected)? {
                 return Err(corrupt("legacy bytes differ from operation"));

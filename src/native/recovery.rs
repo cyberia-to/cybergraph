@@ -35,7 +35,6 @@ impl NativeNode {
             supply: 0,
             head: Head::default(),
             instance,
-            state_metadata: Vec::new(),
         };
         if fresh {
             node.db.transaction::<_, Error>(|tx| {
@@ -49,51 +48,46 @@ impl NativeNode {
                 Ok(())
             })?;
         }
-        node.state_metadata = super::format::read(&node.db)?;
-        let recovered = (|| {
-            let disk_head = node
+        let disk_head = node
+            .db
+            .read_record(D::NativeMetadata, b"head", 256)?
+            .ok_or_else(|| corrupt("missing native head"))?;
+        let expected_head = codec::decode_head(&disk_head)?;
+        let mut after: Option<Vec<u8>> = None;
+        loop {
+            let rows = node
                 .db
-                .read_record(D::NativeMetadata, b"head", 256)?
-                .ok_or_else(|| corrupt("missing native head"))?;
-            let expected_head = codec::decode_head(&disk_head)?;
-            let mut after: Option<Vec<u8>> = None;
-            loop {
-                let rows = node
-                    .db
-                    .scan_records(D::NativeHistory, after.as_deref(), b"", page())?;
-                if rows.is_empty() {
-                    break;
-                }
-                for (key, bytes) in rows {
-                    let expected = node
-                        .head
-                        .position
-                        .checked_add(1)
-                        .ok_or_else(|| corrupt("history overflow"))?;
-                    if key != expected.to_be_bytes() {
-                        return Err(corrupt("noncontiguous native history"));
-                    }
-                    let h = codec::decode_history(&bytes)?;
-                    let operation = codec::decode_operation(&h.command)?;
-                    node.accept_encoded(
-                        Some(h.receipt.request_id),
-                        operation,
-                        h.command.clone(),
-                        h.receipt.timestamp,
-                        h.original_wire.clone(),
-                        Some(&h),
-                    )
-                    .map_err(|e| corrupt(format!("request {expected}: {e}")))?;
-                    after = Some(key);
-                }
+                .scan_records(D::NativeHistory, after.as_deref(), b"", page())?;
+            if rows.is_empty() {
+                break;
             }
-            if node.head != expected_head {
-                return Err(corrupt("replayed native head differs from disk"));
+            for (key, bytes) in rows {
+                let expected = node
+                    .head
+                    .position
+                    .checked_add(1)
+                    .ok_or_else(|| corrupt("history overflow"))?;
+                if key != expected.to_be_bytes() {
+                    return Err(corrupt("noncontiguous native history"));
+                }
+                let h = codec::decode_history(&bytes)?;
+                let operation = codec::decode_operation(&h.command)?;
+                node.accept_encoded(
+                    Some(h.receipt.request_id),
+                    operation,
+                    h.command.clone(),
+                    h.receipt.timestamp,
+                    h.original_wire.clone(),
+                    Some(&h),
+                )
+                .map_err(|e| corrupt(format!("request {expected}: {e}")))?;
+                after = Some(key);
             }
-            node.validate_records()?;
-            Ok(())
-        })();
-        recovered.map_err(|error| super::format::recovery_error(&node.state_metadata, error))?;
+        }
+        if node.head != expected_head {
+            return Err(corrupt("replayed native head differs from disk"));
+        }
+        node.validate_records()?;
         Ok(node)
     }
 
@@ -189,15 +183,7 @@ fn compare<I: Iterator<Item = (Vec<u8>, Vec<u8>)>>(
             break;
         }
         for row in rows {
-            let matches = expected.next().is_some_and(|(key, value)| {
-                key == row.0
-                    && if domain == D::NativeState && key == [0] {
-                        super::format::equivalent(&row.1, &value)
-                    } else {
-                        value == row.1
-                    }
-            });
-            if !matches {
+            if expected.next().as_ref() != Some(&row) {
                 return Err(corrupt(format!("exact state mismatch in {domain:?}")));
             }
             after = Some(row.0);

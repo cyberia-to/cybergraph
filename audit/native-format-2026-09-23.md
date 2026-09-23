@@ -2,8 +2,14 @@
 title: Native format compatibility
 tags: cybergraph, audit, storage
 date: 2026-09-23
+status: withdrawn
 ---
 # Native format compatibility
+
+Withdrawn on 2026-09-23 following the owner's correction. The extra format
+negotiation, legacy normalization, automatic promotion and reader exclusion
+were reverted. Recovery again uses the existing exact replay/record comparison.
+The following text preserves the experiment's evidence, not the active contract.
 
 BBG's new native metadata version 2 identifies the current root semantics.
 Previously, version 1 alone could not distinguish older commitment encodings
