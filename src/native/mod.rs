@@ -2,6 +2,7 @@
 mod codec;
 mod commit;
 mod economics;
+mod format;
 mod import;
 mod read;
 mod recovery;
@@ -38,7 +39,13 @@ pub enum Event {
     Signal(Signal),
     Intent(IntentRecord),
     /// Trusted local host adjustment; never decoded from peer signal tape.
-    LocalCredit { neuron: NeuronId, token: Particle, amount: u64, focus: u64, reason: Particle },
+    LocalCredit {
+        neuron: NeuronId,
+        token: Particle,
+        amount: u64,
+        focus: u64,
+        reason: Particle,
+    },
 }
 pub enum Operation {
     Link {
@@ -137,6 +144,7 @@ pub struct NativeNode {
     supply: u64,
     head: Head,
     instance: Particle,
+    state_metadata: Vec<u8>,
 }
 
 impl NativeNode {
@@ -144,7 +152,9 @@ impl NativeNode {
         Self::open_database(db, genesis, false)
     }
 
-    pub fn database(&self) -> Database { self.db.clone() }
+    pub fn database(&self) -> Database {
+        self.db.clone()
+    }
 
     pub fn open(path: &Path, genesis: &[u8]) -> Result<Self, Error> {
         let db = Database::open(path, Backend::Ssd)?;
