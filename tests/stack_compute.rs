@@ -15,7 +15,7 @@ mod common;
 
 use common::{zero_statement, default_params, make_field_binop, make_word_binop};
 
-use nox::{reduce, Order, Tag, VecTrace, NullCalls, Outcome};
+use nox::{reduce, VecTrace, NullCalls, Outcome, Reduction};
 use nebu::Goldilocks;
 use zheng::{commit, verify};
 
@@ -26,8 +26,8 @@ const ORDER_SIZE: usize = 1024;
 /// Formula [5 [[1 3] [1 5]]] (add) → 3-row trace → zheng commit → verify.
 #[test]
 fn add_field_full_proof_roundtrip() {
-    let mut order = Order::<ORDER_SIZE>::new();
-    let obj     = order.atom(Goldilocks::new(0), Tag::Field).unwrap();
+    let mut order = Reduction::<ORDER_SIZE>::new();
+    let obj     = order.atom(Goldilocks::new(0)).unwrap();
     let formula = make_field_binop(&mut order, 5, 3, 5);  // add(3, 5)
 
     let mut trace = VecTrace::default();
@@ -42,8 +42,8 @@ fn add_field_full_proof_roundtrip() {
 /// Formula [6 [[1 10] [1 3]]] (sub) → 3-row trace → zheng commit → verify.
 #[test]
 fn sub_field_full_proof_roundtrip() {
-    let mut order = Order::<ORDER_SIZE>::new();
-    let obj     = order.atom(Goldilocks::new(0), Tag::Field).unwrap();
+    let mut order = Reduction::<ORDER_SIZE>::new();
+    let obj     = order.atom(Goldilocks::new(0)).unwrap();
     let formula = make_field_binop(&mut order, 6, 10, 3);  // sub(10, 3)
 
     let mut trace = VecTrace::default();
@@ -58,8 +58,8 @@ fn sub_field_full_proof_roundtrip() {
 /// Formula [7 [[1 6] [1 7]]] (mul) → 3-row trace → zheng commit → verify.
 #[test]
 fn mul_field_full_proof_roundtrip() {
-    let mut order = Order::<ORDER_SIZE>::new();
-    let obj     = order.atom(Goldilocks::new(0), Tag::Field).unwrap();
+    let mut order = Reduction::<ORDER_SIZE>::new();
+    let obj     = order.atom(Goldilocks::new(0)).unwrap();
     let formula = make_field_binop(&mut order, 7, 6, 7);  // mul(6, 7)
 
     let mut trace = VecTrace::default();
@@ -80,8 +80,8 @@ fn mul_field_full_proof_roundtrip() {
 /// and boundary trivial_ccs for the quote→xor transition.
 #[test]
 fn xor_bitwise_full_proof_roundtrip() {
-    let mut order = Order::<ORDER_SIZE>::new();
-    let obj     = order.atom(Goldilocks::new(0), Tag::Field).unwrap();
+    let mut order = Reduction::<ORDER_SIZE>::new();
+    let obj     = order.atom(Goldilocks::new(0)).unwrap();
     let formula = make_word_binop(&mut order, 11, 0b1100_1010, 0b1010_0101);  // xor
 
     let mut trace = VecTrace::default();

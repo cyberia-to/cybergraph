@@ -11,7 +11,7 @@
 #![allow(dead_code)]
 
 use nebu::Goldilocks;
-use nox::{OrderId, Order, Tag};
+use nox::{Order, Reduction};
 
 /// Construct a Goldilocks field element.
 pub fn g(v: u64) -> Goldilocks {
@@ -25,6 +25,7 @@ pub fn zero_statement() -> zheng::Statement {
         input_hash:   [0u8; 32],
         output_hash:  [0u8; 32],
         focus_bound:  0,
+        bbg_root:     [0u8; 32],
     }
 }
 
@@ -37,32 +38,32 @@ pub fn default_params() -> zheng::ProofParams {
 ///
 /// Layout: `[[l0 | [l1 | [l2 | l3]]] | rest]`
 /// Limb axes: l0=4, l1=10, l2=22, l3=23 — matching `BBG_ROOT_LIMB_AXES` in nox.
-pub fn make_bbg_object<const N: usize>(order: &mut Order<N>, limbs: [Goldilocks; 4]) -> OrderId {
-    let al0 = order.atom(limbs[0], Tag::Field).unwrap();
-    let al1 = order.atom(limbs[1], Tag::Field).unwrap();
-    let al2 = order.atom(limbs[2], Tag::Field).unwrap();
-    let al3 = order.atom(limbs[3], Tag::Field).unwrap();
+pub fn make_bbg_object<const N: usize>(order: &mut Reduction<N>, limbs: [Goldilocks; 4]) -> Order {
+    let al0 = order.atom(limbs[0]).unwrap();
+    let al1 = order.atom(limbs[1]).unwrap();
+    let al2 = order.atom(limbs[2]).unwrap();
+    let al3 = order.atom(limbs[3]).unwrap();
     let inner     = order.pair(al2, al3).unwrap();
     let mid       = order.pair(al1, inner).unwrap();
     let root_pair = order.pair(al0, mid).unwrap();
-    let rest      = order.atom(Goldilocks::ZERO, Tag::Field).unwrap();
+    let rest      = order.atom(Goldilocks::ZERO).unwrap();
     order.pair(root_pair, rest).unwrap()
 }
 
 /// Build the 4-limb BBG object from a live `BbgState` root.
 pub fn bbg_object_from_state<const N: usize>(
-    order: &mut Order<N>,
+    order: &mut Reduction<N>,
     state: &bbg::BbgState,
-) -> OrderId {
+) -> Order {
     make_bbg_object(order, bbg::dim::goldilocks_from_bytes32(&state.root()))
 }
 
 /// Build `[17 [[1 ns] [1 key]]]` — look formula with quoted ns and key.
-pub fn make_look_formula<const N: usize>(order: &mut Order<N>, ns: u64, key: u64) -> OrderId {
-    let t17  = order.atom(g(17), Tag::Field).unwrap();
-    let t1   = order.atom(g(1),  Tag::Field).unwrap();
-    let vns  = order.atom(g(ns),  Tag::Field).unwrap();
-    let vkey = order.atom(g(key), Tag::Field).unwrap();
+pub fn make_look_formula<const N: usize>(order: &mut Reduction<N>, ns: u64, key: u64) -> Order {
+    let t17  = order.atom(g(17)).unwrap();
+    let t1   = order.atom(g(1)).unwrap();
+    let vns  = order.atom(g(ns)).unwrap();
+    let vkey = order.atom(g(key)).unwrap();
     let ns_f  = order.pair(t1, vns).unwrap();
     let key_f = order.pair(t1, vkey).unwrap();
     let body  = order.pair(ns_f, key_f).unwrap();
@@ -71,11 +72,11 @@ pub fn make_look_formula<const N: usize>(order: &mut Order<N>, ns: u64, key: u64
 
 /// Build `[tag [[1 a] [1 b]]]` — binary field operation formula (tags 5–10).
 /// Operands use `Tag::Field` (Goldilocks elements).
-pub fn make_field_binop<const N: usize>(order: &mut Order<N>, tag: u64, a: u64, b: u64) -> OrderId {
-    let t  = order.atom(g(tag), Tag::Field).unwrap();
-    let t1 = order.atom(g(1),   Tag::Field).unwrap();
-    let va = order.atom(g(a),   Tag::Field).unwrap();
-    let vb = order.atom(g(b),   Tag::Field).unwrap();
+pub fn make_field_binop<const N: usize>(order: &mut Reduction<N>, tag: u64, a: u64, b: u64) -> Order {
+    let t  = order.atom(g(tag)).unwrap();
+    let t1 = order.atom(g(1)).unwrap();
+    let va = order.atom(g(a)).unwrap();
+    let vb = order.atom(g(b)).unwrap();
     let qa   = order.pair(t1, va).unwrap();
     let qb   = order.pair(t1, vb).unwrap();
     let body = order.pair(qa, qb).unwrap();
@@ -84,11 +85,11 @@ pub fn make_field_binop<const N: usize>(order: &mut Order<N>, tag: u64, a: u64, 
 
 /// Build `[tag [[1 a] [1 b]]]` — binary bitwise operation formula (tags 11–14).
 /// Operands use `Tag::Word` (machine words, not field elements).
-pub fn make_word_binop<const N: usize>(order: &mut Order<N>, tag: u64, a: u64, b: u64) -> OrderId {
-    let t  = order.atom(g(tag), Tag::Field).unwrap();
-    let t1 = order.atom(g(1),   Tag::Field).unwrap();
-    let va = order.atom(g(a),   Tag::Word).unwrap();
-    let vb = order.atom(g(b),   Tag::Word).unwrap();
+pub fn make_word_binop<const N: usize>(order: &mut Reduction<N>, tag: u64, a: u64, b: u64) -> Order {
+    let t  = order.atom(g(tag)).unwrap();
+    let t1 = order.atom(g(1)).unwrap();
+    let va = order.atom(g(a)).unwrap();
+    let vb = order.atom(g(b)).unwrap();
     let qa   = order.pair(t1, va).unwrap();
     let qb   = order.pair(t1, vb).unwrap();
     let body = order.pair(qa, qb).unwrap();
@@ -97,11 +98,11 @@ pub fn make_word_binop<const N: usize>(order: &mut Order<N>, tag: u64, a: u64, b
 
 /// Build `[16 [[1 call_tag] [1 0]]]` — call formula where the check always returns 0 (accepted).
 /// `call_tag` identifies which witness the CallProvider should supply.
-pub fn make_call_formula<const N: usize>(order: &mut Order<N>, call_tag: u64) -> OrderId {
-    let t16    = order.atom(g(16),       Tag::Field).unwrap();
-    let t1     = order.atom(g(1),        Tag::Field).unwrap();
-    let ctag   = order.atom(g(call_tag), Tag::Field).unwrap();
-    let zero   = order.atom(g(0),        Tag::Field).unwrap();
+pub fn make_call_formula<const N: usize>(order: &mut Reduction<N>, call_tag: u64) -> Order {
+    let t16    = order.atom(g(16)).unwrap();
+    let t1     = order.atom(g(1)).unwrap();
+    let ctag   = order.atom(g(call_tag)).unwrap();
+    let zero   = order.atom(g(0)).unwrap();
     let tag_f   = order.pair(t1, ctag).unwrap();   // [1 call_tag]
     let check_f = order.pair(t1, zero).unwrap();   // [1 0] — always accepted
     let body    = order.pair(tag_f, check_f).unwrap();
