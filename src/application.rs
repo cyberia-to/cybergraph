@@ -19,6 +19,7 @@ pub use bbg::storage::database::{Backend, Database, ReaderGeneration};
 pub enum Error {
     Storage(bbg::storage::application::Error),
     Content(ContentError),
+    Files(crate::files::Error),
     MissingContent(Particle),
     InvalidProposal,
     Rejected(String),
@@ -38,6 +39,9 @@ impl From<ContentError> for Error {
     fn from(e: ContentError) -> Self {
         Self::Content(e)
     }
+}
+impl From<crate::files::Error> for Error {
+    fn from(error: crate::files::Error) -> Self { Self::Files(error) }
 }
 
 #[derive(Debug)]
@@ -79,6 +83,10 @@ impl ApplicationGraph {
     pub fn head(&self, namespace: &Particle) -> Result<Option<Head>, Error> {
         Ok(self.store.head(namespace)?)
     }
+    /// Share the physical owner with streamed content and its retention roots.
+    pub fn files(&self) -> crate::files::Files {
+        crate::files::Files::from_database(self.store.database())
+    }
     pub fn get(&self, id: &Particle) -> Result<Option<Content>, Error> {
         self.store
             .content(id, MAX_CONTENT_BYTES + 1)?
@@ -104,23 +112,31 @@ impl ApplicationGraph {
         proposal: &Proposal,
         validate: impl FnOnce(&Self) -> Result<(), Error>,
     ) -> Result<Head, Error> {
-        self.commit_inner(proposal,None,false,validate)
+        self.commit_inner(proposal,None,false,&[],validate)
+    }
+    /// Publish sorted unique streamed Blob references with the application head
+    /// and retry receipt. Each file must be sealed in this same namespace.
+    pub fn commit_with_blobs(&self, proposal: &Proposal, blobs: &[Particle],
+        validate: impl FnOnce(&Self) -> Result<(), Error>) -> Result<Head, Error> {
+        self.commit_inner(proposal, None, false, blobs, validate)
     }
     pub fn commit_fresh(&self, proposal: &Proposal, validate: impl FnOnce(&Self) -> Result<(), Error>) -> Result<Head, Error> {
-        self.commit_inner(proposal, None, true, validate)
+        self.commit_inner(proposal, None, true, &[], validate)
     }
     pub fn migration_target(&self,namespace:&Particle)->Result<Option<MigrationTarget>,Error>{
         Ok(self.store.migration_target(namespace)?)
     }
     pub fn commit_migration(&self,proposal:&Proposal,migration:&NamespaceMigration<'_>,
         validate:impl FnOnce(&Self)->Result<(),Error>)->Result<Head,Error>{
-        self.commit_inner(proposal,Some(migration),false,validate)
+        self.commit_inner(proposal,Some(migration),false,&[],validate)
     }
     fn commit_inner(&self,proposal:&Proposal,migration:Option<&NamespaceMigration<'_>>,fresh:bool,
-        validate:impl FnOnce(&Self)->Result<(),Error>)->Result<Head,Error>{
+        blobs:&[Particle],validate:impl FnOnce(&Self)->Result<(),Error>)->Result<Head,Error>{
         if proposal.content.len() > 131_072
             || proposal.required.len() > 131_072
             || proposal.claims.len() > 4096
+            || blobs.len() > 131_072
+            || blobs.windows(2).any(|pair| pair[0] >= pair[1])
         {
             return Err(Error::InvalidProposal);
         }
@@ -135,6 +151,15 @@ impl ApplicationGraph {
             }
         }
         let mut fingerprint = fingerprint(proposal, &content);
+        if !blobs.is_empty() {
+            let mut hash = hemera::Hasher::new();
+            hash.update(b"cybergraph/application-files\0");
+            hash.update(&fingerprint);
+            hash.update(&crate::files::blob_profile());
+            hash.update(&(blobs.len() as u64).to_le_bytes());
+            for id in blobs { hash.update(id); }
+            fingerprint = *hash.finalize().as_bytes();
+        }
         if let Some(migration)=migration {
             if migration.sources.is_empty() || migration.sources.len()>256
                 || migration.sources.windows(2).any(|w|w[0].0>=w[1].0)
@@ -152,13 +177,26 @@ impl ApplicationGraph {
                 Err(Error::Storage(bbg::storage::application::Error::Conflict))
             };
         }
-        let require = |id: &Particle| -> Result<(), Error> {
+        let require_inline = |id: &Particle| -> Result<(), Error> {
             if !content.contains_key(id) && self.get(id)?.is_none() {
                 return Err(Error::MissingContent(*id));
             }
             Ok(())
         };
-        require(&proposal.head.commit)?;
+        let require = |id: &Particle| -> Result<(), Error> {
+            if blobs.binary_search(id).is_ok() {
+                if self.files().info(proposal.namespace, *id)?.is_none() {
+                    return Err(Error::MissingContent(*id));
+                }
+            } else {
+                require_inline(id)?;
+            }
+            Ok(())
+        };
+        // A small application head remains in the existing graph codec; its
+        // streamed file references are retained separately in the same commit.
+        require_inline(&proposal.head.commit)?;
+        for id in blobs { require(id)?; }
         for id in &proposal.required {
             require(id)?;
         }
@@ -182,7 +220,20 @@ impl ApplicationGraph {
             content: &stored,
             claims: &proposal.claims,
         };
-        Ok(match migration {Some(migration)=>self.store.apply_migration(&write,migration)?,None if fresh=>self.store.apply_once(&write)?,None=>self.store.apply(&write)?})
+        Ok(match migration {
+            Some(migration) => self.store.apply_migration(&write,migration)?,
+            None if fresh => self.store.apply_once(&write)?,
+            None => self.store.apply_with(&write, |tx| {
+                for id in blobs {
+                    tx.retain_content(proposal.namespace, *id, crate::files::blob_profile(), proposal.head.commit)
+                        .map_err(|error| match error {
+                            crate::files::Error::Storage(error) => StorageError::from(error),
+                            _ => StorageError::Conflict,
+                        })?;
+                }
+                Ok(())
+            })?,
+        })
     }
 }
 

@@ -4,6 +4,9 @@ alias: cybergraph specs, cybergraph structure
 ---
 # cybergraph specs
 
+[Streamed file content](files.md) defines BBG-backed uploads, reads and atomic
+publication of retained Blob references through the application graph.
+
 cybergraph is exactly its structure, nothing more and nothing less:
 
 ```
