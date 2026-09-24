@@ -1,0 +1,43 @@
+[
+  {
+    "command": "CARGO_TARGET_DIR=/tmp/cyber-content-storage-20260924/target-adapter cargo test --manifest-path radio/Cargo.toml --release --features hdd --test transfer --locked --offline",
+    "cwd_repository": "cybergraph",
+    "revision": "c4854a24e90df1f4d88d6e25ed6ef854b2714a11",
+    "exit_code": 0,
+    "log": "logs/cybergraph-radio-transfer.log",
+    "sha256": "767f3c5554844166102d5d61203fc214549fafc14c0ec77e268d546520995b4d",
+    "raw_sha256": "c13e83aecec45af22f4699d5c0d236eaaf2e2617df4ce07cdeb4e4515ebfa852",
+    "normalization": "Trailing empty lines removed; test output unchanged.",
+    "test_summaries": [
+      {
+        "passed": 3,
+        "failed": 0
+      }
+    ],
+    "warnings": 0
+  },
+  {
+    "command": "CARGO_TARGET_DIR=/tmp/cyber-content-storage-20260924/target-adapter cargo clippy --manifest-path radio/Cargo.toml --all-targets --features hdd --locked --offline --no-deps -- -D warnings",
+    "cwd_repository": "cybergraph",
+    "revision": "c4854a24e90df1f4d88d6e25ed6ef854b2714a11",
+    "exit_code": 0,
+    "log": "logs/cybergraph-radio-clippy.log",
+    "sha256": "89026e82f58e1fd6ffc3ae1a2cd3a63b8220584c0f3c50097dedd1b3281e8677",
+    "raw_sha256": "89026e82f58e1fd6ffc3ae1a2cd3a63b8220584c0f3c50097dedd1b3281e8677",
+    "normalization": "Trailing empty lines removed; test output unchanged.",
+    "test_summaries": [],
+    "warnings": 0
+  },
+  {
+    "command": "CARGO_TARGET_DIR=/tmp/cyber-content-storage-20260924/target-adapter cargo check --manifest-path radio/Cargo.toml --locked --offline",
+    "cwd_repository": "cybergraph",
+    "revision": "c4854a24e90df1f4d88d6e25ed6ef854b2714a11",
+    "exit_code": 0,
+    "log": "logs/cybergraph-radio-default.log",
+    "sha256": "9ce0c544bacff9a43b4138a3b6118ff2ccc124899d9452801db0e4c44a7d9f04",
+    "raw_sha256": "9ce0c544bacff9a43b4138a3b6118ff2ccc124899d9452801db0e4c44a7d9f04",
+    "normalization": "Trailing empty lines removed; test output unchanged.",
+    "test_summaries": [],
+    "warnings": 0
+  }
+]
