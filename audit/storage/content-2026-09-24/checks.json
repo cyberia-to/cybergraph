@@ -1,0 +1,45 @@
+[
+  {
+    "command": "CARGO_TARGET_DIR=/tmp/cyber-content-storage-20260924/target cargo test --release --features local-storage,bbg/backend-hdd --test files --test applications --test text_archive --test native_storage --test native_import --offline",
+    "cwd_repository": "cybergraph",
+    "revision": "597d09127b6237b3b8afdb1855ae817e220caf23",
+    "exit_code": 0,
+    "log": "logs/cybergraph-final-tests.log",
+    "sha256": "52fd4308bc63c43e1641fc68687d1af9ee1d94b6eb021cad64a91c4fb40e7d66",
+    "test_summaries": [
+      {
+        "passed": 6,
+        "failed": 0
+      },
+      {
+        "passed": 4,
+        "failed": 0
+      },
+      {
+        "passed": 11,
+        "failed": 0
+      },
+      {
+        "passed": 10,
+        "failed": 0
+      },
+      {
+        "passed": 3,
+        "failed": 0
+      }
+    ],
+    "passed_total": 34,
+    "warnings": 0
+  },
+  {
+    "command": "CARGO_TARGET_DIR=/tmp/cyber-content-storage-20260924/target cargo check --no-default-features --offline",
+    "cwd_repository": "cybergraph",
+    "revision": "597d09127b6237b3b8afdb1855ae817e220caf23",
+    "exit_code": 0,
+    "log": "logs/cybergraph-check-base.log",
+    "sha256": "11f338b7752dcd8e3349669fd9a3e5cce549488c03135d4e3e1c8857668c31b2",
+    "test_summaries": [],
+    "passed_total": 0,
+    "warnings": 0
+  }
+]

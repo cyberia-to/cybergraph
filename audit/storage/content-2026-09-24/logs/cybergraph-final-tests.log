@@ -1,0 +1,72 @@
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on artifact directory
+   Compiling bbg v0.3.0 (/private/tmp/cyber-content-storage-20260924/bbg/rs)
+   Compiling foculus v0.1.3 (/private/tmp/cyber-content-storage-20260924/foculus)
+   Compiling cybergraph v0.1.1 (/private/tmp/cyber-content-storage-20260924/cybergraph)
+    Finished `release` profile [optimized] target(s) in 8.12s
+     Running tests/applications.rs (/tmp/cyber-content-storage-20260924/target/release/deps/applications-bbadd2413195cf24)
+
+running 6 tests
+test noncanonical_atoms_and_child_particles_do_not_get_normalized ... ok
+test retained_application_references_are_required_and_fingerprint_binds_claims ... ok
+test missing_closure_and_application_rejection_publish_nothing ... ok
+test fresh_publication_allows_one_winner_even_after_both_preflight_reads ... ok
+test application_views_share_one_database_owner_and_receipts ... ok
+test corruption_is_reported_on_read_without_reinitializing_history ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.83s
+
+     Running tests/files.rs (/tmp/cyber-content-storage-20260924/target/release/deps/files-47cc0e58eb1e5cac)
+
+running 4 tests
+test concurrent_head_updates_retain_only_the_winning_publication ... ok
+test application_publication_requires_namespace_scoped_sealed_content_and_binds_retry ... ok
+test streamed_blobs_keep_existing_identities_and_support_bounded_seek_reads ... ok
+test streaming_crosses_the_old_whole_value_limit ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 21.29s
+
+     Running tests/native_import.rs (/tmp/cyber-content-storage-20260924/target/release/deps/native_import-694a64f4d544be02)
+
+running 11 tests
+test unknown_uninitialized_records_are_preserved_without_writing_import_metadata ... ok
+test intent_import_respects_event_count_when_byte_budget_has_room ... ok
+test ordinary_operations_follow_import_without_changing_its_exact_prefix ... ok
+test imported_history_requires_its_source_marker ... ok
+test wrong_genesis_import_preserves_readiness_of_existing_empty_store ... ok
+test copied_completion_marker_cannot_claim_an_empty_store_imported_a_log ... ok
+test interrupted_import_rejects_different_exact_prefix_even_with_valid_chain_and_marker ... ok
+test interrupted_import_resumes_after_exact_committed_frames_without_rebatching_them ... ok
+test import_preserves_historical_bytes_and_resume_compares_representation_exactly ... ok
+test completed_marker_source_and_event_count_are_checked_against_history ... ok
+test aggregate_legacy_log_exceeding_operation_limit_is_split_into_valid_requests ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 10.82s
+
+     Running tests/native_storage.rs (/tmp/cyber-content-storage-20260924/target/release/deps/native_storage-ec2fd478fd42bda3)
+
+running 10 tests
+test equal_commands_without_identity_are_distinct_operations ... ok
+test legacy_import_keeps_bytes_and_requires_complete_input ... ok
+test rejected_batch_restores_graph_ledger_chain_and_disk ... ok
+test native_rewards_intents_and_networks_are_retained ... ok
+test multi_neuron_steps_have_distinct_global_records ... ok
+test original_payment_receipt_survives_other_commits_and_restart ... ok
+test authenticated_proof_bytes_and_commitment_survive_durable_recovery ... ok
+test economics_overflow_never_publishes_a_partial_batch ... ok
+test extra_or_missing_records_are_not_silently_skipped ... ok
+test changed_genesis_or_corrupt_persisted_state_refuses_readiness ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 30.62s
+
+     Running tests/text_archive.rs (/tmp/cyber-content-storage-20260924/target/release/deps/text_archive-62b6bf657bffdf8c)
+
+running 3 tests
+test a_bad_late_line_or_truncated_tail_imports_no_prefix ... ok
+test durable_observations_keep_original_particles_dates_and_request_conflicts ... ok
+test legacy_lines_keep_duplicates_raw_bytes_and_unknown_dates_across_retry ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.35s
+
