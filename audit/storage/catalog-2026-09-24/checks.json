@@ -1,0 +1,86 @@
+[
+  {
+    "command": "CARGO_TARGET_DIR=/tmp/cyber-content-storage-20260924/target-catalog cargo test --release --features legacy-redb-migration --test catalog --locked --offline",
+    "cwd_repository": "cybergraph",
+    "revision": "56680f589727e52bb5803e470b0fb206f0fe550b",
+    "exit_code": 0,
+    "log": "logs/catalog-tests.log",
+    "sha256": "e74c1d5a539e96db2f4ed99f453ca2aec91d4df0b0bcc818cbe990ec56ac2931",
+    "raw_sha256": "8dce5129807775f4f86de7fc4b88a73916eeef1b0146a6f331bb7a4d9bf85d68",
+    "normalization": "Trailing empty lines removed; test output unchanged.",
+    "warnings": 0,
+    "test_summaries": [
+      {
+        "passed": 4,
+        "failed": 0
+      }
+    ]
+  },
+  {
+    "command": "CARGO_TARGET_DIR=/tmp/cyber-content-storage-20260924/target-catalog cargo test --release --features legacy-redb-migration --test catalog ordered_pages_match_a_model_across_prefixes_unicode_and_mutations --locked --offline",
+    "cwd_repository": "cybergraph",
+    "revision": "56680f589727e52bb5803e470b0fb206f0fe550b",
+    "exit_code": 0,
+    "log": "logs/catalog-pages-final.log",
+    "sha256": "4a03984f124785d862366671a2ad25528eeed4d1c353aa603034d23b52df1e39",
+    "raw_sha256": "1b0b02588b21fc9ea8c9fb8002832f73ed70021572ad177ac1ed659befea29ca",
+    "normalization": "Trailing empty lines removed; test output unchanged.",
+    "warnings": 0,
+    "test_summaries": [
+      {
+        "passed": 1,
+        "failed": 0
+      }
+    ]
+  },
+  {
+    "command": "CARGO_TARGET_DIR=/tmp/cyber-content-storage-20260924/target-catalog cargo test --release --lib --test applications --features legacy-redb-migration --locked --offline",
+    "cwd_repository": "cybergraph",
+    "revision": "56680f589727e52bb5803e470b0fb206f0fe550b",
+    "exit_code": 0,
+    "log": "logs/catalog-regression.log",
+    "sha256": "3d7658e20a8210ccfa999b96582d16ae94fd04cac978722117a0885f00300003",
+    "raw_sha256": "48b20c0316cd1fa9344d37b5592f44e6af8f3784df4b9041d2dbc5bfe4c0ade4",
+    "normalization": "Trailing empty lines removed; test output unchanged.",
+    "warnings": 0,
+    "test_summaries": [
+      {
+        "passed": 24,
+        "failed": 0
+      },
+      {
+        "passed": 6,
+        "failed": 0
+      }
+    ]
+  },
+  {
+    "command": "CARGO_TARGET_DIR=/tmp/cyber-content-storage-20260924/target-catalog cargo clippy --lib --test catalog --features legacy-redb-migration --locked --offline --no-deps -- -D warnings",
+    "cwd_repository": "cybergraph",
+    "revision": "56680f589727e52bb5803e470b0fb206f0fe550b",
+    "exit_code": 0,
+    "log": "logs/catalog-clippy.log",
+    "sha256": "1ea17fb92ce992653796d4a2a19aebb9bef25465a8059bba0633c5e7955c3b94",
+    "raw_sha256": "1ea17fb92ce992653796d4a2a19aebb9bef25465a8059bba0633c5e7955c3b94",
+    "normalization": "Trailing empty lines removed; test output unchanged.",
+    "warnings": 0,
+    "test_summaries": []
+  },
+  {
+    "command": "CARGO_TARGET_DIR=/tmp/cyber-content-storage-20260924/target-adapter cargo test --manifest-path radio/Cargo.toml --release --features hdd --test transfer --locked --offline",
+    "cwd_repository": "cybergraph",
+    "revision": "56680f589727e52bb5803e470b0fb206f0fe550b",
+    "exit_code": 0,
+    "log": "logs/radio-transfer-regression.log",
+    "sha256": "9c9d4cf847545c4298955dc9e4210ff8f41c2422d5aaea3c5a45e4b2c9b523ca",
+    "raw_sha256": "fc0967d37faaa7a05afa0ad5231fb1c9ea21e5486487f31bddc59dcf3765c392",
+    "normalization": "Trailing empty lines removed; test output unchanged.",
+    "warnings": 0,
+    "test_summaries": [
+      {
+        "passed": 3,
+        "failed": 0
+      }
+    ]
+  }
+]

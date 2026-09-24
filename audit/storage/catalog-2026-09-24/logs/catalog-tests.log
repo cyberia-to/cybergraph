@@ -1,0 +1,15 @@
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+   Compiling cybergraph v0.1.1 (/private/tmp/cyber-content-storage-20260924/cybergraph)
+    Finished `release` profile [optimized] target(s) in 1.83s
+     Running tests/catalog.rs (/tmp/cyber-content-storage-20260924/target-catalog/release/deps/catalog-cd3131852c913612)
+
+running 4 tests
+test invalid_paths_unsealed_payloads_stale_bindings_and_competing_writers_publish_nothing ... ok
+test rename_edit_remove_and_reopen_keep_old_states_and_payloads ... ok
+test ordered_pages_match_a_model_across_prefixes_unicode_and_mutations ... ok
+test retained_revision_count_exceeds_a_history_page_and_resumes_after_reopen ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 56.51s

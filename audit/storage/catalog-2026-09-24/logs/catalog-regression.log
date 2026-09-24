@@ -1,0 +1,43 @@
+   Compiling cybergraph v0.1.1 (/private/tmp/cyber-content-storage-20260924/cybergraph)
+    Finished `release` profile [optimized] target(s) in 1.94s
+     Running unittests src/lib.rs (/tmp/cyber-content-storage-20260924/target-catalog/release/deps/cybergraph-88c4c8178fe402e3)
+
+running 24 tests
+test api::tests::intend_persists_and_returns_key ... ok
+test api::tests::query_parse_error_is_reported ... ok
+test api::tests::link_accumulates_across_signals ... ok
+test api::tests::link_atomic_path ... ok
+test api::tests::subscribe_receives_matching_events ... ok
+test api::tests::subscribe_by_neuron_filters ... ok
+test api::tests::intend_then_seal_succeeds ... ok
+test api::tests::seal_applies_cyberlinks_to_bbg_state ... ok
+test api::tests::link_applies_cyberlinks_to_bbg_state ... ok
+test api::tests::seal_unknown_intent_fails ... ok
+test api::tests::query_runs_inf_over_bbg_state ... ok
+test api::tests::link_moves_the_root ... ok
+test legacy_file::tests::no_replace_rename_preserves_a_competing_path_and_its_contents ... ok
+test source::tests::scan_axons_carries_weight ... ok
+test source::tests::scan_neurons_and_karma ... ok
+test source::tests::scan_particles_reflects_state ... ok
+test source::tests::schema_known_and_unknown ... ok
+test source::tests::snapshot_tracks_height ... ok
+test source::tests::unknown_relation_scans_empty ... ok
+test legacy_file::tests::retired_entry_preserves_bytes_and_refuses_old_append_open ... ok
+test legacy_file::tests::each_exposed_filesystem_boundary_resumes_the_same_source ... ok
+test native::tests::missing_live_history_or_block_is_corruption ... ok
+test native::tests::staged_native_commit_error_restores_every_published_view_and_request_identity ... ok
+test native::tests::local_credit_staging_failure_rolls_back_and_retry_preserves_receipt ... ok
+
+test result: ok. 24 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.98s
+
+     Running tests/applications.rs (/tmp/cyber-content-storage-20260924/target-catalog/release/deps/applications-ea27207e5010ca81)
+
+running 6 tests
+test noncanonical_atoms_and_child_particles_do_not_get_normalized ... ok
+test retained_application_references_are_required_and_fingerprint_binds_claims ... ok
+test missing_closure_and_application_rejection_publish_nothing ... ok
+test application_views_share_one_database_owner_and_receipts ... ok
+test fresh_publication_allows_one_winner_even_after_both_preflight_reads ... ok
+test corruption_is_reported_on_read_without_reinitializing_history ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.46s
