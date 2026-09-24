@@ -5,7 +5,7 @@
     "revision": "597d09127b6237b3b8afdb1855ae817e220caf23",
     "exit_code": 0,
     "log": "logs/cybergraph-final-tests.log",
-    "sha256": "52fd4308bc63c43e1641fc68687d1af9ee1d94b6eb021cad64a91c4fb40e7d66",
+    "sha256": "22c91d9c0bf5a21304b45ddbc5ffa2e9058c21912d98db6255120118587acf6f",
     "test_summaries": [
       {
         "passed": 6,
@@ -29,7 +29,9 @@
       }
     ],
     "passed_total": 34,
-    "warnings": 0
+    "warnings": 0,
+    "raw_sha256": "52fd4308bc63c43e1641fc68687d1af9ee1d94b6eb021cad64a91c4fb40e7d66",
+    "normalization": "Trailing empty lines removed; test output unchanged."
   },
   {
     "command": "CARGO_TARGET_DIR=/tmp/cyber-content-storage-20260924/target cargo check --no-default-features --offline",

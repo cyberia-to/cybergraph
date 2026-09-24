@@ -69,4 +69,3 @@ test durable_observations_keep_original_particles_dates_and_request_conflicts ..
 test legacy_lines_keep_duplicates_raw_bytes_and_unknown_dates_across_retry ... ok
 
 test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.35s
-
