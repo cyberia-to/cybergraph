@@ -6,6 +6,8 @@ alias: cybergraph specs, cybergraph structure
 
 [Streamed file content](files.md) defines BBG-backed uploads, reads and atomic
 publication of retained Blob references through the application graph.
+[Versioned names](catalog.md) binds paths to sealed files with atomic rename,
+conditional edits and retained local history.
 [File transfer](file-transfer.md) composes these operations with authorized Radio
 sources and sinks.
 

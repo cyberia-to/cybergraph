@@ -12,6 +12,9 @@ the architecture is laid out in the [whitepaper](docs/README.md); the precise st
 history. The local-storage API supports resumable parts, Blob identity
 verification, bounded reads and atomic retention with application publication.
 
+[Versioned names](specs/catalog.md) add conditional create/edit/rename/remove
+over that same owner, with retained historical views and paged listings.
+
 The [Radio adapter](radio/README.md) transfers missing parts over authenticated
 QUIC connections and resumes from the same persisted upload after interruption.
 
