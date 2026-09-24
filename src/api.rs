@@ -109,6 +109,9 @@ pub enum ApiError {
     /// Signal's resolved destination network does not match the network this
     /// node serves.
     WrongNetwork { expected: Particle, got: Particle },
+    /// `register_referral` called with the same neuron as both referrer and
+    /// newcomer.
+    SelfReferral(NeuronId),
 }
 
 /// A neuron's private network — the default destination for its signals.
@@ -118,6 +121,21 @@ pub enum ApiError {
 pub fn private_network(neuron: &NeuronId) -> Particle {
     let mut buf = Vec::with_capacity(8 + 32);
     buf.extend_from_slice(b"network:");
+    buf.extend_from_slice(neuron);
+    let h = hemera::hash(&buf);
+    let b = h.as_bytes();
+    let mut out = [0u8; 32];
+    out[..b.len().min(32)].copy_from_slice(&b[..b.len().min(32)]);
+    out
+}
+
+/// A neuron's own particle identity — domain-separated the same way
+/// `private_network` derives a neuron's home network, so the two identities
+/// never collide. Used as both endpoints of the referral naming cyberlink
+/// `register_referral` publishes: referrer's identity → newcomer's identity.
+fn neuron_identity(neuron: &NeuronId) -> Particle {
+    let mut buf = Vec::with_capacity(7 + 32);
+    buf.extend_from_slice(b"neuron:");
     buf.extend_from_slice(neuron);
     let h = hemera::hash(&buf);
     let b = h.as_bytes();
@@ -208,6 +226,59 @@ impl Cybergraph {
         Ok(())
     }
 
+    /// register_referral — publish the referral naming cyberlink: the
+    /// referrer's neuron links the newcomer's name. Property #32
+    /// (launch.md §5, cores): "registration is a cyberlink: the referrer's
+    /// neuron links the newcomer's name."
+    ///
+    /// plumb#4's `tok::birth_mint` already splits a book's birth mint to
+    /// "the referrer whose cyberlink registered the newcomer's name" — its
+    /// own Remains names the missing half as "wiring `birth_mint` to actual
+    /// book-root and cyberlink-registration events once property 30's
+    /// cybergraph half lands." This publishes that link: nothing upstream
+    /// of tok's ledger math previously recorded a referral as a graph edge
+    /// any reader could see or query.
+    ///
+    /// Self-referral (`referrer == newcomer`) is rejected before any signal
+    /// is built, mirroring `birth_mint`'s ledger-side self-referral
+    /// rejection so the same invariant holds on both sides of property 32.
+    ///
+    /// Returns the newcomer's identity particle — the link's `to` endpoint,
+    /// and the key a caller queries to find who referred a given neuron.
+    pub fn register_referral(
+        &mut self,
+        referrer: NeuronId,
+        newcomer: NeuronId,
+    ) -> Result<Particle, ApiError> {
+        if referrer == newcomer {
+            return Err(ApiError::SelfReferral(referrer));
+        }
+        let from = neuron_identity(&referrer);
+        let to = neuron_identity(&newcomer);
+        let (step, prev) = self.next_step_prev(&referrer);
+        let signal = Signal {
+            neuron: referrer,
+            network: foculus::SELF_NETWORK,
+            links: vec![foculus::CyberlinkRecord {
+                neuron: referrer,
+                from,
+                to,
+                token: [0u8; 32],
+                amount: 1,
+                valence: 1,
+                height: 0,
+            }],
+            delta_pi: vec![],
+            box_moves: vec![],
+            prev,
+            step,
+            height: 0,
+            proof: None,
+        };
+        self.link(signal)?;
+        Ok(to)
+    }
+
     /// subscribe — register a handler over an event filter.
     pub fn subscribe<F>(&mut self, filter: Filter, handler: F)
     where
@@ -295,6 +366,25 @@ impl Cybergraph {
     fn chain_append(&mut self, signal: Signal) -> Result<(), ApiError> {
         let chain = self.chains.entry(signal.neuron).or_default();
         chain.append(signal).map_err(ApiError::SyncRejected)
+    }
+
+    /// The next step and prev-hash a neuron's chain expects, so a caller
+    /// building a `Signal` by hand (as `register_referral` does) doesn't
+    /// have to track that bookkeeping itself — the same values
+    /// `SignalChain::append` validates against.
+    fn next_step_prev(&self, neuron: &NeuronId) -> (u64, Particle) {
+        match self.chains.get(neuron) {
+            None => (0, [0u8; 32]),
+            Some(chain) => {
+                let step = chain.entries.len() as u64;
+                let prev = if step == 0 {
+                    [0u8; 32]
+                } else {
+                    chain.entries[&(step - 1)].hash()
+                };
+                (step, prev)
+            }
+        }
     }
 
     fn emit(&self, event: Event) {
@@ -570,5 +660,64 @@ mod tests {
         let g = Cybergraph::new();
         let err = g.query("this is not inf");
         assert!(matches!(err, Err(QueryError::Parse(_))));
+    }
+
+    #[test]
+    fn register_referral_publishes_a_naming_link() {
+        let mut g = Cybergraph::new();
+        let to = g.register_referral(n(1), n(2)).unwrap();
+        assert_eq!(to, neuron_identity(&n(2)));
+        let from = neuron_identity(&n(1));
+        assert!(
+            g.bbg.state.axons_out.get(&from).is_some(),
+            "referrer's identity carries an outgoing axon"
+        );
+        assert!(
+            g.bbg.state.axons_in.get(&to).is_some(),
+            "newcomer's identity carries an incoming axon"
+        );
+        assert_eq!(
+            g.bbg.state.particles.get(&to).unwrap().energy,
+            1,
+            "the newcomer's identity particle materializes from the referral link"
+        );
+    }
+
+    #[test]
+    fn register_referral_rejects_self_referral() {
+        let mut g = Cybergraph::new();
+        let err = g.register_referral(n(1), n(1));
+        assert!(matches!(err, Err(ApiError::SelfReferral(neuron)) if neuron == n(1)));
+        assert!(
+            g.chains.get(&n(1)).is_none(),
+            "no signal was appended on the rejected path"
+        );
+    }
+
+    #[test]
+    fn register_referral_is_queryable() {
+        let mut g = Cybergraph::new();
+        g.register_referral(n(1), n(2)).unwrap();
+        let out = g
+            .query("?[particle, energy] := particles{particle, energy}")
+            .expect("query runs");
+        let to = neuron_identity(&n(2));
+        assert!(
+            out.rows.iter().any(|row| row[0] == inf_value::Value::hash(to)),
+            "the newcomer's identity particle is queryable through inf"
+        );
+    }
+
+    #[test]
+    fn register_referral_two_referrers_do_not_collide() {
+        let mut g = Cybergraph::new();
+        g.register_referral(n(1), n(3)).unwrap();
+        g.register_referral(n(2), n(3)).unwrap();
+        // Each referrer advances its own chain independently; both referral
+        // links land on the same newcomer identity without equivocation.
+        assert_eq!(g.chains.get(&n(1)).unwrap().entries.len(), 1);
+        assert_eq!(g.chains.get(&n(2)).unwrap().entries.len(), 1);
+        let to = neuron_identity(&n(3));
+        assert_eq!(g.bbg.state.particles.get(&to).unwrap().energy, 2);
     }
 }
