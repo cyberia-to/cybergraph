@@ -167,7 +167,7 @@ impl ApplicationGraph {
             let mut hash=hemera::Hasher::new();hash.update(b"cybergraph/namespace-migration/1\0");
             hash.update(&fingerprint);hash.update(&migration.manifest);hash.update(&(migration.sources.len() as u64).to_le_bytes());
             for (id,head) in migration.sources{hash.update(id);hash.update(&head.index.to_le_bytes());hash.update(&head.commit);}
-            fingerprint=*hash.finalize().as_bytes();
+            fingerprint = *hash.finalize().as_bytes();
         }
         if let Some((prior, head)) = self.store.resolve(&proposal.namespace, &proposal.request)? {
             if fresh { return Err(Error::Storage(bbg::storage::application::Error::Conflict)); }

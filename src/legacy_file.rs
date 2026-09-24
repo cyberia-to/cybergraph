@@ -70,14 +70,14 @@ fn parent(path: &Path) -> &Path {
 fn rename_new(from: &Path, to: &Path) -> io::Result<()> {
     #[cfg(any(target_vendor = "apple", target_os = "linux", target_os = "android"))]
     {
-        return rustix::fs::renameat_with(
+        rustix::fs::renameat_with(
             rustix::fs::CWD,
             from,
             rustix::fs::CWD,
             to,
             rustix::fs::RenameFlags::NOREPLACE,
         )
-        .map_err(Into::into);
+        .map_err(Into::into)
     }
     #[cfg(not(any(target_vendor = "apple", target_os = "linux", target_os = "android")))]
     {
