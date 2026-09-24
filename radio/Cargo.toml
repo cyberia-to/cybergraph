@@ -1,0 +1,22 @@
+[package]
+name = "cybergraph-radio"
+version = "0.1.0"
+edition = "2024"
+description = "Radio file capabilities over Cybergraph and the shared BBG owner"
+license-file = "../LICENSE"
+repository = "https://github.com/cyberia-to/cybergraph"
+
+[workspace]
+
+[features]
+default = []
+hdd = ["cybergraph/legacy-redb-migration"]
+
+[dependencies]
+cybergraph = { path = "..", features = ["local-storage"] }
+radio = { package = "cyber-radio", path = "../../radio/iroh", default-features = false }
+tokio = { version = "1", features = ["rt", "time"] }
+
+[dev-dependencies]
+tokio = { version = "1", features = ["macros", "rt-multi-thread", "sync"] }
+tempfile = "3"

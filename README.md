@@ -12,6 +12,9 @@ the architecture is laid out in the [whitepaper](docs/README.md); the precise st
 history. The local-storage API supports resumable parts, Blob identity
 verification, bounded reads and atomic retention with application publication.
 
+The [Radio adapter](radio/README.md) transfers missing parts over authenticated
+QUIC connections and resumes from the same persisted upload after interruption.
+
 ## cybergraph is the dumb half of a processor
 
 cybergraph and [[soma]] are one machine. cybergraph is the **dumb half** — a store you can read, an event source, and a commit port that only accepts *proven* results. soma is the **smart half** — the runtime that decides what to do, computes it, and proves it. a signal's life is a **fetch → execute → prove → commit** cycle, and soma drives it through cybergraph's minimal interface:
