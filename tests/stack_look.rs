@@ -3,118 +3,100 @@
 // crystal-type: source
 // crystal-domain: cyber
 // ---
-//! Integration tests: nox look pattern (tag 17) → BBG state → zheng proof.
-//!
-//! Pipeline under test:
-//!   nox::reduce()         — executes look formula, records 4 BBG root limbs in trace
-//!   ProofLookProvider     — reads BbgState, produces LookOpening with bbg_root
-//!   zheng::commit()       — folds main + verifier_steps + 4 eq_steps (root binding)
-//!   zheng::verify()       — checks SuperSpartan proof
-//!
-//! Three tests cover:
-//!   1. Time dimension — primary natural use case (u64 key = block height)
-//!   2. Neurons dimension — particle-keyed dimension with u64-compatible key
-//!   3. Agreement between ProofLookProvider (inline) and collect_look_openings (post-exec)
-
+//! BBG entity navigation → flat nox lookup → complete native query authentication
+//! → current public state execution proof. Recursion is an explicit separate refusal.
 mod common;
+use bbg::{Dim, ProofLookProvider, collect_look_openings};
+use common::{
+    bbg_object_from_state, make_look_formula, noun_leaves, refuse_recursive_look, result,
+    seeded_bbg_state, verify_look_openings, verify_state_execution,
+};
+use nox::{Reduction, VecTrace, reduce};
 
-use common::{bbg_object_from_state, default_params, make_look_formula, seeded_bbg_state,
-    zero_statement};
-
-use nox::{reduce, Order, VecTrace, Outcome};
-use bbg::{ProofLookProvider, collect_look_openings, verify_opening};
-use zheng::{commit, verify};
-
-const ORDER_SIZE: usize = 1024;
-
-/// Full pipeline: look(Time, height=0) with real BBG state → zheng commit → verify.
-#[test]
-fn look_time_dimension_full_proof_roundtrip() {
-    let state = seeded_bbg_state();
-    let prov  = ProofLookProvider::new(&state);
-
-    let mut order = Order::<ORDER_SIZE>::new();
-    let obj     = bbg_object_from_state(&mut order, &state);
-    let formula = make_look_formula(&mut order, 8, 0); // Dim::Time = 8, height = 0
-
+fn run_query(
+    state: &bbg::BbgState,
+    query: bbg::QueryProof,
+    dim: Dim,
+    key: [u8; 32],
+    expected: u64,
+) {
+    assert!(bbg::verify_entity(&query, &state.root(), dim, &key));
+    let index = query.context.as_ref().unwrap().index;
+    let provider = ProofLookProvider::new(state);
+    let mut arena = Reduction::<1024>::new();
+    let object = bbg_object_from_state(&mut arena, state);
+    let formula = make_look_formula(&mut arena, dim as u64, index);
     let mut trace = VecTrace::default();
-    let outcome = reduce(&mut order, obj, formula, 1000, &prov, &mut trace);
-    assert!(matches!(outcome, Outcome::Ok(_, _)), "look must succeed");
-
-    let look_openings = prov.take_look_openings();
-    assert_eq!(look_openings.len(), 1);
-
-    let stmt  = zero_statement();
-    let proof = commit(&trace, &[], &[], &look_openings, &stmt, &default_params()).unwrap();
-    verify(&proof, &stmt, &default_params()).expect("Time look proof must verify");
+    let output = result(reduce(
+        &mut arena, object, formula, 1000, &provider, &mut trace,
+    ));
+    assert_eq!(noun_leaves(&arena, output), vec![expected]);
+    let openings = provider.take_look_openings();
+    verify_look_openings(state, &trace, &openings);
+    verify_state_execution(&arena, formula, state, &[expected]);
+    refuse_recursive_look(&trace, state, &openings);
 }
 
-/// Full pipeline: look(Neurons, key=42) where key bytes 8..32 are zero → commit → verify.
-///
-/// Particle-keyed dimensions require keys whose first 8 bytes encode the u64 key and
-/// bytes 8..32 are zero; nox passes the look key as a single Goldilocks element.
 #[test]
-fn look_neurons_dimension_full_proof_roundtrip() {
+fn look_time_native_authentication_and_public_state_proof() {
+    let state = seeded_bbg_state();
+    run_query(
+        &state,
+        bbg::prove_time(&state, 0).unwrap(),
+        Dim::Time,
+        [0; 32],
+        u32::from_le_bytes([99; 4]) as u64,
+    );
+}
+
+#[test]
+fn look_neuron_entity_to_flat_index_and_public_state_proof() {
     let mut key = [0u8; 32];
     key[..8].copy_from_slice(&42u64.to_le_bytes());
-
     let mut state = bbg::BbgState::new();
-    state.neurons.insert(key, bbg::types::NeuronRecord { focus: 1_000, karma: 0, stake: 0 });
-
-    let prov = ProofLookProvider::new(&state);
-
-    let mut order = Order::<ORDER_SIZE>::new();
-    let obj     = bbg_object_from_state(&mut order, &state);
-    let formula = make_look_formula(&mut order, 3, 42); // Dim::Neurons = 3, key = 42
-
-    let mut trace = VecTrace::default();
-    let outcome = reduce(&mut order, obj, formula, 1000, &prov, &mut trace);
-    assert!(matches!(outcome, Outcome::Ok(_, _)), "neuron look must succeed");
-
-    let look_openings = prov.take_look_openings();
-    assert_eq!(look_openings.len(), 1);
-
-    let stmt  = zero_statement();
-    let proof = commit(&trace, &[], &[], &look_openings, &stmt, &default_params()).unwrap();
-    verify(&proof, &stmt, &default_params()).expect("Neurons look proof must verify");
+    state.neurons.insert(
+        key,
+        bbg::NeuronRecord {
+            focus: 1000,
+            karma: 0,
+            stake: 0,
+        },
+    );
+    state.refresh_root();
+    // Entity 42 is resolved by the owner; nox's key is the authenticated cell
+    // index, never the integer prefix of NeuronId.
+    run_query(
+        &state,
+        bbg::prove_neuron(&state, &key).unwrap(),
+        Dim::Neurons,
+        key,
+        1000,
+    );
 }
 
-/// ProofLookProvider (inline during execution) and collect_look_openings (post-execution)
-/// must produce openings that:
-///   (a) individually verify via verify_opening
-///   (b) carry identical bbg_root limbs (same state root at time of query)
-///   (c) both produce proofs that pass zheng::verify
 #[test]
-fn look_provider_and_collect_openings_both_verify() {
+fn inline_and_collected_openings_authenticate_the_same_state() {
     let state = seeded_bbg_state();
-    let prov  = ProofLookProvider::new(&state);
-
-    let mut order = Order::<ORDER_SIZE>::new();
-    let obj     = bbg_object_from_state(&mut order, &state);
-    let formula = make_look_formula(&mut order, 8, 0); // Time, height = 0
-
+    let query = bbg::prove_time(&state, 0).unwrap();
+    let index = query.context.as_ref().unwrap().index;
+    let provider = ProofLookProvider::new(&state);
+    let mut arena = Reduction::<1024>::new();
+    let object = bbg_object_from_state(&mut arena, &state);
+    let formula = make_look_formula(&mut arena, 8, index);
     let mut trace = VecTrace::default();
-    reduce(&mut order, obj, formula, 1000, &prov, &mut trace);
-
-    let prov_openings = prov.take_look_openings();
-    assert_eq!(prov_openings.len(), 1);
-    assert!(verify_opening(&prov_openings[0]), "provider opening must be valid");
-
-    let col_openings = collect_look_openings(&state, &trace.0);
-    assert_eq!(col_openings.len(), 1);
-    assert!(verify_opening(&col_openings[0]), "collected opening must be valid");
-
-    assert_eq!(
-        prov_openings[0].bbg_root, col_openings[0].bbg_root,
-        "both paths must record the same BBG root limbs",
-    );
-
-    let stmt   = zero_statement();
-    let params = default_params();
-
-    let proof_prov = commit(&trace, &[], &[], &prov_openings, &stmt, &params).unwrap();
-    verify(&proof_prov, &stmt, &params).expect("provider-path proof must verify");
-
-    let proof_col = commit(&trace, &[], &[], &col_openings, &stmt, &params).unwrap();
-    verify(&proof_col, &stmt, &params).expect("collect-path proof must verify");
+    let output = result(reduce(
+        &mut arena, object, formula, 1000, &provider, &mut trace,
+    ));
+    let inline = provider.take_look_openings();
+    let collected = collect_look_openings(&state, &trace.0);
+    verify_look_openings(&state, &trace, &inline);
+    verify_look_openings(&state, &trace, &collected);
+    assert_eq!(inline[0].leaves, collected[0].leaves);
+    assert_eq!(inline[0].commitment, collected[0].commitment);
+    assert_eq!(inline[0].point, collected[0].point);
+    assert_eq!(inline[0].value, collected[0].value);
+    assert_eq!(inline[0].opening, collected[0].opening);
+    verify_state_execution(&arena, formula, &state, &noun_leaves(&arena, output));
+    refuse_recursive_look(&trace, &state, &inline);
+    refuse_recursive_look(&trace, &state, &collected);
 }
