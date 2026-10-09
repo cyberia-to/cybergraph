@@ -228,21 +228,23 @@ pub fn authenticated_value(
     ))
 }
 
-/// The verifier side of state profile v3: every active read is answered from
-/// BBG authenticated under the root the statement itself names, as zheng's
-/// contract requires (specs/execution.md, authenticated-state profile v3).
+/// BBG's evidence for every public dimension of `state`.
+pub fn state_evidence(state: &bbg::BbgState) -> zheng::execution::state_evidence::StateEvidence {
+    bbg::certificate::StateCertificate::from_state(state, &(0..=10).collect::<Vec<_>>())
+        .and_then(|c| c.evidence())
+        .expect("BBG state certificate")
+}
+
+/// The verifier side of state profile v3: zheng authenticates the evidence
+/// under the root the statement names and answers every active read from it
+/// (zheng specs/execution.md, authenticated-state profile v3); the caller
+/// only hands the evidence over.
 pub fn verify_state_certificate(
     state: &bbg::BbgState,
     statement: &zheng::execution::state::StateStatement,
     certificate: &zheng::execution::Certificate,
 ) -> Result<(), String> {
-    let mut root = [0u8; 32];
-    for (i, limb) in statement.state_root.iter().enumerate() {
-        root[i * 8..(i + 1) * 8].copy_from_slice(&limb.to_le_bytes());
-    }
-    statement.verify_certificate(certificate, &mut |ns, index| {
-        authenticated_value(state, &root, ns, index)
-    })
+    statement.verify_certificate(certificate, &state_evidence(state))
 }
 
 pub fn verify_state_execution<const N: usize>(
@@ -260,12 +262,11 @@ pub fn verify_state_execution<const N: usize>(
         &execution_noun(arena, formula),
         &[],
         10_000,
-        limbs,
         true,
-        *hemera::hash(b"cybergraph/stack-state-test/1").as_bytes(),
-        &mut |ns, index| authenticated_value(state, &root, ns, index),
+        &state_evidence(state),
     )
     .expect("state execution certificate v3 with authenticated BBG coordinates");
+    assert_eq!(statement.state_root, limbs, "the statement names the state's root");
     assert_eq!(statement.execution.public_output, expected);
     verify_state_certificate(state, &statement, &certificate)
         .expect("state execution certificate verifies");
@@ -283,13 +284,21 @@ pub fn verify_state_execution<const N: usize>(
         verify_state_certificate(state, &wrong, &certificate).is_err(),
         "the output is bound"
     );
-    // The 32-byte context is caller metadata zheng carries and does not
-    // interpret; v3 has no transcript, so the certificate does not bind it.
+    // evidence that carries no table: zheng cannot answer the reads
+    let mut bare = state_evidence(state);
+    bare.tables.clear();
+    if statement.reads.iter().any(|r| r.active) {
+        assert!(
+            statement.verify_certificate(&certificate, &bare).is_err(),
+            "an unauthenticated read must fail"
+        );
+    }
+    // evidence for another state: another root
+    let mut other = state_evidence(state);
+    other.leaves[13][0] = (other.leaves[13][0] + 1) % nebu::field::P;
     assert!(
-        statement
-            .verify_certificate(&certificate, &mut |_, _| None)
-            .is_err(),
-        "missing authentication must fail"
+        statement.verify_certificate(&certificate, &other).is_err(),
+        "evidence for another root must fail"
     );
     (statement, certificate)
 }
