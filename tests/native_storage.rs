@@ -332,14 +332,18 @@ fn extra_or_missing_records_are_not_silently_skipped() {
 #[test]
 fn authenticated_proof_bytes_and_commitment_survive_durable_recovery() {
     let t = Temp::new();
-    let statement = foculus::PayStatement {
-        content_id: [71; 32],
-        total_out: 100,
-        leg_count: 1,
-    };
     let mut signal = signal(1);
     signal.network = [88; 32];
-    signal.proof = Some(foculus::prove_pay(&statement).unwrap());
+    signal.links.push(CyberlinkRecord {
+        neuron: [1; 32],
+        from: [71; 32],
+        to: [72; 32],
+        token: [0; 32],
+        amount: 100,
+        valence: 1,
+        height: 0,
+    });
+    signal.proof = Some(foculus::prove_pay(&signal).unwrap());
     let original = foculus::signal_codec::encode_signal(&signal).unwrap();
     let proof_hash = foculus::signal_codec::proof_hash(&signal).unwrap();
     let mut node = t.open();
@@ -361,7 +365,7 @@ fn authenticated_proof_bytes_and_commitment_survive_durable_recovery() {
     );
     assert!(foculus::verify_pay(
         block.signal.proof.as_ref().unwrap(),
-        &statement
+        &block.signal
     ));
     assert_eq!(node.graph().bbg.state.signals[&0].proof_hash, proof_hash);
 }
