@@ -1,6 +1,6 @@
 # particle
 
-a content-addressed node. identity = [[Hemera]] hash of content. 64 raw bytes, no headers, no version prefix. one hash function, one address space, permanent
+a content-addressed node. identity = [[Hemera]] hash of content. 32 raw bytes, no headers, no version prefix. one hash function, one address space, permanent
 
 the address is the identity. `Hemera(content)` — that is the particle. no registration, no authority, no namespace collision. two agents on opposite sides of the planet hashing the same content produce the same address. the first [[cyberlink]] to that address brings the particle into the [[cybergraph]]. a naked hash with no links never enters the graph (axiom A4)
 
@@ -9,21 +9,22 @@ the address is the identity. `Hemera(content)` — that is the particle. no regi
 ```
 Hemera = Poseidon2(
   p  = 2^64 - 2^32 + 1     Goldilocks field
-  d  = 7                   S-box: x -> x^7
+  d  = 7                   full-round S-box: x -> x^7
+  partial S-box            x -> x^-1 (field inversion)
   t  = 16                  state width (elements)
   Rf = 8                   full rounds (4 + 4)
-  Rp = 64                  partial rounds
-  r  = 8                   rate (64 bytes in)
+  Rp = 16                  partial rounds
+  r  = 8                   rate (elements; 56 bytes in per block, 7 B/element)
   c  = 8                   capacity (64 bytes)
-  out = 8 elements          64 bytes out
+  out = 4 elements          32 bytes out
 )
 ```
 
 every parameter is a power of 2. the [[Goldilocks field]] gives native 64-bit CPU arithmetic — a field multiplication is a single instruction. the S-box exponent $d = 7$ is the minimum invertible exponent for this field ($\gcd(7, p-1) = 1$; both 3 and 5 divide $p-1$)
 
-capacity 8 (256-bit) provides 256-bit classical collision resistance and 170-bit quantum collision resistance (BHT); its algebraic degree is specified in [[hemera]] (the S-box and round structure live there, not here). production systems use capacity 4 (128-bit) because their hashes are ephemeral — trace commitments that live seconds. particle addresses live decades. the parameter choice matches the lifetime
+capacity 8 (8 elements, 512 bits) bounds generic attacks on the sponge; collision resistance is set by the output length, not the capacity. a $b$-bit digest gives $b/2$-bit classical (birthday) and about $b/3$-bit quantum (BHT) collision resistance: the 32-byte (4-element) output above gives 128-bit classical and ~85-bit quantum (the hash row of `zheng/specs/soundness.md`); a 64-byte digest would give 256 and ~170. hemera profile v2 ([hemera#15](https://github.com/cyberia-to/hemera/pull/15)) proposes the longer identity digest for post-quantum collision resistance; Merkle nodes inside a proof stay 32 bytes. the block above mirrors [[hemera]] 0.3, which is normative. its algebraic degree is specified in [[hemera]] (the S-box and round structure live there, not here). production systems use capacity 4 (128-bit) because their hashes are ephemeral — trace commitments that live seconds. particle addresses live decades. the parameter choice matches the lifetime
 
-one mode only: sponge. no compression mode. two modes producing the same 64-byte output from different inputs would break the address space as a function
+one mode only: sponge. no compression mode. two modes producing the same 32-byte output from different inputs would break the address space as a function
 
 ```
 initialize:  state <- [0; 16]
@@ -39,18 +40,18 @@ see [[hemera/spec]] for the full decision record
 
 ## tree structure
 
-large content splits into 4 KB chunks — OS page aligned, L1 cache fit, 512 field elements per chunk, 64 absorb blocks per leaf
+large content splits into 4 KB chunks — OS page aligned, L1 cache fit, ⌈4096/56⌉ = 74 absorb blocks per leaf
 
 ```
 leaf:          Hemera(chunk_bytes)
-internal node: Hemera(left_id || right_id)    128 bytes in, 64 bytes out
+internal node: Hemera(left_id || right_id)    64 bytes in (one rate block), 32 bytes out
 tree shape:    binary, left-balanced
 particle:      root hash of the tree
 ```
 
 left-balanced means the same content prefix always produces the same left subtree. streaming: buffer at most 4 KB + proof per step. deduplication: 4 KB blocks show meaningful repetition in real data. overhead: 1.6% tree metadata
 
-a single chunk (<=4 KB) hashes directly — no tree, just `Hemera(content)`. the particle address is the same whether content is 10 bytes or 10 gigabytes: always 64 bytes, always a Hemera output
+a single chunk (<=4 KB) hashes directly — no tree, just `Hemera(content)`. the particle address is the same whether content is 10 bytes or 10 gigabytes: always 32 bytes, always a Hemera output
 
 ## domain separation
 
@@ -70,16 +71,16 @@ different uses of Hemera are separated at the input:
 
 ```
 IPFS CIDv1:  <version><multicodec><multihash><length><digest>   36-69 bytes
-particle:     <digest>                                          64 bytes
+particle:     <digest>                                          32 bytes
 ```
 
-inside the protocol, the 64-byte digest is the complete identifier. IPFS compatibility is a thin translation layer at the gateway — inside [[nox]], the wrapper never exists
+inside the protocol, the 32-byte digest is the complete identifier. IPFS compatibility is a thin translation layer at the gateway — inside [[nox]], the wrapper never exists
 
-all identities live in one flat 64-byte namespace: [[particles]], edges, [[neurons]], commitments, nullifiers. no type tags in the address. the type is determined by where the address appears in the [[BBG]] structure
+all identities live in one flat 32-byte namespace: [[particles]], edges, [[neurons]], commitments, nullifiers. no type tags in the address. the type is determined by where the address appears in the [[BBG]] structure
 
 ## endofunction
 
-`Hemera(Hemera(x) || Hemera(y))` type-checks: 64 bytes in one side, 64 bytes the other, 64 bytes out. hash of hashes is a hash. this closure under composition is why Merkle trees, polynomial commitments, and recursive proofs all use the same function without conversion
+`Hemera(Hemera(x) || Hemera(y))` type-checks: 32 bytes in one side, 32 bytes the other, 32 bytes out. hash of hashes is a hash. this closure under composition is why Merkle trees, polynomial commitments, and recursive proofs all use the same function without conversion
 
 ## permanence
 
