@@ -3,122 +3,89 @@
 // crystal-type: source
 // crystal-domain: cyber
 // ---
-//! Integration tests: nox Poseidon2 hash pattern (tag 15) → zheng proof.
+//! Integration tests: nox Poseidon2 hash pattern (tag 15) → zheng public v3.
 //!
 //! Pipeline under test:
-//!   nox::reduce()         — executes hash formula, emits 26 trace rows (1 quote + 24 rounds + 1 squeeze)
-//!   HashAux               — rate vector (structural digest of input) for sponge replay
-//!   zheng::commit()       — folds main steps + particle CCS steps (round constraints)
-//!   zheng::verify()       — checks SuperSpartan proof
-//!
-//! The rate is derived from `Order::digest(s)` — the hemera structural hash of the
-//! input atom, which nox computes during execution and zheng must replay to constrain
-//! the Poseidon2 sponge.
+//!   nox::reduce()             — executes hash formula, emits 26 trace rows (1 quote + 24 rounds + 1 squeeze)
+//!   zheng certify_execution   — certificate v3; the relation compiles the full
+//!                               structural hemera hash and final permutation
+//!   zheng verify_certificate  — checks every row exactly
 
 mod common;
 
-use common::{default_params, zero_statement};
-
 use nebu::Goldilocks;
-use nox::{NullCalls, Reduction, VecTrace, reduce};
-use zheng::{HashAux, commit, verify};
+use nox::{NullCalls, Order, Reduction, VecTrace, reduce};
+use zheng::execution::verify_certificate;
 
 const ORDER_SIZE: usize = 1024;
 
-/// Full pipeline: hash(quote(42)) → 26-row trace → HashAux → zheng commit → verify.
+/// `[15 [1 s]]` over subject `s`.
+fn hash_formula<const N: usize>(order: &mut Reduction<N>, s: Order) -> Order {
+    let tag1 = order.atom(Goldilocks::new(1)).unwrap();
+    let tag15 = order.atom(Goldilocks::new(15)).unwrap();
+    let quote_f = order.pair(tag1, s).unwrap(); // [1 s]
+    order.pair(tag15, quote_f).unwrap() // [15 [1 s]]
+}
+
+/// Full pipeline: hash(quote(42)) → 26-row trace → public v3 certificate.
 #[test]
 fn hash_poseidon2_single_atom_roundtrip() {
     let mut order = Reduction::<ORDER_SIZE>::new();
     let s = order.atom(Goldilocks::new(42)).unwrap();
-    let tag1 = order.atom(Goldilocks::new(1)).unwrap();
-    let tag15 = order.atom(Goldilocks::new(15)).unwrap();
-    let quote_f = order.pair(tag1, s).unwrap(); // [1 s]
-    let hash_f = order.pair(tag15, quote_f).unwrap(); // [15 [1 s]]
+    let hash_f = hash_formula(&mut order, s);
 
     let mut trace = VecTrace::default();
     let output = common::result(reduce(&mut order, s, hash_f, 100, &NullCalls, &mut trace));
-    common::verify_public_execution(&order, s, hash_f, output);
     // 1 quote row + 24 Poseidon2 round rows + 1 squeeze row
     assert_eq!(trace.0.len(), 26, "hash trace must be 26 rows");
-
-    // Rate = structural digest of s (4 field elements), zero-padded to sponge width 8.
-    let in_digest = *order.digest(s).unwrap();
-    let rate = [
-        in_digest[0],
-        in_digest[1],
-        in_digest[2],
-        in_digest[3],
-        Goldilocks::ZERO,
-        Goldilocks::ZERO,
-        Goldilocks::ZERO,
-        Goldilocks::ZERO,
-    ];
-    let hash_aux = HashAux { rate };
-
-    let stmt = zero_statement();
-    let proof = commit(&trace, &[hash_aux], &[], &[], &stmt, &default_params()).unwrap();
-    verify(&proof, &stmt, &default_params()).expect("hash proof must verify");
+    let (statement, _) = common::verify_public_execution(&order, s, hash_f, output);
+    assert_eq!(statement.public_output.len(), 4, "a 4-limb digest");
 }
 
-/// Full pipeline: hash two different inputs → traces with independent HashAux → both verify.
-///
-/// Confirms that HashAux is input-specific (different digests produce different rates)
-/// and that both resulting proofs are independently valid.
+/// hash over a public input: `[15 [0 2]]` reads the input from the subject.
+/// With a quoted constant the relation fixes every wire and the certificate is
+/// empty; with an input the hash rounds are free witness positions.
 #[test]
 fn hash_two_independent_inputs_both_verify() {
-    let run_hash = |input_val: u64| {
+    use zheng::execution::{ExecutionNoun as N, certify_execution};
+    let program = N::Pair(
+        Box::new(N::Atom(15)),
+        Box::new(N::Pair(Box::new(N::Atom(0)), Box::new(N::Atom(2)))),
+    );
+    let native = |input_val: u64| {
         let mut order = Reduction::<ORDER_SIZE>::new();
         let s = order.atom(Goldilocks::new(input_val)).unwrap();
-        let tag1 = order.atom(Goldilocks::new(1)).unwrap();
-        let tag15 = order.atom(Goldilocks::new(15)).unwrap();
-        let quote_f = order.pair(tag1, s).unwrap();
-        let hash_f = order.pair(tag15, quote_f).unwrap();
-
+        let hash_f = hash_formula(&mut order, s);
         let mut trace = VecTrace::default();
         let output = common::result(reduce(&mut order, s, hash_f, 100, &NullCalls, &mut trace));
-        common::verify_public_execution(&order, s, hash_f, output);
-
-        let in_digest = *order.digest(s).unwrap();
-        let rate = [
-            in_digest[0],
-            in_digest[1],
-            in_digest[2],
-            in_digest[3],
-            Goldilocks::ZERO,
-            Goldilocks::ZERO,
-            Goldilocks::ZERO,
-            Goldilocks::ZERO,
-        ];
-        (trace, HashAux { rate })
+        let (statement, certificate) = common::verify_public_execution(&order, s, hash_f, output);
+        assert!(
+            certificate.free.is_empty(),
+            "a constant hash is fixed by the relation"
+        );
+        statement.public_output
     };
 
-    let (trace_a, aux_a) = run_hash(100);
-    let (trace_b, aux_b) = run_hash(999);
+    let (statement_a, certificate_a) = certify_execution(&program, &[100], 1000).unwrap();
+    let (statement_b, certificate_b) = certify_execution(&program, &[999], 1000).unwrap();
+    assert_eq!(statement_a.public_output, native(100));
+    assert_eq!(statement_b.public_output, native(999));
+    assert!(!certificate_a.free.is_empty());
+    verify_certificate(&statement_a, &certificate_a).unwrap();
+    verify_certificate(&statement_b, &certificate_b).unwrap();
     assert_ne!(
-        aux_a.rate, aux_b.rate,
+        statement_a.public_output, statement_b.public_output,
         "structural hashes must bind distinct inputs"
     );
     assert!(
-        matches!(
-            commit(
-                &trace_a,
-                &[HashAux { rate: aux_b.rate }],
-                &[],
-                &[],
-                &zero_statement(),
-                &default_params()
-            ),
-            Err(zheng::CommitError::HashBinding)
-        ),
-        "another input's rate cannot prove this trace"
+        verify_certificate(&statement_b, &certificate_a).is_err(),
+        "hash(100)'s witness cannot certify hash(999)"
     );
-
-    let stmt = zero_statement();
-    let params = default_params();
-
-    let proof_a = commit(&trace_a, &[aux_a], &[], &[], &stmt, &params).unwrap();
-    verify(&proof_a, &stmt, &params).expect("hash(100) proof must verify");
-
-    let proof_b = commit(&trace_b, &[aux_b], &[], &[], &stmt, &params).unwrap();
-    verify(&proof_b, &stmt, &params).expect("hash(999) proof must verify");
+    assert!(
+        verify_certificate(&statement_a, &certificate_b).is_err(),
+        "hash(999)'s witness cannot certify hash(100)"
+    );
+    let mut relabeled = statement_a.clone();
+    relabeled.public_output = statement_b.public_output.clone();
+    assert!(verify_certificate(&relabeled, &certificate_a).is_err());
 }

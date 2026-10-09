@@ -18,23 +18,6 @@ pub fn g(v: u64) -> Goldilocks {
     Goldilocks::new(v)
 }
 
-/// Legacy raw-fold fixture statement. This checks the folding primitive only;
-/// verifier-derived public/state execution proofs below bind actual semantics.
-pub fn zero_statement() -> zheng::Statement {
-    zheng::Statement {
-        program_hash: [0u8; 32],
-        input_hash: [0u8; 32],
-        output_hash: [0u8; 32],
-        focus_bound: 0,
-        bbg_root: [0; 32],
-    }
-}
-
-/// Default proof parameters.
-pub fn default_params() -> zheng::ProofParams {
-    zheng::ProofParams::default()
-}
-
 /// Build the 4-limb BBG root object used by nox's look pattern (tag 17).
 ///
 /// Layout: `[[l0 | [l1 | [l2 | l3]]] | rest]`
@@ -188,15 +171,20 @@ pub fn result(outcome: nox::Outcome) -> Order {
     }
 }
 
-/// Bind the actual public object and formula, independently of the legacy raw
-/// trace fold. This public development proof discloses its witness columns.
+/// Certify and verify the actual public object and formula with zheng public
+/// profile v3 (`certify_execution` / `verify_certificate`): the verifier
+/// recompiles the relation from the program and checks every row exactly.
+/// The certificate discloses the witness. A substituted output must fail.
 pub fn verify_public_execution<const N: usize>(
     arena: &Reduction<N>,
     object: Order,
     formula: Order,
     output: Order,
+) -> (
+    zheng::execution::ExecutionStatement,
+    zheng::execution::Certificate,
 ) {
-    use zheng::execution::{ExecutionNoun, prove_execution, verify_execution};
+    use zheng::execution::{ExecutionNoun, certify_execution, verify_certificate};
     let atom = ExecutionNoun::Atom;
     let pair = |a, b| ExecutionNoun::Pair(Box::new(a), Box::new(b));
     let quote = |v| pair(atom(1), v);
@@ -207,16 +195,18 @@ pub fn verify_public_execution<const N: usize>(
             quote(execution_noun(arena, formula)),
         ),
     );
-    let (statement, proof) =
-        prove_execution(&program, &[], 10_000).expect("current public execution proof");
+    let (statement, certificate) =
+        certify_execution(&program, &[], 10_000).expect("public execution certificate v3");
     assert_eq!(statement.public_output, noun_leaves(arena, output));
-    verify_execution(&statement, &proof).expect("verifier-derived public execution relation");
+    verify_certificate(&statement, &certificate)
+        .expect("verifier-derived public execution relation");
     let mut wrong = statement.clone();
     wrong.public_output[0] = (wrong.public_output[0] + 1) % nebu::field::P;
     assert!(
-        verify_execution(&wrong, &proof).is_err(),
+        verify_certificate(&wrong, &certificate).is_err(),
         "wrong actual result must fail"
     );
+    (statement, certificate)
 }
 
 /// Authenticate a flat public BBG coordinate against the caller's exact root.
@@ -238,6 +228,23 @@ pub fn authenticated_value(
     ))
 }
 
+/// The verifier side of state profile v3: every active read is answered from
+/// BBG authenticated under the root the statement itself names, as zheng's
+/// contract requires (specs/execution.md, authenticated-state profile v3).
+pub fn verify_state_certificate(
+    state: &bbg::BbgState,
+    statement: &zheng::execution::state::StateStatement,
+    certificate: &zheng::execution::Certificate,
+) -> Result<(), String> {
+    let mut root = [0u8; 32];
+    for (i, limb) in statement.state_root.iter().enumerate() {
+        root[i * 8..(i + 1) * 8].copy_from_slice(&limb.to_le_bytes());
+    }
+    statement.verify_certificate(certificate, &mut |ns, index| {
+        authenticated_value(state, &root, ns, index)
+    })
+}
+
 pub fn verify_state_execution<const N: usize>(
     arena: &Reduction<N>,
     formula: Order,
@@ -245,50 +252,52 @@ pub fn verify_state_execution<const N: usize>(
     expected: &[u64],
 ) -> (
     zheng::execution::state::StateStatement,
-    zheng::execution::DirectProof,
+    zheng::execution::Certificate,
 ) {
     let root = state.root();
     let limbs = bbg::dim::goldilocks_from_bytes32(&root).map(|v| v.as_u64());
-    let mut lookup = |ns, index| authenticated_value(state, &root, ns, index);
-    let (statement, proof) = zheng::execution::state::prove_state_execution(
+    let (statement, certificate) = zheng::execution::state::certify_state_execution(
         &execution_noun(arena, formula),
         &[],
         10_000,
         limbs,
         true,
         *hemera::hash(b"cybergraph/stack-state-test/1").as_bytes(),
-        &mut lookup,
+        &mut |ns, index| authenticated_value(state, &root, ns, index),
     )
-    .expect("public state execution with authenticated BBG coordinates");
+    .expect("state execution certificate v3 with authenticated BBG coordinates");
     assert_eq!(statement.execution.public_output, expected);
-    statement
-        .verify(&proof, &mut lookup)
-        .expect("public state execution verifies");
+    verify_state_certificate(state, &statement, &certificate)
+        .expect("state execution certificate verifies");
     for i in 0..4 {
         let mut wrong = statement.clone();
         wrong.state_root[i] = (wrong.state_root[i] + 1) % nebu::field::P;
         assert!(
-            wrong.verify(&proof, &mut lookup).is_err(),
-            "every state-root limb is bound"
+            verify_state_certificate(state, &wrong, &certificate).is_err(),
+            "every state-root limb is bound through read authentication"
         );
     }
     let mut wrong = statement.clone();
-    wrong.context[0] ^= 1;
+    wrong.execution.public_output[0] = (wrong.execution.public_output[0] + 1) % nebu::field::P;
     assert!(
-        wrong.verify(&proof, &mut lookup).is_err(),
-        "execution context is bound"
+        verify_state_certificate(state, &wrong, &certificate).is_err(),
+        "the output is bound"
     );
+    // The 32-byte context is caller metadata zheng carries and does not
+    // interpret; v3 has no transcript, so the certificate does not bind it.
     assert!(
-        statement.verify(&proof, &mut |_, _| None).is_err(),
+        statement
+            .verify_certificate(&certificate, &mut |_, _| None)
+            .is_err(),
         "missing authentication must fail"
     );
-    (statement, proof)
+    (statement, certificate)
 }
 
 pub fn verify_look_openings(
     state: &bbg::BbgState,
     trace: &nox::VecTrace,
-    openings: &[zheng::LookOpening],
+    openings: &[bbg::LookOpening],
 ) {
     let rows: Vec<_> = trace.0.iter().filter(|r| r.r()[0] == 17).collect();
     assert_eq!(
@@ -333,20 +342,4 @@ pub fn verify_look_openings(
             index + 1
         ));
     }
-}
-
-pub fn refuse_recursive_look(
-    trace: &nox::VecTrace,
-    state: &bbg::BbgState,
-    openings: &[zheng::LookOpening],
-) {
-    let mut statement = zero_statement();
-    statement.bbg_root = state.root();
-    assert!(
-        matches!(
-            zheng::commit(trace, &[], &[], openings, &statement, &default_params()),
-            Err(zheng::CommitError::UnsupportedRecursiveOpening)
-        ),
-        "TensorMerkle recursion is explicitly unsupported"
-    );
 }

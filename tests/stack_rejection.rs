@@ -7,7 +7,8 @@
 //!
 //! Exercises error conditions at each layer:
 //!   nox       — Unavailable (absent BBG key)
-//!   zheng     — TraceOverflow, FocusExhausted, StatementMismatch, verify failure
+//!   zheng     — omitted read, budget below cost, wrong input, wrong program
+//!               (public and state profile v3)
 //!   bbg       — InsertError::DoubleSpend (nullifier reuse)
 //!
 //! Every test asserts a specific error variant; "should fail" is as important
@@ -15,17 +16,14 @@
 
 mod common;
 
-use common::{
-    bbg_object_from_state, default_params, make_field_binop, make_look_formula, seeded_bbg_state,
-    zero_statement,
-};
+use common::{bbg_object_from_state, make_look_formula, seeded_bbg_state};
 
 use bbg::types::NeuronRecord;
 use bbg::{BbgState, NeuronId, Particle, Signal as BbgSignal};
 use bbg::{BoxMove, InsertError, ProofLookProvider};
 use nebu::Goldilocks;
-use nox::{ErrorKind, NullCalls, Outcome, Reduction, VecTrace, reduce};
-use zheng::{CommitError, Statement, commit};
+use nox::{ErrorKind, Outcome, Reduction, VecTrace, reduce};
+use zheng::execution::{ExecutionNoun, certify_execution, verify_certificate};
 
 const ORDER_SIZE: usize = 1024;
 
@@ -66,12 +64,11 @@ fn look_absent_key_returns_unavailable_no_opening() {
     );
 }
 
-// ── zheng commit errors ───────────────────────────────────────────────────────
+// ── zheng state profile v3 ────────────────────────────────────────────────────
 
-/// A missing read fails the current state execution verifier. The legacy fold
-/// refuses recursive auxiliaries; omitting them also fails its cardinality gate.
+/// A statement that omits one of the program's reads fails verification.
 #[test]
-fn look_openings_undercount_commit_fails() {
+fn omitted_read_fails_state_verification() {
     // State needs two queryable time entries.
     let mut state = BbgState::new();
     let n = neuron(1);
@@ -113,7 +110,7 @@ fn look_openings_undercount_commit_fails() {
         Outcome::Ok(_, _)
     ));
 
-    let mut all_openings = prov.take_look_openings();
+    let all_openings = prov.take_look_openings();
     assert_eq!(all_openings.len(), 2);
 
     common::verify_look_openings(&state, &trace, &all_openings);
@@ -124,115 +121,80 @@ fn look_openings_undercount_commit_fails() {
         common::authenticated_value(&state, &state.root(), 8, index0).unwrap(),
         common::authenticated_value(&state, &state.root(), 8, index1).unwrap(),
     ];
-    let (mut statement, proof) = common::verify_state_execution(&order, program, &state, &expected);
+    let (mut statement, certificate) =
+        common::verify_state_execution(&order, program, &state, &expected);
     assert_eq!(statement.reads.len(), 2);
     statement.reads.truncate(1);
     assert!(
-        statement
-            .verify(&proof, &mut |ns, index| common::authenticated_value(
-                &state,
-                &state.root(),
-                ns,
-                index
-            ))
-            .is_err(),
-        "current public state proof rejects an omitted read"
-    );
-
-    // The recursive profile refuses even before cardinality gadgets run.
-    all_openings.truncate(1);
-    common::refuse_recursive_look(&trace, &state, &all_openings);
-    let mut stmt = zero_statement();
-    stmt.bbg_root = state.root();
-    let err = commit(&trace, &[], &[], &[], &stmt, &default_params());
-    assert!(
-        matches!(err, Err(CommitError::TraceOverflow)),
-        "omitting all auxiliaries cannot bypass the legacy trace cardinality gate: {err:?}"
+        common::verify_state_certificate(&state, &statement, &certificate).is_err(),
+        "state certificate v3 rejects an omitted read"
     );
 }
 
-/// Trace has 3 rows; Statement.focus_bound=1 → FocusExhausted.
-#[test]
-fn focus_bound_exceeded_commit_fails() {
-    let mut order = Reduction::<ORDER_SIZE>::new();
-    let obj = order.atom(Goldilocks::new(0)).unwrap();
-    let formula = make_field_binop(&mut order, 5, 2, 3); // add(2,3)
+// ── zheng public profile v3 ───────────────────────────────────────────────────
 
-    let mut trace = VecTrace::default();
-    reduce(&mut order, obj, formula, 1000, &NullCalls, &mut trace);
-    assert!(trace.0.len() >= 2, "add produces at least 2 rows");
-
-    let stmt = Statement {
-        program_hash: [0u8; 32],
-        input_hash: [0u8; 32],
-        output_hash: [0u8; 32],
-        focus_bound: 1, // trace.len() > 1 → FocusExhausted
-        bbg_root: [0; 32],
-    };
-    let err = commit(&trace, &[], &[], &[], &stmt, &default_params());
-    assert!(
-        matches!(err, Err(CommitError::FocusExhausted)),
-        "trace exceeding focus_bound must produce FocusExhausted, got {:?}",
-        err,
-    );
+fn atom(v: u64) -> ExecutionNoun {
+    ExecutionNoun::Atom(v)
+}
+fn pair(a: ExecutionNoun, b: ExecutionNoun) -> ExecutionNoun {
+    ExecutionNoun::Pair(Box::new(a), Box::new(b))
+}
+/// `[5 [[1 a] [1 b]]]` — add two quoted constants.
+fn add(a: u64, b: u64) -> ExecutionNoun {
+    pair(
+        atom(5),
+        pair(pair(atom(1), atom(a)), pair(atom(1), atom(b))),
+    )
 }
 
-/// Statement.input_hash=[1u8;32] doesn't match the first trace row → StatementMismatch.
+/// A budget below the execution's cost: the prover refuses, and a statement
+/// claiming that budget does not verify.
 #[test]
-fn input_hash_mismatch_commit_fails() {
-    let mut order = Reduction::<ORDER_SIZE>::new();
-    let obj = order.atom(Goldilocks::new(0)).unwrap();
-    let formula = make_field_binop(&mut order, 5, 1, 1);
-
-    let mut trace = VecTrace::default();
-    reduce(&mut order, obj, formula, 1000, &NullCalls, &mut trace);
-
-    let stmt = Statement {
-        program_hash: [0u8; 32],
-        input_hash: [1u8; 32], // non-zero, will not match any trace row hash
-        output_hash: [0u8; 32],
-        focus_bound: 0,
-        bbg_root: [0; 32],
-    };
-    let err = commit(&trace, &[], &[], &[], &stmt, &default_params());
-    assert!(
-        matches!(err, Err(CommitError::StatementMismatch)),
-        "wrong input_hash must produce StatementMismatch, got {:?}",
-        err,
-    );
+fn budget_below_cost_is_refused() {
+    let (statement, certificate) = certify_execution(&add(2, 3), &[], 1000).unwrap();
+    assert_eq!(statement.public_output, vec![5]);
+    assert!(statement.cycles > 1);
+    assert!(certify_execution(&add(2, 3), &[], statement.cycles - 1).is_err());
+    let mut tight = statement.clone();
+    tight.budget = statement.cycles - 1;
+    assert!(verify_certificate(&tight, &certificate).is_err());
+    let mut exact = statement;
+    exact.budget = exact.cycles;
+    verify_certificate(&exact, &certificate).expect("budget is an upper bound");
 }
 
-// ── zheng verify errors ───────────────────────────────────────────────────────
-
-/// A proof committed under statement A must not verify under a different statement B.
-///
-/// The statement (program_hash/input_hash/output_hash/focus_bound) is absorbed
-/// into the Fiat-Shamir transcript before sumcheck challenges are derived.
-/// Mismatching statements cause transcript divergence, which propagates to the
-/// Brakedown PCS seed and causes verify() to return LensFailed.
+/// A certificate for one public input does not verify another input.
 #[test]
-fn proof_from_wrong_statement_fails_verify() {
-    let mut order = Reduction::<ORDER_SIZE>::new();
-    let obj = order.atom(Goldilocks::new(0)).unwrap();
-    let formula = make_field_binop(&mut order, 5, 2, 3);
+fn wrong_public_input_fails_verify() {
+    // [5 [[0 2] [1 7]]] — subject axis 2 (the input) plus 7.
+    let program = pair(
+        atom(5),
+        pair(pair(atom(0), atom(2)), pair(atom(1), atom(7))),
+    );
+    let (statement, certificate) = certify_execution(&program, &[5], 1000).unwrap();
+    assert_eq!(statement.public_output, vec![12]);
+    verify_certificate(&statement, &certificate).unwrap();
+    let mut wrong = statement.clone();
+    wrong.public_input[0] = 6;
+    assert!(verify_certificate(&wrong, &certificate).is_err());
+}
 
-    let mut trace = VecTrace::default();
-    reduce(&mut order, obj, formula, 1000, &NullCalls, &mut trace);
-
-    let stmt_a = zero_statement();
-    let proof = commit(&trace, &[], &[], &[], &stmt_a, &default_params()).unwrap();
-
-    // Different statement: any non-zero program_hash diverges the transcript.
-    let stmt_b = Statement {
-        program_hash: [7u8; 32],
-        input_hash: [0u8; 32],
-        output_hash: [0u8; 32],
-        focus_bound: 0,
-        bbg_root: [0; 32],
-    };
+/// A's certificate cannot carry A's output over to program B. (A program of
+/// quoted constants fixes every wire, so its certificate is empty and any
+/// true statement verifies with it; acceptance means the statement is true.)
+#[test]
+fn false_statement_about_another_program_fails_verify() {
+    let (a, certificate) = certify_execution(&add(2, 3), &[], 1000).unwrap();
+    assert!(certificate.free.is_empty());
+    let (b, _) = certify_execution(&add(2, 4), &[], 1000).unwrap();
+    let mut relabeled = b;
+    relabeled.public_output = a.public_output.clone();
+    assert!(verify_certificate(&relabeled, &certificate).is_err());
+    let mut cycles = a.clone();
+    cycles.cycles += 1;
     assert!(
-        zheng::verify(&proof, &stmt_b, &default_params()).is_err(),
-        "proof committed under stmt_a must not verify under stmt_b",
+        verify_certificate(&cycles, &certificate).is_err(),
+        "cost is bound"
     );
 }
 

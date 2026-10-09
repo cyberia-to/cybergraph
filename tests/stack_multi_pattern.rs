@@ -3,8 +3,8 @@
 // crystal-type: source
 // crystal-domain: cyber
 // ---
-//! One actual composed formula per trace. Public execution binds all operations;
-//! current TensorMerkle recursion is tested as an explicit unsupported profile.
+//! One actual composed formula per trace. zheng public and state profile v3
+//! certificates bind every operation.
 mod common;
 use bbg::ProofLookProvider;
 use common::{
@@ -53,9 +53,10 @@ fn mixed_add_hash_axis_public_execution() {
     assert_eq!(&values[1..5], noun_leaves(&arena, hash_output));
     verify_public_execution(&arena, object, formula, output);
 
-    // A different arithmetic leg must reject the same public execution proof.
+    // A different program must reject the same certificate.
     let program = common::execution_noun(&arena, formula);
-    let (statement, proof) = zheng::execution::prove_execution(&program, &[], 1000).unwrap();
+    let (statement, certificate) =
+        zheng::execution::certify_execution(&program, &[], 1000).unwrap();
     assert_eq!(statement.public_output, values);
     let mut wrong = statement.clone();
     wrong.program = zheng::execution::ExecutionStatement::encode_program(&ExecutionNoun::Pair(
@@ -63,7 +64,7 @@ fn mixed_add_hash_axis_public_execution() {
         Box::new(ExecutionNoun::Atom(10)),
     ))
     .unwrap();
-    assert!(zheng::execution::verify_execution(&wrong, &proof).is_err());
+    assert!(zheng::execution::verify_certificate(&wrong, &certificate).is_err());
 }
 
 #[test]
@@ -88,5 +89,4 @@ fn mixed_add_look_public_state_execution() {
     let openings = provider.take_look_openings();
     common::verify_look_openings(&state, &trace, &openings);
     verify_state_execution(&arena, formula, &state, &[expected]);
-    common::refuse_recursive_look(&trace, &state, &openings);
 }

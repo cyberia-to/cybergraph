@@ -4,12 +4,12 @@
 // crystal-domain: cyber
 // ---
 //! BBG entity navigation → flat nox lookup → complete native query authentication
-//! → current public state execution proof. Recursion is an explicit separate refusal.
+//! → zheng state profile v3 certificate.
 mod common;
 use bbg::{Dim, ProofLookProvider, collect_look_openings};
 use common::{
-    bbg_object_from_state, make_look_formula, noun_leaves, refuse_recursive_look, result,
-    seeded_bbg_state, verify_look_openings, verify_state_execution,
+    bbg_object_from_state, make_look_formula, noun_leaves, result, seeded_bbg_state,
+    verify_look_openings, verify_state_execution,
 };
 use nox::{Reduction, VecTrace, reduce};
 
@@ -34,7 +34,6 @@ fn run_query(
     let openings = provider.take_look_openings();
     verify_look_openings(state, &trace, &openings);
     verify_state_execution(&arena, formula, state, &[expected]);
-    refuse_recursive_look(&trace, state, &openings);
 }
 
 #[test]
@@ -97,6 +96,4 @@ fn inline_and_collected_openings_authenticate_the_same_state() {
     assert_eq!(inline[0].value, collected[0].value);
     assert_eq!(inline[0].opening, collected[0].opening);
     verify_state_execution(&arena, formula, &state, &noun_leaves(&arena, output));
-    refuse_recursive_look(&trace, &state, &inline);
-    refuse_recursive_look(&trace, &state, &collected);
 }

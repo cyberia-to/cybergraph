@@ -3,24 +3,24 @@
 // crystal-type: source
 // crystal-domain: cyber
 // ---
-//! Integration tests: nox call pattern (tag 16) → zheng proof.
+//! Integration tests: nox call pattern (tag 16) → zheng certificate v3.
 //!
 //! Pipeline under test:
-//!   CallProvider impl  — prover-supplied witness injection
-//!   nox::reduce()      — evaluates call formula, checks witness via check_formula
-//!   zheng::commit()    — folds main steps for the accepted-witness case
-//!   zheng::verify()    — checks SuperSpartan proof
+//!   CallProvider impl          — prover-supplied witness injection
+//!   nox::reduce()              — evaluates call formula, checks witness via check_formula
+//!   zheng certificate::certify — exact check of the verifier-derived relation
+//!     (the call witness is public test data here; the private backend is MITH)
 
 mod common;
 
-use common::{default_params, g, make_call_formula, zero_statement};
+use common::{g, make_call_formula};
 
 use nebu::Goldilocks;
 use nox::trace::NoTrace;
 use nox::{
     CallProvider, ErrorKind, LookProvider, NullCalls, Order, Outcome, Reduction, VecTrace, reduce,
 };
-use zheng::{commit, verify};
+use zheng::execution::certificate;
 
 const ORDER_SIZE: usize = 1024;
 
@@ -59,7 +59,7 @@ impl<const N: usize> CallProvider<N> for BadWitness99 {
 // ── tests ─────────────────────────────────────────────────────────────────────
 
 /// FixedWitness42 supplies witness=42; check=[1 0] always returns 0 (accepted).
-/// Outcome::Ok; trace committed and verified via zheng.
+/// Outcome::Ok; the relation is certified and checked exactly (certificate v3).
 #[test]
 fn call_with_accepted_witness_roundtrip() {
     let mut order = Reduction::<ORDER_SIZE>::new();
@@ -77,8 +77,8 @@ fn call_with_accepted_witness_roundtrip() {
     let val = order.atom_value(witness_id).expect("witness must be atom");
     assert_eq!(val.as_u64(), 42, "returned witness must be 42");
 
-    // Current public direct proof over the independently regenerated relation.
-    // The fixture witness is public test data; this backend is not a ZK claim.
+    // Certificate v3 over the independently regenerated relation. The fixture
+    // witness is public test data; this is not a ZK claim.
     let program = common::execution_noun(&order, formula);
     let (statement, prepared, columns) =
         zheng::execution::private::prepare_execution(&program, &[], &[42], 1000)
@@ -94,26 +94,14 @@ fn call_with_accepted_witness_roundtrip() {
         .iter()
         .map(|&(i, v)| (i, g(v)))
         .collect();
-    let direct = zheng::execution::proof::prove(
-        &prepared.relation.instance,
-        &witness,
-        &statement.transcript_bytes(),
-        &public,
-    )
-    .unwrap();
+    let certified = certificate::certify(&prepared.relation.instance, &witness, &public).unwrap();
     let verifier = statement.prepare().unwrap();
     let bindings: Vec<_> = verifier
         .public_coordinates
         .iter()
         .map(|&(i, v)| (i, g(v)))
         .collect();
-    zheng::execution::proof::verify(
-        &verifier.relation.instance,
-        &direct,
-        &statement.transcript_bytes(),
-        &bindings,
-    )
-    .unwrap();
+    certificate::verify(&verifier.relation.instance, &certified, &bindings).unwrap();
     let mut wrong = statement.clone();
     wrong.execution.public_output[0] = 99;
     let wrong_verifier = wrong.prepare().unwrap();
@@ -123,18 +111,13 @@ fn call_with_accepted_witness_roundtrip() {
         .map(|&(i, v)| (i, g(v)))
         .collect();
     assert!(
-        zheng::execution::proof::verify(
+        certificate::verify(
             &wrong_verifier.relation.instance,
-            &direct,
-            &wrong.transcript_bytes(),
+            &certified,
             &wrong_bindings
         )
         .is_err()
     );
-
-    let stmt = zero_statement();
-    let proof = commit(&trace, &[], &[], &[], &stmt, &default_params()).unwrap();
-    verify(&proof, &stmt, &default_params()).expect("call proof must verify");
 }
 
 /// BadWitness99 provides witness=99; check formula quotes 99 → check=99 ≠ 0 → CallRejected.

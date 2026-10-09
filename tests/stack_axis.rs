@@ -3,14 +3,18 @@
 // crystal-type: source
 // crystal-domain: cyber
 // ---
-//! Actual nox axis execution, native TensorMerkle openings and current public
-//! execution proofs. Legacy recursive-opening folds explicitly refuse this profile.
+//! Actual nox axis execution, native Brakedown openings of the object
+//! polynomial, and zheng public v3 certificates of the execution.
 mod common;
-use common::{default_params, g, result, verify_public_execution, zero_statement};
-use lens::{Lens, MultilinearPoly, Transcript, brakedown::Brakedown};
+use common::{g, result, verify_public_execution};
+use lens::{Commitment, Lens, MultilinearPoly, Transcript, brakedown::Brakedown};
 use nebu::Goldilocks;
 use nox::{CallProvider, LookProvider, Order, Reduction, VecTrace, reduce};
-use zheng::{AxisOpening, CommitError, commit};
+
+/// A native opening of the object polynomial (checked by lens directly).
+struct AxisOpening {
+    commitment: Commitment,
+}
 
 struct CommittedObject {
     object: Order,
@@ -52,13 +56,7 @@ fn opening(values: &[u64], point: &[u64], value: u64) -> AxisOpening {
         &proof,
         &mut Transcript::new(&seed)
     ));
-    AxisOpening {
-        commitment,
-        point,
-        value: g(value),
-        opening: proof,
-        transcript_seed: seed,
-    }
+    AxisOpening { commitment }
 }
 
 fn run<const N: usize>(
@@ -84,17 +82,6 @@ fn run<const N: usize>(
     );
     assert_eq!(trace.0.len(), 2);
     verify_public_execution(arena, object, formula, output);
-    assert!(matches!(
-        commit(
-            &trace,
-            &[],
-            &openings,
-            &[],
-            &zero_statement(),
-            &default_params()
-        ),
-        Err(CommitError::UnsupportedRecursiveOpening)
-    ));
 }
 
 #[test]
