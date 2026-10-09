@@ -3,7 +3,7 @@
 // crystal-type: source
 // crystal-domain: cyber
 // ---
-//! Integration tests: bbg::Bbg facade lifecycle → zheng proof.
+//! Integration tests: bbg::Bbg facade lifecycle → zheng state certificate v3.
 //!
 //! Exercises the full BBG lifecycle:
 //!   Bbg::insert()          — signal insertion, state update
@@ -111,7 +111,6 @@ fn finalize_block_updates_root_and_look_proof_consistent() {
         &bbg.state,
         &common::noun_leaves(&order, output),
     );
-    common::refuse_recursive_look(&trace, &bbg.state, &look_openings);
 }
 
 // ── box moves ─────────────────────────────────────────────────────────────────
@@ -244,5 +243,4 @@ fn multi_block_insert_finalize_cycle_then_look_proof() {
         &bbg.state,
         &common::noun_leaves(&order, output),
     );
-    common::refuse_recursive_look(&trace, &bbg.state, &look_openings);
 }

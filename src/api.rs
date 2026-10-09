@@ -111,6 +111,8 @@ pub enum ApiError {
     /// Signal's resolved destination network does not match the network this
     /// node serves.
     WrongNetwork { expected: Particle, got: Particle },
+    /// The signal carries a proof that is not a valid pay proof of itself.
+    ProofRejected(foculus::PayProofError),
 }
 
 /// A neuron's private network — the default destination for its signals.
@@ -239,7 +241,8 @@ impl Cybergraph {
 
     /// Order, apply, and record a signal. Shared by `link` and `seal`.
     ///
-    /// Three steps, in order:
+    /// A carried proof is verified first (gate: `foculus::check_signal_proof`).
+    /// Then three steps, in order:
     ///   1. chain ordering — equivocation / step / prev (gate: sync)
     ///   2. state application — cyberlinks land in bbg via `insert` (gate: double-spend)
     ///   3. header record — the signal header enters the signals dimension
@@ -272,6 +275,9 @@ impl Cybergraph {
                 });
             }
         }
+
+        // Proof gate: a carried proof is verified before anything is applied.
+        foculus::check_signal_proof(&signal).map_err(ApiError::ProofRejected)?;
 
         let bbg_signal = bridge_to_bbg(&signal);
         self.validate_bbg_batch(&bbg_signal)?;

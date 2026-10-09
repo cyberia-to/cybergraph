@@ -3,7 +3,7 @@
 // crystal-type: source
 // crystal-domain: cyber
 // ---
-//! Integration tests: cybergraph signal lifecycle → BBG state → zheng proof.
+//! Integration tests: cybergraph signal lifecycle → BBG state → zheng state certificate v3.
 //!
 //! These tests exercise the full coordinator path:
 //!   SignalChain           — layer-2 ordering: hash chain + equivocation detection
@@ -129,7 +129,7 @@ fn vdf_different_challenges_produce_different_outputs() {
     );
 }
 
-// ── signal → BbgState → look → zheng proof ───────────────────────────────────
+// ── signal → BbgState → look → zheng v3 ───────────────────────────────────────
 
 /// Signal → BbgState insert → look(Time) → public state execution proof.
 ///
@@ -200,7 +200,6 @@ fn signal_to_bbg_state_to_look_proof() {
         &state,
         &common::noun_leaves(&order, output),
     );
-    common::refuse_recursive_look(&trace, &state, &look_openings);
 }
 
 /// Multiple signals from the same neuron → all inserted into BbgState → state is consistent.

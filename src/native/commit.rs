@@ -246,6 +246,10 @@ impl NativeNode {
                 if signal.links.iter().any(|link| link.neuron != signal.neuron) {
                     return Err(invalid("link neuron differs from signal neuron"));
                 }
+                // A signal proof is verified before it is stored: today it
+                // can only be a pay proof of the signal itself.
+                foculus::check_signal_proof(signal)
+                    .map_err(|e| invalid(format!("signal proof: {e}")))?;
                 positions.insert(
                     signal.neuron,
                     (
@@ -364,6 +368,9 @@ fn wire_frames(
     let mut frames = Vec::new();
     for event in events {
         match event {
+            // Legacy frames carry neither a network nor a proof: such a
+            // signal ends the legacy wire export (its proof was verified at
+            // admission and lives in the durable signal record).
             Event::Signal(s) if s.network != SELF_NETWORK || s.proof.is_some() => {
                 return Ok((frames, true));
             }

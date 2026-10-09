@@ -38,6 +38,8 @@ pub use foculus::{
     ChainError, CyberlinkRecord, SELF_NETWORK, Signal, SignalChain, VdfProof, challenge_from_hash,
     vdf_evaluate, vdf_verify,
 };
+// The proof a signal may carry and why admission rejects one.
+pub use foculus::{PayProofError, Proof, ProofError};
 
 // The five-verb public API.
 pub use api::{ApiError, Cybergraph, Event, Filter, Intent, QueryError, Scope, private_network};
