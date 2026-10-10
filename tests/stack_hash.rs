@@ -20,7 +20,7 @@ mod common;
 use common::{zero_statement, default_params};
 
 use nebu::Goldilocks;
-use nox::{reduce, Order, Tag, VecTrace, NullCalls};
+use nox::{reduce, VecTrace, NullCalls, Reduction};
 use zheng::{commit, verify, HashAux};
 
 const ORDER_SIZE: usize = 1024;
@@ -28,12 +28,12 @@ const ORDER_SIZE: usize = 1024;
 /// Full pipeline: hash(quote(42)) → 26-row trace → HashAux → zheng commit → verify.
 #[test]
 fn hash_poseidon2_single_atom_roundtrip() {
-    let mut order = Order::<ORDER_SIZE>::new();
-    let s     = order.atom(Goldilocks::new(42), Tag::Field).unwrap();
-    let tag1  = order.atom(Goldilocks::new(1),  Tag::Field).unwrap();
-    let tag15 = order.atom(Goldilocks::new(15), Tag::Field).unwrap();
-    let quote_f = order.cell(tag1,  s).unwrap();        // [1 s]
-    let hash_f  = order.cell(tag15, quote_f).unwrap();  // [15 [1 s]]
+    let mut order = Reduction::<ORDER_SIZE>::new();
+    let s     = order.atom(Goldilocks::new(42)).unwrap();
+    let tag1  = order.atom(Goldilocks::new(1)).unwrap();
+    let tag15 = order.atom(Goldilocks::new(15)).unwrap();
+    let quote_f = order.pair(tag1,  s).unwrap();        // [1 s]
+    let hash_f  = order.pair(tag15, quote_f).unwrap();  // [15 [1 s]]
 
     let mut trace = VecTrace::default();
     reduce(&mut order, s, hash_f, 100, &NullCalls, &mut trace);
@@ -60,12 +60,12 @@ fn hash_poseidon2_single_atom_roundtrip() {
 #[test]
 fn hash_two_independent_inputs_both_verify() {
     let run_hash = |input_val: u64| {
-        let mut order = Order::<ORDER_SIZE>::new();
-        let s     = order.atom(Goldilocks::new(input_val), Tag::Field).unwrap();
-        let tag1  = order.atom(Goldilocks::new(1),         Tag::Field).unwrap();
-        let tag15 = order.atom(Goldilocks::new(15),        Tag::Field).unwrap();
-        let quote_f = order.cell(tag1,  s).unwrap();
-        let hash_f  = order.cell(tag15, quote_f).unwrap();
+        let mut order = Reduction::<ORDER_SIZE>::new();
+        let s     = order.atom(Goldilocks::new(input_val)).unwrap();
+        let tag1  = order.atom(Goldilocks::new(1)).unwrap();
+        let tag15 = order.atom(Goldilocks::new(15)).unwrap();
+        let quote_f = order.pair(tag1,  s).unwrap();
+        let hash_f  = order.pair(tag15, quote_f).unwrap();
 
         let mut trace = VecTrace::default();
         reduce(&mut order, s, hash_f, 100, &NullCalls, &mut trace);
