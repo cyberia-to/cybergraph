@@ -9,20 +9,20 @@ the address is the identity. `Hemera(content)` — that is the particle. no regi
 ```
 Hemera = Poseidon2(
   p  = 2^64 - 2^32 + 1     Goldilocks field
-  d  = 7                   full-round S-box: x -> x^7
-  partial S-box            x -> x^-1 (field inversion)
+  d  = 7                   S-box: x -> x^7 in every round
   t  = 16                  state width (elements)
-  Rf = 8                   full rounds (4 + 4)
-  Rp = 16                  partial rounds
+  Rf = 12                  full rounds (6 + 6)
+  Rp = 48                  partial rounds
+  RC = 240                 self-generated round constants
   r  = 8                   rate (elements; 56 bytes in per block, 7 B/element)
   c  = 8                   capacity (64 bytes)
   out = 4 elements          32 bytes out
 )
 ```
 
-every parameter is a power of 2. the [[Goldilocks field]] gives native 64-bit CPU arithmetic — a field multiplication is a single instruction. the S-box exponent $d = 7$ is the minimum invertible exponent for this field ($\gcd(7, p-1) = 1$; both 3 and 5 divide $p-1$)
+width, rate, capacity and output are powers of 2; the round counts follow the Poseidon2 rules with margin. the [[Goldilocks field]] gives native 64-bit CPU arithmetic — a field multiplication is a single instruction. the S-box exponent $d = 7$ is the minimum invertible exponent for this field ($\gcd(7, p-1) = 1$; both 3 and 5 divide $p-1$)
 
-capacity 8 (8 elements, 512 bits) bounds generic attacks on the sponge; collision resistance is set by the output length, not the capacity. a $b$-bit digest gives $b/2$-bit classical (birthday) and about $b/3$-bit quantum (BHT) collision resistance: the 32-byte (4-element) output above gives 128-bit classical and ~85-bit quantum (the hash row of `zheng/specs/soundness.md`); a 64-byte digest would give 256 and ~170. hemera profile v2 ([hemera#15](https://github.com/cyberia-to/hemera/pull/15)) proposes the longer identity digest for post-quantum collision resistance; Merkle nodes inside a proof stay 32 bytes. the block above mirrors [[hemera]] 0.3, which is normative. its algebraic degree is specified in [[hemera]] (the S-box and round structure live there, not here). production systems use capacity 4 (128-bit) because their hashes are ephemeral — trace commitments that live seconds. particle addresses live decades. the parameter choice matches the lifetime
+capacity 8 (8 elements, 512 bits) bounds generic attacks on the sponge; collision resistance is set by the output length, not the capacity. a $b$-bit digest gives $b/2$-bit classical (birthday) and about $b/3$-bit quantum (BHT) collision resistance: the 32-byte (4-element) output above gives 128-bit classical and ~85-bit quantum (the hash row of `zheng/specs/soundness.md`); a 64-byte digest would give 256 and ~170. hemera 0.4 ([hemera#15](https://github.com/cyberia-to/hemera/pull/15), frozen 2026-10-16) keeps the 32-byte digest; the longer options stay recorded in hemera's specs. Merkle nodes inside a proof stay 32 bytes. the block above mirrors [[hemera]] 0.4, which is normative; 0.3 (4 + 4 full rounds, 16 inverse partial rounds) is the record. its algebraic degree is specified in [[hemera]] (the S-box and round structure live there, not here). production systems use capacity 4 (128-bit) because their hashes are ephemeral — trace commitments that live seconds. particle addresses live decades. the parameter choice matches the lifetime
 
 one mode only: sponge. no compression mode. two modes producing the same 32-byte output from different inputs would break the address space as a function
 
