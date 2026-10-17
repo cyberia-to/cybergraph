@@ -292,17 +292,15 @@ impl Cybergraph {
             }
             return Err(ApiError::BbgRejected(error));
         }
-        // 3. record the signal header
-        self.bbg.apply_signal_record(
+        // 3. record the signal header at bbg::signal_key(neuron, step)
+        self.bbg.apply_signal_record(bbg::SignalRecord {
+            neuron,
+            network,
+            link_count,
+            block_height: height,
+            proof_hash: [0u8; 32],
             step,
-            bbg::SignalRecord {
-                neuron,
-                network,
-                link_count,
-                block_height: height,
-                proof_hash: [0u8; 32],
-            },
-        );
+        });
 
         Ok((neuron, step))
     }
@@ -499,7 +497,7 @@ mod tests {
         let key = g.intend(intent(n(1), 0, p(2))).unwrap();
         let s = empty_signal(n(1), 0, [0u8; 32]);
         g.seal(key, s).unwrap();
-        assert!(g.bbg.state.signals.contains_key(&0));
+        assert!(g.bbg.state.signals.contains_key(&bbg::signal_key(&n(1), 0)));
     }
 
     #[test]
@@ -507,7 +505,29 @@ mod tests {
         let mut g = Cybergraph::new();
         let s = empty_signal(n(1), 0, [0u8; 32]);
         g.link(s).unwrap();
-        assert!(g.bbg.state.signals.contains_key(&0));
+        assert!(g.bbg.state.signals.contains_key(&bbg::signal_key(&n(1), 0)));
+    }
+
+    /// Launch row 9: two neurons' first signals are both step 0. Both headers
+    /// persist, and the order a node received them in does not move the root.
+    #[test]
+    fn first_signals_of_two_neurons_both_persist_in_any_order() {
+        let link_both = |order: [u8; 2]| {
+            let mut g = Cybergraph::new();
+            for i in order {
+                g.link(one_link_signal(n(i), 0, [0u8; 32], p(10 + i), p(20))).unwrap();
+            }
+            g
+        };
+        let (ab, ba) = (link_both([1, 2]), link_both([2, 1]));
+        for g in [&ab, &ba] {
+            assert_eq!(g.bbg.state.signals.len(), 2);
+            for i in [1, 2] {
+                let record = g.bbg.state.signals.get(&bbg::signal_key(&n(i), 0)).unwrap();
+                assert_eq!((record.neuron, record.step), (n(i), 0));
+            }
+        }
+        assert_eq!(ab.bbg.state.root(), ba.bbg.state.root());
     }
 
     #[test]

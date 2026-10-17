@@ -123,12 +123,36 @@ fn multi_neuron_steps_have_distinct_global_records() {
     let mut n = t.open();
     n.accept(None, link(1, 1), 1).unwrap();
     n.accept(None, link(2, 1), 2).unwrap();
+    // both are step 0 of their own chains: two records under signal_key(neuron, 0)
     assert_eq!(n.graph().bbg.state.signals.len(), 2);
-    assert_eq!(n.graph().bbg.state.signals[&0].neuron, [1; 32]);
-    assert_eq!(n.graph().bbg.state.signals[&1].neuron, [2; 32]);
+    for neuron in [[1; 32], [2; 32]] {
+        let record = &n.graph().bbg.state.signals[&bbg::signal_key(&neuron, 0)];
+        assert_eq!((record.neuron, record.step), (neuron, 0));
+    }
     let root = n.root();
     drop(n);
     assert_eq!(t.open().root(), root);
+}
+
+/// Launch row 9: the signals dimension is a function of the accepted signals,
+/// not of the order one node accepted them in. Two nodes accept the same two
+/// first signals in opposite order; both keep both records and agree on the
+/// signals dimension, and each recovers its own stored root after restart.
+#[test]
+fn signals_dimension_is_independent_of_acceptance_order() {
+    let (ta, tb) = (Temp::new(), Temp::new());
+    let (mut a, mut b) = (ta.open(), tb.open());
+    a.accept(None, link(1, 1), 1).unwrap();
+    a.accept(None, link(2, 1), 2).unwrap();
+    b.accept(None, link(2, 1), 1).unwrap();
+    b.accept(None, link(1, 1), 2).unwrap();
+    let dims = |n: &NativeNode| n.graph().bbg.state.root_leaves().dims[9];
+    assert_eq!(a.graph().bbg.state.signals.len(), 2);
+    assert_eq!(dims(&a), dims(&b));
+    let (root_a, root_b) = (a.root(), b.root());
+    drop((a, b));
+    assert_eq!(ta.open().root(), root_a);
+    assert_eq!(tb.open().root(), root_b);
 }
 
 #[test]
@@ -198,7 +222,7 @@ fn native_rewards_intents_and_networks_are_retained() {
     )
     .unwrap();
     assert_eq!((n.balance(&[1; 32]), n.balance(&[2; 32])), (4, 3));
-    assert_eq!(n.graph().bbg.state.signals[&0].network, [99; 32]);
+    assert_eq!(n.graph().bbg.state.signals[&bbg::signal_key(&[1; 32], 0)].network, [99; 32]);
     assert_eq!(n.block(1).unwrap().unwrap().signal.height, 42);
     let root = n.root();
     drop(n);
@@ -332,14 +356,18 @@ fn extra_or_missing_records_are_not_silently_skipped() {
 #[test]
 fn authenticated_proof_bytes_and_commitment_survive_durable_recovery() {
     let t = Temp::new();
-    let statement = foculus::PayStatement {
-        content_id: [71; 32],
-        total_out: 100,
-        leg_count: 1,
-    };
     let mut signal = signal(1);
     signal.network = [88; 32];
-    signal.proof = Some(foculus::prove_pay(&statement).unwrap());
+    signal.links.push(CyberlinkRecord {
+        neuron: signal.neuron,
+        from: *hemera::hash(b"zheng").as_bytes(),
+        to: *hemera::hash(b"pussy").as_bytes(),
+        token: [0; 32],
+        amount: 7,
+        valence: 1,
+        height: 0,
+    });
+    signal.proof = Some(foculus::prove_pay(&signal).unwrap());
     let original = foculus::signal_codec::encode_signal(&signal).unwrap();
     let proof_hash = foculus::signal_codec::proof_hash(&signal).unwrap();
     let mut node = t.open();
@@ -350,7 +378,7 @@ fn authenticated_proof_bytes_and_commitment_survive_durable_recovery() {
             9,
         )
         .unwrap();
-    assert_eq!(node.graph().bbg.state.signals[&0].proof_hash, proof_hash);
+    assert_eq!(node.graph().bbg.state.signals[&bbg::signal_key(&[1; 32], 0)].proof_hash, proof_hash);
     drop(node);
     let node = t.open();
     assert_eq!(node.root(), receipt.root);
@@ -361,7 +389,7 @@ fn authenticated_proof_bytes_and_commitment_survive_durable_recovery() {
     );
     assert!(foculus::verify_pay(
         block.signal.proof.as_ref().unwrap(),
-        &statement
+        &block.signal
     ));
-    assert_eq!(node.graph().bbg.state.signals[&0].proof_hash, proof_hash);
+    assert_eq!(node.graph().bbg.state.signals[&bbg::signal_key(&[1; 32], 0)].proof_hash, proof_hash);
 }

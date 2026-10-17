@@ -49,7 +49,6 @@ impl NativeNode {
         for event in &events {
             headers.push(match event {
                 Event::Signal(s) => {
-                    let position = signals;
                     signals = signals
                         .checked_add(1)
                         .ok_or_else(|| invalid("signal count overflow"))?;
@@ -58,17 +57,17 @@ impl NativeNode {
                     } else {
                         s.network
                     };
-                    Some((
-                        position,
-                        bbg::SignalRecord {
-                            neuron: s.neuron,
-                            network,
-                            link_count: u32::try_from(s.links.len())
-                                .map_err(|_| invalid("link count"))?,
-                            block_height: s.height,
-                            proof_hash: foculus::signal_codec::proof_hash(s)?,
-                        },
-                    ))
+                    // keyed by bbg::signal_key(neuron, step): the record set
+                    // does not depend on this node's acceptance order
+                    Some(bbg::SignalRecord {
+                        neuron: s.neuron,
+                        network,
+                        link_count: u32::try_from(s.links.len())
+                            .map_err(|_| invalid("link count"))?,
+                        block_height: s.height,
+                        proof_hash: foculus::signal_codec::proof_hash(s)?,
+                        step: s.step,
+                    })
                 }
                 Event::Intent(_) | Event::LocalCredit { .. } => None,
             });
@@ -79,11 +78,9 @@ impl NativeNode {
             .zip(&headers)
             .map(|((event, signal), header)| match event {
                 Event::Signal(_) => {
-                    let (position, header) = header.as_ref().expect("signal header");
                     NativeChange::Signal {
                         signal: signal.as_ref().expect("signal bridge"),
-                        position: *position,
-                        header,
+                        header: header.as_ref().expect("signal header"),
                     }
                 }
                 Event::Intent(i) => NativeChange::Intent(i),

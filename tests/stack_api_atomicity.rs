@@ -195,7 +195,8 @@ fn amount_preflight_preserves_ordered_debits_and_u64_boundary_values() {
     next.links = vec![outbound, link(first.neuron, 7, 5), link(first.neuron, 9, 0)];
     graph.link(next.clone()).unwrap();
     assert_eq!(graph.bbg.state.balances[&key7], u64::MAX);
-    assert_eq!(graph.bbg.state.balances[&key8], 0);
+    // a zero balance is an absent row (bbg dimension version 3, rule 4)
+    assert!(!graph.bbg.state.balances.contains_key(&key8));
     assert_eq!(graph.chains[&first.neuron].entries.len(), 2);
     let before = snapshot(&graph, &events);
     let mut overflow = signal(first.neuron, 2, next.hash(), &[]);
