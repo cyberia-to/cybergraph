@@ -1,0 +1,12 @@
+   Compiling cyber-radio v0.1.0 (/private/tmp/cyber-content-storage-20260924/radio/iroh)
+   Compiling cybergraph v0.1.1 (/private/tmp/cyber-content-storage-20260924/cybergraph)
+   Compiling cybergraph-radio v0.1.0 (/private/tmp/cyber-content-storage-20260924/cybergraph/radio)
+    Finished `release` profile [optimized] target(s) in 8.01s
+     Running tests/transfer.rs (/tmp/cyber-content-storage-20260924/target-adapter/release/deps/transfer-0bf9a459f98a52f1)
+
+running 3 tests
+test received_bytes_cannot_publish_before_full_identity_verification ... ok
+test denied_peer_cannot_read_or_advance_receiver_coverage ... ok
+test restart_resumes_only_missing_parts_and_retains_through_the_shared_owner ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 35.53s
