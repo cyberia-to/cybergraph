@@ -18,6 +18,7 @@ a cybergraph is built from signals; a signal is built from cyberlinks; each has 
 - [signal.md](signal.md) — the broadcast unit a neuron commits
 - [cyberlink.md](cyberlink.md) — the atomic unit a signal carries
 - [intent.md](intent.md) — an unsealed signal: declared and identity-proven, not yet sealed
+- [address.md](address.md) — the four links a neuron publishes to be reachable: FOLLOW, ANTENNA, SOCKET, LOCUS
 
 ## signal fields
 

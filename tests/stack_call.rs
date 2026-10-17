@@ -16,7 +16,7 @@ mod common;
 use common::{zero_statement, default_params, make_call_formula, g};
 
 use nebu::Goldilocks;
-use nox::{reduce, Order, NounId, Tag, VecTrace, NullCalls, Outcome, ErrorKind, CallProvider, LookProvider};
+use nox::{reduce, Order, VecTrace, NullCalls, Outcome, ErrorKind, CallProvider, LookProvider, Reduction};
 use nox::trace::NoTrace;
 use zheng::{commit, verify};
 
@@ -32,8 +32,8 @@ impl LookProvider for FixedWitness42 {
 }
 
 impl<const N: usize> CallProvider<N> for FixedWitness42 {
-    fn provide(&self, order: &mut Order<N>, _tag: Goldilocks, _object: NounId) -> Option<NounId> {
-        Some(order.atom(g(42), Tag::Field).unwrap())
+    fn provide(&self, order: &mut Reduction<N>, _tag: Goldilocks, _object: Order) -> Option<Order> {
+        Some(order.atom(g(42)).unwrap())
     }
 }
 
@@ -45,8 +45,8 @@ impl LookProvider for BadWitness99 {
 }
 
 impl<const N: usize> CallProvider<N> for BadWitness99 {
-    fn provide(&self, order: &mut Order<N>, _tag: Goldilocks, _object: NounId) -> Option<NounId> {
-        Some(order.atom(g(99), Tag::Field).unwrap())
+    fn provide(&self, order: &mut Reduction<N>, _tag: Goldilocks, _object: Order) -> Option<Order> {
+        Some(order.atom(g(99)).unwrap())
     }
 }
 
@@ -56,8 +56,8 @@ impl<const N: usize> CallProvider<N> for BadWitness99 {
 /// Outcome::Ok; trace committed and verified via zheng.
 #[test]
 fn call_with_accepted_witness_roundtrip() {
-    let mut order = Order::<ORDER_SIZE>::new();
-    let obj     = order.atom(g(0), Tag::Field).unwrap();
+    let mut order = Reduction::<ORDER_SIZE>::new();
+    let obj     = order.atom(g(0)).unwrap();
     // formula: [16 [[1 call_tag] [1 0]]] — check always returns 0 (quote(0) = 0)
     let formula = make_call_formula(&mut order, 7);  // call_tag=7
 
@@ -68,7 +68,7 @@ fn call_with_accepted_witness_roundtrip() {
         Outcome::Ok(w, _) => w,
         o => panic!("expected Ok, got {:?}", o),
     };
-    let (val, _) = order.atom_value(witness_id).expect("witness must be atom");
+    let val = order.atom_value(witness_id).expect("witness must be atom");
     assert_eq!(val.as_u64(), 42, "returned witness must be 42");
 
     let stmt  = zero_statement();
@@ -82,18 +82,18 @@ fn call_with_accepted_witness_roundtrip() {
 /// the witness_object. Since 99 ≠ 0, the call pattern returns CallRejected.
 #[test]
 fn call_rejected_witness_returns_error() {
-    let mut order = Order::<ORDER_SIZE>::new();
-    let obj = order.atom(g(0), Tag::Field).unwrap();
+    let mut order = Reduction::<ORDER_SIZE>::new();
+    let obj = order.atom(g(0)).unwrap();
 
     // Build formula [16 [[1 0] [1 99]]]:  tag=quote(0), check=quote(99) → always rejects
-    let t16    = order.atom(g(16), Tag::Field).unwrap();
-    let t1     = order.atom(g(1),  Tag::Field).unwrap();
-    let zero   = order.atom(g(0),  Tag::Field).unwrap();
-    let n99    = order.atom(g(99), Tag::Field).unwrap();
-    let tag_f   = order.cell(t1, zero).unwrap();
-    let check_f = order.cell(t1, n99).unwrap();
-    let body    = order.cell(tag_f, check_f).unwrap();
-    let formula = order.cell(t16, body).unwrap();
+    let t16    = order.atom(g(16)).unwrap();
+    let t1     = order.atom(g(1)).unwrap();
+    let zero   = order.atom(g(0)).unwrap();
+    let n99    = order.atom(g(99)).unwrap();
+    let tag_f   = order.pair(t1, zero).unwrap();
+    let check_f = order.pair(t1, n99).unwrap();
+    let body    = order.pair(tag_f, check_f).unwrap();
+    let formula = order.pair(t16, body).unwrap();
 
     let mut trace = VecTrace::default();
     let outcome = reduce(&mut order, obj, formula, 1000, &BadWitness99, &mut trace);
@@ -106,8 +106,8 @@ fn call_rejected_witness_returns_error() {
 /// NullCalls provides no witness (None) → Halt.
 #[test]
 fn call_null_provider_halts() {
-    let mut order = Order::<ORDER_SIZE>::new();
-    let obj     = order.atom(g(0), Tag::Field).unwrap();
+    let mut order = Reduction::<ORDER_SIZE>::new();
+    let obj     = order.atom(g(0)).unwrap();
     let formula = make_call_formula(&mut order, 0);
 
     let outcome = reduce(&mut order, obj, formula, 1000, &NullCalls, &mut NoTrace);

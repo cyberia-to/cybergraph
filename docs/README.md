@@ -8,7 +8,7 @@ alias: cybergraph whitepaper
 
 a knowledge graph where every change is a proven computation.
 
-not "someone wrote a fact and we trust them," and not "a contract moved tokens and we re-execute to check." instead: a neuron declares what it will do, runs it, and publishes a proof that it did exactly that — and anyone holding a 32-byte root verifies the proof in microseconds, without the graph, without trusting whoever produced it. the graph is the shared, authenticated memory of the planet; cybergraph is the component that admits change to it, and admits only change that comes with proof.
+not "someone wrote a fact and we trust them," and not "a contract moved tokens and we re-execute to check." instead: a neuron declares what it will do, runs it, and publishes a proof that it did exactly that — and anyone holding a 32-byte root verifies the proof without the graph, without trusting whoever produced it. the graph is the shared, authenticated memory of the planet; cybergraph is the component that admits change to it, and admits only change that comes with proof.
 
 this document explains the architecture. the product surface is [README](../README.md); the precise structure is [specs/](../specs/).
 
