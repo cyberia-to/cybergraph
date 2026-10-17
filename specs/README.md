@@ -77,7 +77,7 @@ cybergraph and [[soma]] are one processor: cybergraph is the dumb half (store ·
 
 ## genesis
 
-- [genesis-replay.md](genesis-replay.md) — bijective replay of the bostrom burial snapshot into genesis state; the contract behind [[cyber/launch|launch]] property 14
+- [genesis-replay.md](genesis-replay.md) — the bijection between the burial snapshots and the phase-1 genesis file that soft3's genesis pipeline must satisfy; the contract behind [[cyber/launch|launch]] property 14
 
 ## staking — placing weight
 
