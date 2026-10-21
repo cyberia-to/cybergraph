@@ -21,6 +21,10 @@ pub mod api;
 #[cfg(feature = "local-storage")]
 pub mod application;
 #[cfg(feature = "local-storage")]
+pub mod catalog;
+#[cfg(feature = "local-storage")]
+pub mod files;
+#[cfg(feature = "local-storage")]
 pub mod text_archive;
 #[cfg(feature = "local-storage")]
 pub mod legacy_file;

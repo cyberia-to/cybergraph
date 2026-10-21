@@ -136,6 +136,8 @@ pub enum QueryError {
     Eval(String),
 }
 
+type Subscriber = (Filter, Box<dyn Fn(&Event) + Send + Sync>);
+
 /// The cybergraph runtime: bbg state + per-neuron chains + event bus.
 ///
 /// Scope is local-first — a cybergraph instance processes whichever cyberlinks
@@ -147,7 +149,7 @@ pub struct Cybergraph {
     /// The network this node serves. `None` accepts any network (local-first
     /// dev default); `Some(n)` enforces that each signal's resolved network is `n`.
     pub network: Option<Particle>,
-    subscribers: Vec<(Filter, Box<dyn Fn(&Event) + Send + Sync>)>,
+    subscribers: Vec<Subscriber>,
 }
 
 impl Cybergraph {
@@ -264,13 +266,11 @@ impl Cybergraph {
             signal.network
         };
         // Routing gate: a node serving a specific network rejects foreign signals.
-        if let Some(serving) = self.network {
-            if network != serving {
-                return Err(ApiError::WrongNetwork {
-                    expected: serving,
-                    got: network,
-                });
-            }
+        if let Some(serving) = self.network && network != serving {
+            return Err(ApiError::WrongNetwork {
+                expected: serving,
+                got: network,
+            });
         }
 
         let bbg_signal = bridge_to_bbg(&signal);
