@@ -164,6 +164,7 @@ fn signal_to_bbg_state_to_look_proof() {
             focus: 100_000,
             karma: 0,
             stake: 0,
+            nonce: 0,
         },
     );
     graph.link(s0).unwrap();
@@ -225,6 +226,7 @@ fn multiple_signals_same_neuron_bbg_state_consistent() {
             focus: 200_000,
             karma: 0,
             stake: 0,
+            nonce: 0,
         },
     );
 

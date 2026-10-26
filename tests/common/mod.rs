@@ -132,6 +132,7 @@ pub fn seeded_bbg_state() -> bbg::BbgState {
             focus: 50_000,
             karma: 0,
             stake: 0,
+            nonce: 0,
         },
     );
     s.insert(&bbg::Signal {

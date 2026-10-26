@@ -62,6 +62,7 @@ fn finalize_block_updates_root_and_look_proof_consistent() {
             focus: 100_000,
             karma: 0,
             stake: 0,
+            nonce: 0,
         },
     );
     bbg.insert(&one_link(n, particle(2), particle(3), 0))
@@ -129,6 +130,7 @@ fn box_moves_nullifier_double_spend_rejected() {
             focus: 100_000,
             karma: 0,
             stake: 0,
+            nonce: 0,
         },
     );
 
@@ -168,6 +170,7 @@ fn checkpoint_tracks_state_after_finalize() {
             focus: 100_000,
             karma: 0,
             stake: 0,
+            nonce: 0,
         },
     );
     bbg.insert(&one_link(n, particle(2), particle(3), 0))
@@ -200,6 +203,7 @@ fn multi_block_insert_finalize_cycle_then_look_proof() {
             focus: 200_000,
             karma: 0,
             stake: 0,
+            nonce: 0,
         },
     );
 

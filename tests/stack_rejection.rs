@@ -81,6 +81,7 @@ fn look_openings_undercount_commit_fails() {
             focus: 100_000,
             karma: 0,
             stake: 0,
+            nonce: 0,
         },
     );
     state
@@ -253,6 +254,7 @@ fn double_spend_bbg_insert_rejected() {
             focus: 100_000,
             karma: 0,
             stake: 0,
+            nonce: 0,
         },
     );
 

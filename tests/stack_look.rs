@@ -62,6 +62,7 @@ fn look_neuron_entity_to_flat_index_and_public_state_proof() {
             focus: 1000,
             karma: 0,
             stake: 0,
+            nonce: 0,
         },
     );
     state.refresh_root();
