@@ -126,6 +126,8 @@ pub fn seeded_bbg_state() -> bbg::BbgState {
     let p2: bbg::Particle = [2u8; 32];
     let p3: bbg::Particle = [3u8; 32];
     let mut s = bbg::BbgState::new();
+    // bbg 0.3: Brakedown cell proofs and their QueryContext bind the V1 leaf (bbg tests/query_authentication.rs); the default V2 trie leaf makes prove_* return None.
+    s.set_root_version(bbg::RootVersion::V1);
     s.neurons.insert(
         p1,
         bbg::types::NeuronRecord {

@@ -56,6 +56,8 @@ fn look_neuron_entity_to_flat_index_and_public_state_proof() {
     let mut key = [0u8; 32];
     key[..8].copy_from_slice(&42u64.to_le_bytes());
     let mut state = bbg::BbgState::new();
+    // bbg 0.3: cell proofs bind the V1 leaf; default V2 makes prove_* return None.
+    state.set_root_version(bbg::RootVersion::V1);
     state.neurons.insert(
         key,
         bbg::NeuronRecord {

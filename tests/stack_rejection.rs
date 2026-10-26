@@ -74,6 +74,8 @@ fn look_absent_key_returns_unavailable_no_opening() {
 fn look_openings_undercount_commit_fails() {
     // State needs two queryable time entries.
     let mut state = BbgState::new();
+    // bbg 0.3: cell proofs bind the V1 leaf; default V2 makes prove_* return None.
+    state.set_root_version(bbg::RootVersion::V1);
     let n = neuron(1);
     state.neurons.insert(
         n,

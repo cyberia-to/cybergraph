@@ -158,6 +158,8 @@ fn signal_to_bbg_state_to_look_proof() {
 
     // Exercise the actual coordinator bridge with exactly that same Signal.
     let mut graph = cybergraph::Cybergraph::new();
+    // bbg 0.3: cell proofs bind the V1 leaf; default V2 makes prove_* return None.
+    graph.bbg.state.set_root_version(bbg::RootVersion::V1);
     graph.bbg.state.neurons.insert(
         n,
         NeuronRecord {

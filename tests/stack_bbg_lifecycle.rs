@@ -55,6 +55,8 @@ fn one_link(neuron: NeuronId, from: Particle, to: Particle, height: u64) -> BbgS
 #[test]
 fn finalize_block_updates_root_and_look_proof_consistent() {
     let mut bbg = Bbg::new();
+    // bbg 0.3: Brakedown cell proofs and their QueryContext bind the V1 leaf (bbg tests/query_authentication.rs); the default V2 trie leaf makes prove_* return None.
+    bbg.state.set_root_version(bbg::RootVersion::V1);
     let n = neuron(1);
     bbg.state.neurons.insert(
         n,
@@ -196,6 +198,8 @@ fn checkpoint_tracks_state_after_finalize() {
 #[test]
 fn multi_block_insert_finalize_cycle_then_look_proof() {
     let mut bbg = Bbg::new();
+    // bbg 0.3: cell proofs bind the V1 leaf; default V2 makes prove_* return None.
+    bbg.state.set_root_version(bbg::RootVersion::V1);
     let n = neuron(1);
     bbg.state.neurons.insert(
         n,
