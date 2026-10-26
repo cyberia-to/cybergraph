@@ -35,7 +35,8 @@ fn mixed_add_hash_axis_public_execution() {
     let output = result(reduce(
         &mut arena, object, formula, 1000, &NullCalls, &mut trace,
     ));
-    assert_eq!(trace.0.iter().filter(|r| r.r()[0] == 15).count(), 25);
+    // pattern 15 under hemera 0.4: 60 round rows + 1 squeeze (nox rs/patterns/hash.rs HASH_COST)
+    assert_eq!(trace.0.iter().filter(|r| r.r()[0] == 15).count(), 61);
     assert_eq!(trace.0.iter().filter(|r| r.r()[0] == 0).count(), 1);
     let values = noun_leaves(&arena, output);
     assert_eq!(values.len(), 6);

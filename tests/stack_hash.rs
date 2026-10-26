@@ -6,7 +6,7 @@
 //! Integration tests: nox Poseidon2 hash pattern (tag 15) → zheng proof.
 //!
 //! Pipeline under test:
-//!   nox::reduce()         — executes hash formula, emits 26 trace rows (1 quote + 24 rounds + 1 squeeze)
+//!   nox::reduce()         — executes hash formula, emits 62 trace rows (1 quote + 60 rounds + 1 squeeze; hemera 0.4 profile 15)
 //!   HashAux               — rate vector (structural digest of input) for sponge replay
 //!   zheng::commit()       — folds main steps + particle CCS steps (round constraints)
 //!   zheng::verify()       — checks SuperSpartan proof
@@ -25,7 +25,7 @@ use zheng::{HashAux, commit, verify};
 
 const ORDER_SIZE: usize = 1024;
 
-/// Full pipeline: hash(quote(42)) → 26-row trace → HashAux → zheng commit → verify.
+/// Full pipeline: hash(quote(42)) → 62-row trace → HashAux → zheng commit → verify.
 #[test]
 fn hash_poseidon2_single_atom_roundtrip() {
     let mut order = Reduction::<ORDER_SIZE>::new();
@@ -38,8 +38,8 @@ fn hash_poseidon2_single_atom_roundtrip() {
     let mut trace = VecTrace::default();
     let output = common::result(reduce(&mut order, s, hash_f, 100, &NullCalls, &mut trace));
     common::verify_public_execution(&order, s, hash_f, output);
-    // 1 quote row + 24 Poseidon2 round rows + 1 squeeze row
-    assert_eq!(trace.0.len(), 26, "hash trace must be 26 rows");
+    // 1 quote row + 60 Poseidon2 round rows (hemera 0.4: 6 + 6 full, 48 partial) + 1 squeeze row
+    assert_eq!(trace.0.len(), 62, "hash trace must be 62 rows");
 
     // Rate = structural digest of s (4 field elements), zero-padded to sponge width 8.
     let in_digest = *order.digest(s).unwrap();
