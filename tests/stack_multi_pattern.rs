@@ -88,6 +88,6 @@ fn mixed_add_look_public_state_execution() {
     assert_eq!(trace.0.iter().filter(|r| r.r()[0] == 17).count(), 1);
     let openings = provider.take_look_openings();
     common::verify_look_openings(&state, &trace, &openings);
-    verify_state_execution(&arena, formula, &state, &[expected]);
+    common::verify_state_execution(&arena, formula, &state, &[expected]);
     common::refuse_recursive_look(&trace, &state, &openings);
 }

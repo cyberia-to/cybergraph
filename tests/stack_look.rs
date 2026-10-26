@@ -33,7 +33,7 @@ fn run_query(
     assert_eq!(noun_leaves(&arena, output), vec![expected]);
     let openings = provider.take_look_openings();
     verify_look_openings(state, &trace, &openings);
-    verify_state_execution(&arena, formula, state, &[expected]);
+    common::verify_state_execution(&arena, formula, state, &[expected]);
     refuse_recursive_look(&trace, state, &openings);
 }
 
@@ -99,7 +99,7 @@ fn inline_and_collected_openings_authenticate_the_same_state() {
     assert_eq!(inline[0].point, collected[0].point);
     assert_eq!(inline[0].value, collected[0].value);
     assert_eq!(inline[0].opening, collected[0].opening);
-    verify_state_execution(&arena, formula, &state, &noun_leaves(&arena, output));
+    common::verify_state_execution(&arena, formula, &state, &noun_leaves(&arena, output));
     refuse_recursive_look(&trace, &state, &inline);
     refuse_recursive_look(&trace, &state, &collected);
 }
