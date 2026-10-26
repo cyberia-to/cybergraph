@@ -127,24 +127,16 @@ fn look_openings_undercount_commit_fails() {
         common::authenticated_value(&state, &state.root(), 8, index0).unwrap(),
         common::authenticated_value(&state, &state.root(), 8, index1).unwrap(),
     ];
-    // Disabled: zheng 0.4 replaced prove_state_execution/StateStatement::verify (lookup closure) with certified StateEvidence, which needs a RootVersion::V1 BbgState (default is V2; see bbg tests/look_e2e.rs).
-    #[cfg(any())]
-    {
-        let (mut statement, proof) = common::verify_state_execution(&order, program, &state, &expected);
-        assert_eq!(statement.reads.len(), 2);
-        statement.reads.truncate(1);
-        assert!(
-            statement
-                .verify(&proof, &mut |ns, index| common::authenticated_value(
-                    &state,
-                    &state.root(),
-                    ns,
-                    index
-                ))
-                .is_err(),
-            "current public state proof rejects an omitted read"
-        );
-    }
+    let (mut statement, certificate, evidence) =
+        common::verify_state_execution(&order, program, &state, &expected);
+    assert_eq!(statement.reads.len(), 2);
+    statement.reads.truncate(1);
+    assert!(
+        statement
+            .verify_certificate(&certificate, &evidence)
+            .is_err(),
+        "current public state proof rejects an omitted read"
+    );
 
     // The recursive profile refuses even before cardinality gadgets run.
     all_openings.truncate(1);

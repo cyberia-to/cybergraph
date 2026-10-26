@@ -241,8 +241,21 @@ pub fn authenticated_value(
     ))
 }
 
-// Disabled: zheng 0.4 replaced prove_state_execution/StateStatement::verify (lookup closure) with certified StateEvidence, which needs a RootVersion::V1 BbgState (default is V2; see bbg tests/look_e2e.rs).
-#[cfg(any())]
+/// Certify the public state execution of `formula` against the bbg state and
+/// check every property the certified-state profile (zheng 0.4 profile v3,
+/// `StateStatement::verify_certificate`) guarantees:
+///
+/// - the public output equals `expected`;
+/// - the honest certificate verifies against the evidence;
+/// - every state-root limb is bound (the evidence is authenticated under the
+///   statement's own root, so a moved limb fails);
+/// - a tampered output, and a tampered table field in the evidence, are rejected;
+/// - evidence without its tables (absent authentication) is rejected.
+///
+/// The statement carries no caller context under the public profiles (zheng
+/// `execution/state.rs` module docs), so there is no context to tamper with.
+/// The state must be `RootVersion::V1` (the look argument opens the Brakedown
+/// cell of the dimension polynomial).
 pub fn verify_state_execution<const N: usize>(
     arena: &Reduction<N>,
     formula: Order,
@@ -250,44 +263,55 @@ pub fn verify_state_execution<const N: usize>(
     expected: &[u64],
 ) -> (
     zheng::execution::state::StateStatement,
-    zheng::execution::DirectProof,
+    zheng::execution::Certificate,
+    zheng::execution::state_evidence::StateEvidence,
 ) {
-    let root = state.root();
-    let limbs = bbg::dim::goldilocks_from_bytes32(&root).map(|v| v.as_u64());
-    let mut lookup = |ns, index| authenticated_value(state, &root, ns, index);
-    let (statement, proof) = zheng::execution::state::prove_state_execution(
-        &execution_noun(arena, formula),
-        &[],
-        10_000,
-        limbs,
-        true,
-        *hemera::hash(b"cybergraph/stack-state-test/1").as_bytes(),
-        &mut lookup,
-    )
-    .expect("public state execution with authenticated BBG coordinates");
+    use zheng::execution::state::certify_state_execution;
+    // Public dimensions 0..=9 are the namespaces a state read may name.
+    let namespaces: Vec<u64> = (0..=9).collect();
+    let cert = bbg::certificate::StateCertificate::from_state(state, &namespaces)
+        .expect("state certificate for the public dimensions");
+    let evidence = cert.evidence().expect("state evidence from the certificate");
+    let root = cert.root().expect("certificate root");
+    let limbs = bbg::dim::goldilocks_from_bytes32(&state.root()).map(|v| v.as_u64());
+    assert_eq!(root, limbs, "certificate root is the state root");
+    let (statement, certificate) =
+        certify_state_execution(&execution_noun(arena, formula), &[], 10_000, true, &evidence)
+            .expect("public state execution certified against BBG evidence");
+    assert_eq!(statement.state_root, root);
     assert_eq!(statement.execution.public_output, expected);
     statement
-        .verify(&proof, &mut lookup)
+        .verify_certificate(&certificate, &evidence)
         .expect("public state execution verifies");
     for i in 0..4 {
         let mut wrong = statement.clone();
         wrong.state_root[i] = (wrong.state_root[i] + 1) % nebu::field::P;
         assert!(
-            wrong.verify(&proof, &mut lookup).is_err(),
+            wrong.verify_certificate(&certificate, &evidence).is_err(),
             "every state-root limb is bound"
         );
     }
     let mut wrong = statement.clone();
-    wrong.context[0] ^= 1;
+    wrong.execution.public_output[0] = (wrong.execution.public_output[0] + 1) % nebu::field::P;
     assert!(
-        wrong.verify(&proof, &mut lookup).is_err(),
-        "execution context is bound"
+        wrong.verify_certificate(&certificate, &evidence).is_err(),
+        "public output is bound"
     );
+    let mut forged = evidence.clone();
+    let table = forged.tables.last_mut().expect("evidence carries tables");
+    let last = table.fields.last_mut().expect("table has fields");
+    *last = (*last + 1) % nebu::field::P;
     assert!(
-        statement.verify(&proof, &mut |_, _| None).is_err(),
+        statement.verify_certificate(&certificate, &forged).is_err(),
+        "a table that does not match its root leaf must fail"
+    );
+    let mut bare = evidence.clone();
+    bare.tables.clear();
+    assert!(
+        statement.verify_certificate(&certificate, &bare).is_err(),
         "missing authentication must fail"
     );
-    (statement, proof)
+    (statement, certificate, evidence)
 }
 
 pub fn verify_look_openings(

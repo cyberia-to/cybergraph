@@ -33,8 +33,6 @@ fn run_query(
     assert_eq!(noun_leaves(&arena, output), vec![expected]);
     let openings = provider.take_look_openings();
     verify_look_openings(state, &trace, &openings);
-    // Disabled: zheng 0.4 replaced prove_state_execution/StateStatement::verify (lookup closure) with certified StateEvidence, which needs a RootVersion::V1 BbgState (default is V2; see bbg tests/look_e2e.rs).
-    #[cfg(any())]
     verify_state_execution(&arena, formula, state, &[expected]);
     refuse_recursive_look(&trace, state, &openings);
 }
@@ -101,8 +99,6 @@ fn inline_and_collected_openings_authenticate_the_same_state() {
     assert_eq!(inline[0].point, collected[0].point);
     assert_eq!(inline[0].value, collected[0].value);
     assert_eq!(inline[0].opening, collected[0].opening);
-    // Disabled: zheng 0.4 replaced prove_state_execution/StateStatement::verify (lookup closure) with certified StateEvidence, which needs a RootVersion::V1 BbgState (default is V2; see bbg tests/look_e2e.rs).
-    #[cfg(any())]
     verify_state_execution(&arena, formula, &state, &noun_leaves(&arena, output));
     refuse_recursive_look(&trace, &state, &inline);
     refuse_recursive_look(&trace, &state, &collected);

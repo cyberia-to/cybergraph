@@ -197,8 +197,6 @@ fn signal_to_bbg_state_to_look_proof() {
 
     let output = common::result(outcome);
     common::verify_look_openings(&state, &trace, &look_openings);
-    // Disabled: zheng 0.4 replaced prove_state_execution/StateStatement::verify (lookup closure) with certified StateEvidence, which needs a RootVersion::V1 BbgState (default is V2; see bbg tests/look_e2e.rs).
-    #[cfg(any())]
     common::verify_state_execution(
         &order,
         formula,

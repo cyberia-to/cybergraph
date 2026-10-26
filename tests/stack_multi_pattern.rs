@@ -88,8 +88,6 @@ fn mixed_add_look_public_state_execution() {
     assert_eq!(trace.0.iter().filter(|r| r.r()[0] == 17).count(), 1);
     let openings = provider.take_look_openings();
     common::verify_look_openings(&state, &trace, &openings);
-    // Disabled: zheng 0.4 replaced prove_state_execution/StateStatement::verify (lookup closure) with certified StateEvidence, which needs a RootVersion::V1 BbgState (default is V2; see bbg tests/look_e2e.rs).
-    #[cfg(any())]
     verify_state_execution(&arena, formula, &state, &[expected]);
     common::refuse_recursive_look(&trace, &state, &openings);
 }
