@@ -30,8 +30,11 @@ rustix = { version = "1", features = ["fs"], optional = true }
 [dev-dependencies]
 fjall = { version = "2", path = "../bbg/rs/vendor/fjall" }
 lens = { package = "cyber-lens", version = "0.2", path = "../lens/src" }
-# tests only: the stack tests assert the retired 0.3 fold API refuses
-# recursive TensorMerkle openings; zheng 0.4 keeps that API behind `legacy`.
+# tests only: the stack tests call foculus::prove_pay/verify_pay (behind
+# foculus `legacy-proofs`) and use zheng's retired 0.3 fold API directly
+# (LookOpening etc.; they assert it refuses recursive TensorMerkle openings).
+# zheng 0.4 keeps that API behind `legacy`. Dev-only: never a normal dep.
+foculus = { version = "0.1.3", path = "../foculus", default-features = false, features = ["legacy-proofs"] }
 zheng = { version = "0.4", path = "../zheng/rs", features = ["legacy"] }
 
 [features]
