@@ -156,6 +156,13 @@ an inf query is a derivation tree over the relations above. for queries that nee
 
 interactive queries skip the proof step and run directly through CozoDB. the same inf script produces the same answer either way — provability is an opt-in cost at submission time.
 
+complete recovery queries bind the declared input scope, its authenticated
+coverage and the exact result at one root. private retrieval applies the same
+contract to encrypted detection and retrieval computations. the composition and
+component responsibilities are recorded in
+[verifiable private retrieval](../docs/private-retrieval.md); complete evaluation
+semantics belong to [inf](../../inf/specs/proof.md#complete-input-coverage).
+
 ## what is NOT in this spec
 
 - language syntax (rules, atoms, `:=`, `<~`, `?`, query options) — [[inf queries]]

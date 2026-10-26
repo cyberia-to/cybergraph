@@ -78,8 +78,8 @@ impl<'a> RelationSource for BbgSource<'a> {
             "karma" => Box::new(self.state.neurons.iter().map(|(id, r)| {
                 vec![Value::hash(*id), int(r.karma)]
             })),
-            "signals" => Box::new(self.state.signals.iter().map(|(step, r)| {
-                vec![int(*step), Value::hash(r.neuron), int(r.link_count as u64), int(r.block_height)]
+            "signals" => Box::new(self.state.signals.iter().map(|(_, r)| {
+                vec![int(r.step), Value::hash(r.neuron), int(r.link_count as u64), int(r.block_height)]
             })),
             _ => Box::new(std::iter::empty()),
         }
@@ -106,7 +106,7 @@ mod tests {
 
     fn seeded() -> Bbg {
         let mut bbg = Bbg::new();
-        bbg.state.neurons.insert(neuron(1), bbg::types::NeuronRecord { focus: 100, karma: 50, stake: 7 });
+        bbg.state.neurons.insert(neuron(1), bbg::types::NeuronRecord { focus: 100, karma: 50, stake: 7, nonce: 0 });
         bbg.insert(&bbg::Signal {
             neuron: neuron(1),
             links: vec![bbg::Cyberlink {

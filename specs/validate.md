@@ -14,7 +14,7 @@ the full set of conditions a signal must satisfy. each is checked one way — at
 
 | criterion | what must hold | checked by | owner |
 |---|---|---|---|
-| availability | each referenced particle's content is published and retrievable (and hashes to its id) | availability proof (DAS) | [[foculus]] (DAS), [[bbg]] files |
+| availability | each referenced file's data is published and retrievable (and hashes to its particle) | availability proof (DAS) | [[foculus]] (DAS), [[bbg]] files |
 | signature | valid signature from ν over $H(\vec\ell \,\|\, \Delta\phi^* \,\|\, t)$ | σ | [[mudra]] |
 | cyberlink validity | each $\ell \in \vec\ell$ has valid particle references and is well-formed | σ | [[hemera]] |
 | box unspent | each spent [[box]]'s nullifier is live — $N(n) \neq 0$ (opening into $N(x)$) | σ | [[bbg]] |
@@ -35,7 +35,7 @@ every criterion that can fail is a reject reason — the verdicts the gate retur
 
 | reason | failed criterion |
 |---|---|
-| `Unavailable` | a referenced particle's content is not available |
+| `Unavailable` | a referenced file's data is not available |
 | `BadProof` | σ does not verify, or any condition it attests fails |
 | `InsufficientFocus` | focus sufficiency fails |
 | `BadOwnership` / `DoubleSpend` | box not owned by ν / nullifier reused |

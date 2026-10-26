@@ -14,23 +14,32 @@
 
 mod common;
 
-use common::{bbg_object_from_state, default_params, make_look_formula, zero_statement};
+use common::{bbg_object_from_state, make_look_formula};
 
-use nox::{reduce, VecTrace, Outcome, Reduction};
-use zheng::{commit, verify};
-use bbg::{Bbg, Signal as BbgSignal, Cyberlink as BbgCyberlink, Particle, NeuronId};
 use bbg::types::NeuronRecord;
+use bbg::{Bbg, Cyberlink as BbgCyberlink, NeuronId, Particle, Signal as BbgSignal};
 use bbg::{BoxMove, InsertError, ProofLookProvider};
+use nox::{Outcome, Reduction, VecTrace, reduce};
 
 const ORDER_SIZE: usize = 1024;
 
-fn neuron(seed: u8) -> NeuronId  { [seed; 32] }
-fn particle(seed: u8) -> Particle { [seed; 32] }
+fn neuron(seed: u8) -> NeuronId {
+    [seed; 32]
+}
+fn particle(seed: u8) -> Particle {
+    [seed; 32]
+}
 
 fn one_link(neuron: NeuronId, from: Particle, to: Particle, height: u64) -> BbgSignal {
     BbgSignal {
         neuron,
-        links:     vec![BbgCyberlink { from, to, token: particle(0), amount: 1, valence: 1 }],
+        links: vec![BbgCyberlink {
+            from,
+            to,
+            token: particle(0),
+            amount: 1,
+            valence: 1,
+        }],
         box_moves: vec![],
         height,
     }
@@ -44,38 +53,67 @@ fn one_link(neuron: NeuronId, from: Particle, to: Particle, height: u64) -> BbgS
 /// index has a snapshot at the previous height, and a ProofLookProvider built
 /// from the post-finalize state can produce a verifiable opening.
 #[test]
-#[ignore = "zheng::commit rejects any non-empty axis_openings or look_openings with UnsupportedRecursiveOpening (zheng/rs/src/lib.rs) — the retired Tensor recursive gadgets cannot verify authenticated TensorMerkle columns; pre-existing to this migration, row 39"]
 fn finalize_block_updates_root_and_look_proof_consistent() {
     let mut bbg = Bbg::new();
     let n = neuron(1);
-    bbg.state.neurons.insert(n, NeuronRecord { focus: 100_000, karma: 0, stake: 0 });
-    bbg.insert(&one_link(n, particle(2), particle(3), 0)).unwrap();
+    bbg.state.neurons.insert(
+        n,
+        NeuronRecord {
+            focus: 100_000,
+            karma: 0,
+            stake: 0,
+        },
+    );
+    bbg.insert(&one_link(n, particle(2), particle(3), 0))
+        .unwrap();
 
     let root_before = bbg.state.root();
     bbg.finalize_block();
 
     // finalize_block records time[0]=root_before, recomputes root, increments height.
     assert_eq!(bbg.state.height, 1);
-    assert_ne!(bbg.state.root(), root_before, "root must change after finalize");
-    assert!(bbg.state.time.contains_key(&0), "time[0] must exist after finalize");
+    assert_ne!(
+        bbg.state.root(),
+        root_before,
+        "root must change after finalize"
+    );
+    assert!(
+        bbg.state.time.contains_key(&0),
+        "time[0] must exist after finalize"
+    );
 
     // Build look proof against the post-finalize state.
     let prov = ProofLookProvider::new(&bbg.state);
     let mut order = Reduction::<ORDER_SIZE>::new();
     let bbg_obj = bbg_object_from_state(&mut order, &bbg.state);
-    let formula = make_look_formula(&mut order, 8, 0);  // Dim::Time=8, height=0
+    let index = bbg::prove_time(&bbg.state, 0)
+        .unwrap()
+        .context
+        .unwrap()
+        .index;
+    let formula = make_look_formula(&mut order, 8, index);
 
     let mut trace = VecTrace::default();
     let outcome = reduce(&mut order, bbg_obj, formula, 1000, &prov, &mut trace);
-    assert!(matches!(outcome, Outcome::Ok(_, _)), "look(Time, 0) must succeed");
+    assert!(
+        matches!(outcome, Outcome::Ok(_, _)),
+        "look(Time, 0) must succeed"
+    );
 
     let look_openings = prov.take_look_openings();
     assert_eq!(look_openings.len(), 1);
 
-    let stmt  = zero_statement();
-    let proof = commit(&trace, &[], &[], &look_openings, &stmt, &default_params()).unwrap();
-    verify(&proof, &stmt, &default_params())
-        .expect("finalize+look proof must verify");
+    let output = common::result(outcome);
+    common::verify_look_openings(&bbg.state, &trace, &look_openings);
+    // Disabled: zheng 0.4 replaced prove_state_execution/StateStatement::verify (lookup closure) with certified StateEvidence, which needs a RootVersion::V1 BbgState (default is V2; see bbg tests/look_e2e.rs).
+    #[cfg(any())]
+    common::verify_state_execution(
+        &order,
+        formula,
+        &bbg.state,
+        &common::noun_leaves(&order, output),
+    );
+    common::refuse_recursive_look(&trace, &bbg.state, &look_openings);
 }
 
 // ── box moves ─────────────────────────────────────────────────────────────────
@@ -85,18 +123,29 @@ fn finalize_block_updates_root_and_look_proof_consistent() {
 fn box_moves_nullifier_double_spend_rejected() {
     let mut bbg = Bbg::new();
     let n = neuron(1);
-    bbg.state.neurons.insert(n, NeuronRecord { focus: 100_000, karma: 0, stake: 0 });
+    bbg.state.neurons.insert(
+        n,
+        NeuronRecord {
+            focus: 100_000,
+            karma: 0,
+            stake: 0,
+        },
+    );
 
     let nullifier = particle(77);
     let mk = |commitment| BbgSignal {
-        neuron:    n,
-        links:     vec![],
-        box_moves: vec![BoxMove { nullifier, commitment }],
-        height:    0,
+        neuron: n,
+        links: vec![],
+        box_moves: vec![BoxMove {
+            nullifier,
+            commitment,
+        }],
+        height: 0,
     };
 
     // First spend: nullifier not yet recorded → Ok.
-    bbg.insert(&mk(Some((particle(88), 500)))).expect("first box spend must succeed");
+    bbg.insert(&mk(Some((particle(88), 500))))
+        .expect("first box spend must succeed");
 
     // Second spend: same nullifier → DoubleSpend.
     assert_eq!(
@@ -113,15 +162,28 @@ fn box_moves_nullifier_double_spend_rejected() {
 fn checkpoint_tracks_state_after_finalize() {
     let mut bbg = Bbg::new();
     let n = neuron(1);
-    bbg.state.neurons.insert(n, NeuronRecord { focus: 100_000, karma: 0, stake: 0 });
-    bbg.insert(&one_link(n, particle(2), particle(3), 0)).unwrap();
+    bbg.state.neurons.insert(
+        n,
+        NeuronRecord {
+            focus: 100_000,
+            karma: 0,
+            stake: 0,
+        },
+    );
+    bbg.insert(&one_link(n, particle(2), particle(3), 0))
+        .unwrap();
 
     bbg.finalize_block();
 
-    assert_eq!(bbg.checkpoint.root, bbg.state.root(),
-        "checkpoint.root must match state.root after finalize");
-    assert_eq!(bbg.checkpoint.height, bbg.state.height,
-        "checkpoint.height must match state.height after finalize");
+    assert_eq!(
+        bbg.checkpoint.root,
+        bbg.state.root(),
+        "checkpoint.root must match state.root after finalize"
+    );
+    assert_eq!(
+        bbg.checkpoint.height, bbg.state.height,
+        "checkpoint.height must match state.height after finalize"
+    );
 }
 
 // ── multi-block cycle ─────────────────────────────────────────────────────────
@@ -129,19 +191,27 @@ fn checkpoint_tracks_state_after_finalize() {
 /// Two insert+finalize cycles produce time entries at heights 0 and 1.
 /// A look proof at time[1] (the second snapshot) verifies.
 #[test]
-#[ignore = "zheng::commit rejects any non-empty axis_openings or look_openings with UnsupportedRecursiveOpening (zheng/rs/src/lib.rs) — the retired Tensor recursive gadgets cannot verify authenticated TensorMerkle columns; pre-existing to this migration, row 39"]
 fn multi_block_insert_finalize_cycle_then_look_proof() {
     let mut bbg = Bbg::new();
     let n = neuron(1);
-    bbg.state.neurons.insert(n, NeuronRecord { focus: 200_000, karma: 0, stake: 0 });
+    bbg.state.neurons.insert(
+        n,
+        NeuronRecord {
+            focus: 200_000,
+            karma: 0,
+            stake: 0,
+        },
+    );
 
     // Block 0
-    bbg.insert(&one_link(n, particle(2), particle(3), 0)).unwrap();
-    bbg.finalize_block();  // time[0] recorded; height → 1
+    bbg.insert(&one_link(n, particle(2), particle(3), 0))
+        .unwrap();
+    bbg.finalize_block(); // time[0] recorded; height → 1
 
     // Block 1
-    bbg.insert(&one_link(n, particle(4), particle(5), 1)).unwrap();
-    bbg.finalize_block();  // time[1] recorded; height → 2
+    bbg.insert(&one_link(n, particle(4), particle(5), 1))
+        .unwrap();
+    bbg.finalize_block(); // time[1] recorded; height → 2
 
     assert_eq!(bbg.state.height, 2);
     assert!(bbg.state.time.contains_key(&0), "time[0] must exist");
@@ -151,17 +221,32 @@ fn multi_block_insert_finalize_cycle_then_look_proof() {
     let prov = ProofLookProvider::new(&bbg.state);
     let mut order = Reduction::<ORDER_SIZE>::new();
     let bbg_obj = bbg_object_from_state(&mut order, &bbg.state);
-    let formula = make_look_formula(&mut order, 8, 1);  // Dim::Time=8, height=1
+    let index = bbg::prove_time(&bbg.state, 1)
+        .unwrap()
+        .context
+        .unwrap()
+        .index;
+    let formula = make_look_formula(&mut order, 8, index);
 
     let mut trace = VecTrace::default();
     let outcome = reduce(&mut order, bbg_obj, formula, 1000, &prov, &mut trace);
-    assert!(matches!(outcome, Outcome::Ok(_, _)), "look(Time, 1) must succeed");
+    assert!(
+        matches!(outcome, Outcome::Ok(_, _)),
+        "look(Time, 1) must succeed"
+    );
 
     let look_openings = prov.take_look_openings();
     assert_eq!(look_openings.len(), 1);
 
-    let stmt  = zero_statement();
-    let proof = commit(&trace, &[], &[], &look_openings, &stmt, &default_params()).unwrap();
-    verify(&proof, &stmt, &default_params())
-        .expect("multi-block lifecycle look proof must verify");
+    let output = common::result(outcome);
+    common::verify_look_openings(&bbg.state, &trace, &look_openings);
+    // Disabled: zheng 0.4 replaced prove_state_execution/StateStatement::verify (lookup closure) with certified StateEvidence, which needs a RootVersion::V1 BbgState (default is V2; see bbg tests/look_e2e.rs).
+    #[cfg(any())]
+    common::verify_state_execution(
+        &order,
+        formula,
+        &bbg.state,
+        &common::noun_leaves(&order, output),
+    );
+    common::refuse_recursive_look(&trace, &bbg.state, &look_openings);
 }

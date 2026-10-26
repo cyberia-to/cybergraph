@@ -23,7 +23,7 @@
 //!   query(inf_script)    → run an inf (CozoScript datalog) query over the
 //!                          relations cybergraph exposes — schema in specs/query.md.
 
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet, btree_map::Entry};
 
 use bbg::{Bbg, IntentRecord, NeuronId, Particle};
 use foculus::{ChainError, Signal, SignalChain};
@@ -104,6 +104,8 @@ pub enum ApiError {
     SyncRejected(ChainError),
     /// Bbg rejected the cyberlinks (e.g., DoubleSpend).
     BbgRejected(bbg::InsertError),
+    /// Applying the ordered link batch would overflow a public u64 balance.
+    AmountOverflow,
     /// Intent key not found (seal called for unknown intent).
     UnknownIntent(Particle),
     /// Signal's resolved destination network does not match the network this
@@ -242,10 +244,12 @@ impl Cybergraph {
     ///   2. state application — cyberlinks land in bbg via `insert` (gate: double-spend)
     ///   3. header record — the signal header enters the signals dimension
     ///
-    /// Release 0: `box_moves` is always empty (CyberlinkRecord carries none), so
-    /// `insert` is infallible here and the partial-failure window between step 1
-    /// and step 2 cannot open. When conviction spends arrive (Release 1), this
-    /// must become a validate-then-apply two-phase commit.
+    /// Preflight same-batch nullifier uniqueness and arithmetic before mutation.
+    /// BBG's only returned insertion error is structural DoubleSpend, checked
+    /// before it changes state. If that owner rejects, remove the just-appended
+    /// chain entry (and a newly created chain) before returning. Exclusive &mut
+    /// access keeps the temporary append unobservable; events follow success.
+    /// This in-memory boundary carries no disk durability or consensus claim.
     fn commit_signal(&mut self, signal: Signal) -> Result<(NeuronId, u64), ApiError> {
         let neuron = signal.neuron;
         let step = signal.step;
@@ -270,31 +274,78 @@ impl Cybergraph {
         }
 
         let bbg_signal = bridge_to_bbg(&signal);
+        self.validate_bbg_batch(&bbg_signal)?;
 
         // 1. ordering gate
+        let new_chain = !self.chains.contains_key(&neuron);
         self.chain_append(signal)?;
         // 2. apply cyberlinks to authenticated state
-        self.bbg
-            .insert(&bbg_signal)
-            .map_err(ApiError::BbgRejected)?;
-        // 3. record the signal header
-        self.bbg.apply_signal_record(
+        if let Err(error) = self.bbg.insert(&bbg_signal) {
+            if new_chain {
+                self.chains.remove(&neuron);
+            } else {
+                self.chains
+                    .get_mut(&neuron)
+                    .expect("appended chain exists")
+                    .entries
+                    .remove(&step);
+            }
+            return Err(ApiError::BbgRejected(error));
+        }
+        // 3. record the signal header at bbg::signal_key(neuron, step)
+        self.bbg.apply_signal_record(bbg::SignalRecord {
+            neuron,
+            network,
+            link_count,
+            block_height: height,
+            proof_hash: [0u8; 32],
             step,
-            bbg::SignalRecord {
-                neuron,
-                network,
-                link_count,
-                block_height: height,
-                proof_hash: [0u8; 32],
-            },
-        );
+        });
 
         Ok((neuron, step))
     }
 
     fn chain_append(&mut self, signal: Signal) -> Result<(), ApiError> {
-        let chain = self.chains.entry(signal.neuron).or_default();
-        chain.append(signal).map_err(ApiError::SyncRejected)
+        match self.chains.entry(signal.neuron) {
+            Entry::Occupied(mut entry) => entry
+                .get_mut()
+                .append(signal)
+                .map_err(ApiError::SyncRejected),
+            Entry::Vacant(entry) => {
+                let mut chain = SignalChain::new();
+                chain.append(signal).map_err(ApiError::SyncRejected)?;
+                entry.insert(chain);
+                Ok(())
+            }
+        }
+    }
+
+    /// BBG accepts prevalidated inputs. Preserve its ordered credit/debit and
+    /// saturating debit semantics while rejecting an unrepresentable credit.
+    /// The temporary map contains only balances touched by this operation.
+    fn validate_bbg_batch(&self, signal: &bbg::Signal) -> Result<(), ApiError> {
+        let mut nullifiers = BTreeSet::new();
+        for movement in &signal.box_moves {
+            if !nullifiers.insert(movement.nullifier) {
+                return Err(ApiError::BbgRejected(bbg::InsertError::DoubleSpend));
+            }
+        }
+        let mut balances = BTreeMap::new();
+        for link in &signal.links {
+            let to = bbg::balance_key(&link.to, &link.token);
+            let credit = balances
+                .entry(to)
+                .or_insert_with(|| self.bbg.state.balances.get(&to).copied().unwrap_or(0));
+            *credit = credit
+                .checked_add(link.amount)
+                .ok_or(ApiError::AmountOverflow)?;
+            let from = bbg::balance_key(&link.from, &link.token);
+            let debit = balances
+                .entry(from)
+                .or_insert_with(|| self.bbg.state.balances.get(&from).copied().unwrap_or(0));
+            *debit = debit.saturating_sub(link.amount);
+        }
+        Ok(())
     }
 
     fn emit(&self, event: Event) {
@@ -446,7 +497,7 @@ mod tests {
         let key = g.intend(intent(n(1), 0, p(2))).unwrap();
         let s = empty_signal(n(1), 0, [0u8; 32]);
         g.seal(key, s).unwrap();
-        assert!(g.bbg.state.signals.contains_key(&0));
+        assert!(g.bbg.state.signals.contains_key(&bbg::signal_key(&n(1), 0)));
     }
 
     #[test]
@@ -454,7 +505,29 @@ mod tests {
         let mut g = Cybergraph::new();
         let s = empty_signal(n(1), 0, [0u8; 32]);
         g.link(s).unwrap();
-        assert!(g.bbg.state.signals.contains_key(&0));
+        assert!(g.bbg.state.signals.contains_key(&bbg::signal_key(&n(1), 0)));
+    }
+
+    /// Launch row 9: two neurons' first signals are both step 0. Both headers
+    /// persist, and the order a node received them in does not move the root.
+    #[test]
+    fn first_signals_of_two_neurons_both_persist_in_any_order() {
+        let link_both = |order: [u8; 2]| {
+            let mut g = Cybergraph::new();
+            for i in order {
+                g.link(one_link_signal(n(i), 0, [0u8; 32], p(10 + i), p(20))).unwrap();
+            }
+            g
+        };
+        let (ab, ba) = (link_both([1, 2]), link_both([2, 1]));
+        for g in [&ab, &ba] {
+            assert_eq!(g.bbg.state.signals.len(), 2);
+            for i in [1, 2] {
+                let record = g.bbg.state.signals.get(&bbg::signal_key(&n(i), 0)).unwrap();
+                assert_eq!((record.neuron, record.step), (n(i), 0));
+            }
+        }
+        assert_eq!(ab.bbg.state.root(), ba.bbg.state.root());
     }
 
     #[test]
