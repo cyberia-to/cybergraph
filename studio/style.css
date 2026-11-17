@@ -1,0 +1,477 @@
+/* studio: the dark face of cyberia.my, only what this app uses */
+:root {
+    --black: #000000;
+    --dark: #0a0a0a;
+    --green: #00fe00;
+    --cyan: #00acff;
+    --yellow: #fcf000;
+    --red: #ff3b3b;
+    --dim: #1a1a1a;
+    --muted: #333333;
+    --soft: #8a8a8a;
+    --text: #d7d7d7;
+}
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+html,
+body {
+    background: var(--black);
+    color: var(--text);
+    font-family: "Play", system-ui, sans-serif;
+    font-size: 15px;
+    line-height: 1.45;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+}
+a {
+    color: var(--cyan);
+    text-decoration: none;
+}
+a:hover {
+    color: var(--green);
+}
+button,
+input,
+select {
+    font: inherit;
+    color: inherit;
+}
+.hidden {
+    display: none;
+}
+.dim {
+    color: var(--soft);
+}
+
+/* header: brand, three tabs, the neuron in one line */
+.top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px 20px;
+    flex-wrap: wrap;
+    padding: 10px 16px;
+    border-bottom: 1px solid #151515;
+}
+.top-row {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    min-width: 0;
+}
+.brand {
+    color: var(--green);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    font-size: 17px;
+}
+.tabs {
+    display: flex;
+    gap: 4px;
+}
+.tab {
+    color: var(--soft);
+    padding: 6px 10px;
+    border-radius: 6px;
+}
+.tab:hover {
+    color: var(--text);
+}
+.tab-on {
+    color: var(--text);
+    background: var(--dim);
+}
+.neuron {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    min-width: 0;
+    max-width: 100%;
+    background: none;
+    border: 0;
+    cursor: pointer;
+    padding: 4px 0;
+}
+.neuron-lab {
+    color: var(--soft);
+    font-size: 12px;
+    flex-shrink: 0;
+}
+.neuron-id {
+    font-family: ui-monospace, Menlo, monospace;
+    font-size: 12px;
+    color: var(--text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.neuron:hover .neuron-id {
+    color: var(--green);
+}
+
+/* layout */
+.page {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 16px;
+}
+.cols {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 16px;
+    align-items: start;
+}
+.panel {
+    background: var(--dark);
+    border: 1px solid var(--dim);
+    border-radius: 10px;
+    padding: 16px;
+    min-width: 0;
+}
+.h {
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+}
+.lead {
+    color: var(--soft);
+    margin: 2px 0 14px;
+}
+.local {
+    color: var(--yellow);
+    font-size: 13px;
+    margin: 2px 0 12px;
+}
+.empty {
+    color: var(--soft);
+    margin-top: 8px;
+}
+
+/* form */
+.field {
+    margin-bottom: 14px;
+    border-radius: 8px;
+}
+.field-over {
+    outline: 1px dashed var(--green);
+    outline-offset: 4px;
+}
+.lab {
+    display: block;
+    color: var(--soft);
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    margin-bottom: 4px;
+}
+.field-row {
+    display: flex;
+    gap: 6px;
+}
+.inp {
+    flex: 1;
+    min-width: 0;
+    width: 100%;
+    background: var(--black);
+    border: 1px solid var(--muted);
+    border-radius: 6px;
+    padding: 9px 10px;
+    font-size: 16px;
+    outline: none;
+}
+.inp:focus {
+    border-color: var(--green);
+}
+.inp-coin {
+    flex: 0 0 96px;
+    text-transform: uppercase;
+}
+.inp-sel {
+    flex: 0 1 140px;
+    font-size: 14px;
+    padding: 6px 8px;
+}
+.hint {
+    color: var(--soft);
+    font-size: 12px;
+    margin-top: 4px;
+    overflow-wrap: anywhere;
+}
+.segs {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+}
+.segs-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.seg {
+    background: var(--black);
+    border: 1px solid var(--muted);
+    border-radius: 6px;
+    padding: 8px 6px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+.seg-v {
+    font-weight: 700;
+    font-size: 16px;
+}
+.seg-w {
+    font-size: 11px;
+    color: var(--soft);
+    text-align: center;
+}
+.seg-on {
+    border-color: var(--green);
+    background: #031a03;
+}
+.seg-on .seg-v {
+    color: var(--green);
+}
+.btn,
+.btn-s {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--dim);
+    border: 1px solid var(--muted);
+    border-radius: 6px;
+    color: var(--text);
+    cursor: pointer;
+    white-space: nowrap;
+}
+.btn {
+    padding: 10px 16px;
+}
+.btn-s {
+    padding: 6px 10px;
+    font-size: 13px;
+}
+.btn:hover,
+.btn-s:hover {
+    border-color: var(--green);
+    color: var(--green);
+}
+.btn-s:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    border-color: var(--muted);
+    color: var(--text);
+}
+.btn-main {
+    width: 100%;
+    background: var(--green);
+    border-color: var(--green);
+    color: #000;
+    font-weight: 700;
+}
+.btn-main:hover {
+    color: #000;
+    filter: brightness(0.9);
+}
+.msg {
+    font-size: 13px;
+    margin: 0 0 10px;
+}
+.msg-err {
+    color: var(--red);
+}
+.msg-ok {
+    color: var(--green);
+}
+
+/* links of a signal */
+.legs {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.leg,
+.intent {
+    background: var(--black);
+    border: 1px solid var(--dim);
+    border-radius: 8px;
+    padding: 9px 10px;
+    min-width: 0;
+}
+.leg {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.leg-body {
+    flex: 1;
+    min-width: 0;
+}
+.leg-link {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 2px 8px;
+}
+.pt {
+    color: #fff;
+    overflow-wrap: anywhere;
+}
+.arrow {
+    color: var(--green);
+}
+.leg-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px 12px;
+    color: var(--soft);
+    font-size: 12px;
+    margin-top: 2px;
+}
+.val-pos {
+    color: var(--green);
+}
+.val-neg {
+    color: var(--red);
+}
+.btn-x {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    background: none;
+    border: 1px solid var(--dim);
+    border-radius: 6px;
+    color: var(--soft);
+    font-size: 18px;
+    cursor: pointer;
+}
+.btn-x:hover {
+    color: var(--red);
+    border-color: var(--red);
+}
+.sum {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 4px 12px;
+    padding: 10px 2px;
+    color: var(--text);
+    font-size: 14px;
+}
+.cosign {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px 10px;
+    font-size: 13px;
+    padding: 10px 0;
+    margin-bottom: 12px;
+    border-top: 1px solid var(--dim);
+    border-bottom: 1px solid var(--dim);
+}
+
+/* the signal page */
+.facts {
+    margin: 4px 0 14px;
+    border-top: 1px solid var(--dim);
+}
+.facts dt {
+    color: var(--soft);
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    margin-top: 10px;
+}
+.facts dd {
+    font-family: ui-monospace, Menlo, monospace;
+    font-size: 12px;
+    overflow-wrap: anywhere;
+}
+.facts dd.dim {
+    font-family: inherit;
+    font-size: 13px;
+}
+.actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px 12px;
+    margin-top: 10px;
+}
+.actions .msg {
+    margin: 0;
+}
+
+/* lists */
+.rows {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.row {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 2px 12px;
+    background: var(--black);
+    border: 1px solid var(--dim);
+    border-radius: 8px;
+    padding: 10px;
+    color: var(--text);
+}
+.row:hover {
+    border-color: var(--green);
+    color: var(--text);
+}
+.row-id {
+    color: var(--soft);
+    font-size: 13px;
+}
+.row-main {
+    flex: 1;
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+.row-side {
+    color: var(--soft);
+    font-size: 13px;
+}
+
+/* intents */
+.intent-scope {
+    color: #fff;
+    overflow-wrap: anywhere;
+    margin: 2px 0;
+}
+.state {
+    font-size: 12px;
+    color: var(--soft);
+    border: 1px solid var(--muted);
+    border-radius: 10px;
+    padding: 0 8px;
+}
+.state-open {
+    color: var(--green);
+    border-color: var(--green);
+}
+.seal {
+    display: flex;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+@media (max-width: 800px) {
+    .cols {
+        grid-template-columns: minmax(0, 1fr);
+    }
+    .page {
+        padding: 10px;
+    }
+    .top {
+        padding: 8px 12px;
+    }
+    .panel {
+        padding: 14px 12px;
+    }
+}
