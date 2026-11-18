@@ -287,12 +287,14 @@ pub fn verify_state_execution<const N: usize>(
     // evidence that carries no table: zheng cannot answer the reads
     let mut bare = state_evidence(state);
     bare.tables.clear();
-    if statement.reads.iter().any(|r| r.active) {
-        assert!(
-            statement.verify_certificate(&certificate, &bare).is_err(),
-            "an unauthenticated read must fail"
-        );
-    }
+    assert!(
+        statement.reads.iter().any(|r| r.active),
+        "the statement must carry at least one active read"
+    );
+    assert!(
+        statement.verify_certificate(&certificate, &bare).is_err(),
+        "an unauthenticated read must fail"
+    );
     // evidence for another state: another root
     let mut other = state_evidence(state);
     other.leaves[13][0] = (other.leaves[13][0] + 1) % nebu::field::P;

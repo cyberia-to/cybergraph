@@ -11,11 +11,6 @@ use lens::{Commitment, Lens, MultilinearPoly, Transcript, brakedown::Brakedown};
 use nebu::Goldilocks;
 use nox::{CallProvider, LookProvider, Order, Reduction, VecTrace, reduce};
 
-/// A native opening of the object polynomial (checked by lens directly).
-struct AxisOpening {
-    commitment: Commitment,
-}
-
 struct CommittedObject {
     object: Order,
     commitment: [u8; 32],
@@ -34,9 +29,10 @@ impl<const N: usize> CallProvider<N> for CommittedObject {
     }
 }
 
-/// The polynomial contains the actual fixture's leaves, with explicit zero
+/// A native opening of the object polynomial (checked by lens directly). The
+/// polynomial contains the actual fixture's leaves, with explicit zero
 /// padding. Execution correctness is separately bound by the public relation.
-fn opening(values: &[u64], point: &[u64], value: u64) -> AxisOpening {
+fn opening(values: &[u64], point: &[u64], value: u64) -> Commitment {
     let poly = MultilinearPoly::new(values.iter().map(|&v| g(v)).collect());
     let commitment = Brakedown::commit(&poly);
     let point: Vec<_> = point.iter().map(|&v| g(v)).collect();
@@ -56,7 +52,7 @@ fn opening(values: &[u64], point: &[u64], value: u64) -> AxisOpening {
         &proof,
         &mut Transcript::new(&seed)
     ));
-    AxisOpening { commitment }
+    commitment
 }
 
 fn run<const N: usize>(
@@ -64,11 +60,11 @@ fn run<const N: usize>(
     object: Order,
     address: u64,
     expected: u64,
-    openings: [AxisOpening; 2],
+    opening: Commitment,
 ) {
     let provider = CommittedObject {
         object,
-        commitment: openings[0].commitment.as_bytes().try_into().unwrap(),
+        commitment: opening.as_bytes().try_into().unwrap(),
     };
     let zero = arena.atom(g(0)).unwrap();
     let address = arena.atom(g(address)).unwrap();
@@ -88,13 +84,7 @@ fn run<const N: usize>(
 fn axis_identity_public_execution_and_native_opening() {
     let mut arena = Reduction::<1024>::new();
     let object = arena.atom(g(7)).unwrap();
-    run(
-        &mut arena,
-        object,
-        1,
-        7,
-        [opening(&[7, 0], &[0], 7), opening(&[7, 0], &[0], 7)],
-    );
+    run(&mut arena, object, 1, 7, opening(&[7, 0], &[0], 7));
 }
 
 #[test]
@@ -105,14 +95,5 @@ fn axis_nested_pair_public_execution_and_native_opening() {
     let c = arena.atom(g(30)).unwrap();
     let ab = arena.pair(a, b).unwrap();
     let object = arena.pair(ab, c).unwrap();
-    run(
-        &mut arena,
-        object,
-        4,
-        10,
-        [
-            opening(&[10, 20, 30, 0], &[0, 0], 10),
-            opening(&[10, 20, 30, 0], &[0, 0], 10),
-        ],
-    );
+    run(&mut arena, object, 4, 10, opening(&[10, 20, 30, 0], &[0, 0], 10));
 }

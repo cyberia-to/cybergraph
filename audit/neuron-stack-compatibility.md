@@ -32,6 +32,17 @@ state root before supplying a coordinate. The state proof binds all four root
 limbs, namespace/index/value, program, output and execution context. Tests reject
 root/context/output substitution, unauthenticated values and omitted reads.
 
+Erratum 2026-11-18 (cybergraph#15, branch `feat/sound-proof-consumers`): two
+statements of this 2026-09-13 snapshot no longer describe the tree. The
+recursive-opening row above says `zheng::commit` returns
+`UnsupportedRecursiveOpening` and that tests require that refusal separately;
+that legacy entry point and the `refuse_recursive_look` helper with its six
+call sites were removed when the stack tests moved to zheng certificate v3.
+The successful execution path is now `zheng::execution::Certificate` over the
+same verifier-derived relation, not `zheng::execution::DirectProof`, and
+`StateStatement` is checked through `verify_certificate`. Recursive
+TensorMerkle execution remains unsupported, as stated below.
+
 These are public development proofs: their full tables/witness columns are
 disclosed. The call fixture uses public test witness 42 and the independently
 regenerated prepared relation. It establishes no zero-knowledge guarantee.

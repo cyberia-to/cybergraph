@@ -34,7 +34,7 @@ impl NativeNode {
             return check_retry(&bytes, &fingerprint, &id);
         }
         let (events, payer) = self.events(operation)?;
-        self.validate_chains(&events)?;
+        self.validate_chains(&events, replay.is_none())?;
         let ledger = economics::Ledger::prepare(self, &events)?;
         let balance = payer.map(|n| ledger.balance(self, &n));
         let bridges: Vec<_> = events
@@ -232,7 +232,7 @@ impl NativeNode {
         Ok(receipt)
     }
 
-    fn validate_chains(&self, events: &[Event]) -> Result<(), Error> {
+    fn validate_chains(&self, events: &[Event], admission: bool) -> Result<(), Error> {
         let mut positions = BTreeMap::new();
         for event in events {
             if let Event::Signal(signal) = event {
@@ -246,10 +246,17 @@ impl NativeNode {
                 if signal.links.iter().any(|link| link.neuron != signal.neuron) {
                     return Err(invalid("link neuron differs from signal neuron"));
                 }
-                // A signal proof is verified before it is stored: today it
-                // can only be a pay proof of the signal itself.
-                foculus::check_signal_proof(signal)
-                    .map_err(|e| invalid(format!("signal proof: {e}")))?;
+                // A signal proof is verified at admission: today it can only
+                // be a pay proof of the signal itself. Replay does not repeat
+                // the check — the record is already on disk, its bytes are
+                // re-checked by require_record and its proof hash is bound
+                // into the stored signal record — so a store written before
+                // this gate existed stays openable and open time does not
+                // grow with the number of proved signals.
+                if admission {
+                    foculus::check_signal_proof(signal)
+                        .map_err(|e| invalid(format!("signal proof: {e}")))?;
+                }
                 positions.insert(
                     signal.neuron,
                     (
