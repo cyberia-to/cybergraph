@@ -53,7 +53,7 @@ each is a static handoff to one companion. no decisions.
 | step | cybergraph | hands off to |
 |---|---|---|
 | [validate](specs/validate.md) | check the [[proof]] σ covers the signal against the root | verify only — [[zheng]] constructs |
-| [order](specs/order.md) | append to the neuron's [[signal]] chain; reject equivocation | [[foculus]] (hash chain, VDF) |
+| [order](specs/order.md) | append to each subject's [[signal]] chain; reject equivocation | [[foculus]] (hash chain, VDF) |
 | [apply](specs/apply.md) | move each cyberlink's [[box]] into state — particle energy, axon weights, focus debit | [[bbg]] (`insert`, the mutator set) |
 | [expose](specs/expose.md) | answer reads over the committed graph | [[inf]] (datalog), [[tru]] (focus) |
 

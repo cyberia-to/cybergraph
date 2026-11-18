@@ -37,7 +37,7 @@ if the neuron never seals, the intent record stays in the [[cybergraph]] at ince
 
 ### cascaded
 
-a neuron may declare an intent with scope that invites participation: subscribers observe it, self-organize into coordinated sub-signals, and the lead neuron seals a parent signal with a recursive [[zheng]] proof over the entire cascade. see [[cascade]] for the full multiparty protocol
+the multi-subject [[signal]] governs how neurons act together inside one step: one proof, one conservation equation, one id, per-author authorization ([[signal]], many subjects one act). cascade is the layer above it, across steps — it composes signals in time, it does not give neurons a second way to co-sign one. a neuron declares an intent with scope that invites participation; subscribers observe it and seal sub-signals, each a signal of the ordinary shape and each multi-subject in its own right; the lead neuron's closing signal carries a recursive [[zheng]] proof over the stages. see [[cascade]] for the staged protocol
 
 ## completion — how an intent becomes a complete signal
 
@@ -67,8 +67,10 @@ signal and intent share the same substrate. signal is what intent becomes:
 
 ```
 intent   = (neuron, inception, scope, identity_proof)
-signal   = (neuron, links, impulse, proof, inception, sealing)
+signal   = (subjects, network, links, impulse, proof, inception, sealing)
 ```
+
+the declarer seals its own declaration; a signal of one subject is the common case, and when the declared act is one several neurons perform together the sealing signal has them all as its subjects ([[signal]], many subjects one act).
 
 the difference is completeness. an intent asserts what will happen; a signal proves it happened
 

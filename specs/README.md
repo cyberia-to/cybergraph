@@ -15,23 +15,23 @@ a cybergraph is built from signals; a signal is built from cyberlinks; each has 
 ## the structure
 
 - [cybergraph.md](cybergraph.md) — the triple $(P, N, L)$, six axioms, derived adjacency
-- [signal.md](signal.md) — the broadcast unit a neuron commits
+- [signal.md](signal.md) — the broadcast unit one or more neurons commit together
 - [cyberlink.md](cyberlink.md) — the atomic unit a signal carries
 - [intent.md](intent.md) — an unsealed signal: declared and identity-proven, not yet sealed
 - [address.md](address.md) — the four links a neuron publishes to be reachable: FOLLOW, ANTENNA, SOCKET, LOCUS
 
 ## signal fields
 
-$$s = (\nu,\; \mathit{net},\; \vec\ell,\; \Delta\phi^*,\; \sigma,\; h_0,\; h_1)$$
+$$s = (\vec\nu,\; \mathit{net},\; \vec\ell,\; \Delta\phi^*,\; \sigma,\; h_0,\; h_1)$$
 
 | name | fields | deep mechanics |
 |---|---|---|
-| [subject](neuron.md) | $\nu$ | identity in [[mudra]] |
+| [subjects](neuron.md) | $\vec\nu$ | the authors of the links — one neuron in the common case, many in one atomic act; identity in [[mudra]] |
 | [network](network.md) | $\mathit{net}$ | — |
-| [links](cyberlink.md) | $\vec\ell$ | — |
+| [links](cyberlink.md) | $\vec\ell$ | grouped by author — the group a link lies in is what names its author |
 | [impulse](impulse.md) | $\Delta\phi^*$ | computed/rewarded in [[tru]] |
 | [proof](proof.md) | $\sigma$ | constructed by [[zheng]] |
-| [inception, sealing](signal.md) | $h_0, h_1$ | ordering in [[foculus]]; pre-seal state in [[intent]] |
+| [inception, sealing](signal.md) | $h_0, h_1$ | one pair for the whole signal; ordering in [[foculus]]; pre-seal state in [[intent]] |
 
 ## cyberlink — link + box + valence
 
@@ -61,7 +61,7 @@ the structure above is what cybergraph *is*; these four verbs are what it *does*
 | verb | does | routes to |
 |---|---|---|
 | [validate.md](validate.md) | verify the [[proof]] σ against the root | [[zheng]] |
-| [order.md](order.md) | place in the neuron's chain; reject equivocation | [[foculus]] |
+| [order.md](order.md) | place in each subject's chain; reject equivocation | [[foculus]] |
 | [apply.md](apply.md) | move each [[box]] into state | [[bbg]] |
 | [expose.md](expose.md) | answer reads over the committed graph | [[inf]], [[tru]] |
 

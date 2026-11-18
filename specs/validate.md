@@ -15,12 +15,12 @@ the full set of conditions a signal must satisfy. each is checked one way — at
 | criterion | what must hold | checked by | owner |
 |---|---|---|---|
 | availability | each referenced particle's content is published and retrievable (and hashes to its id) | availability proof (DAS) | [[foculus]] (DAS), [[bbg]] files |
-| signature | valid signature from ν over $H(\vec\ell \,\|\, \Delta\phi^* \,\|\, t)$ | σ | [[mudra]] |
-| cyberlink validity | each $\ell \in \vec\ell$ has valid particle references and is well-formed | σ | [[hemera]] |
+| signature | for every subject $\nu_k \in \vec\nu$, a valid signature from $\nu_k$ over $H(\vec\ell \,\|\, \Delta\phi^* \,\|\, t)$ — each subject signs the whole signal, grouping included | σ | [[mudra]] |
+| cyberlink validity | each $\ell \in \vec\ell$ has valid particle references, is well-formed, and lies in the group $\vec\ell_k$ of exactly one subject $\nu_k \in \vec\nu$ — its author | σ | [[hemera]] |
 | box unspent | each spent [[box]]'s nullifier is live — $N(n) \neq 0$ (opening into $N(x)$) | σ | [[bbg]] |
-| box ownership | the spender owns it — $A(c)$ resolves to ν's key (opening into $A(x)$) | σ | [[bbg]] |
-| conservation | $\sum$ box inputs $= \sum$ outputs $+$ fee | σ | [[tru]] |
-| focus sufficiency | $\text{focus}(\nu) \geq \sum_\ell \text{cost}(\ell)$, $\text{cost}(\ell) = a(\ell) + \text{base\_fee}$, against $\text{BBG\_poly}(\text{neurons}, \nu, t)$ | σ | [[tru]] |
+| box ownership | the spender owns it — $A(c)$ resolves to the key of that link's author (opening into $A(x)$) | σ | [[bbg]] |
+| conservation | $\sum$ box inputs over all subjects $= \sum$ outputs $+$ fee — one equation for the signal | σ | [[tru]] |
+| focus sufficiency | for every subject, $\text{focus}(\nu_k) \geq \sum_{\ell \text{ by } \nu_k} \text{cost}(\ell)$, $\text{cost}(\ell) = a(\ell) + \text{base\_fee}$, against $\text{BBG\_poly}(\text{neurons}, \nu_k, t)$ | σ | [[tru]] |
 | impulse correctness | $\Delta\phi^*$ is the true tri-kernel shift against the current root | σ | [[tru]] ([[impulse]]) |
 | ordering | height = current, prev links, no equivocation, valid VDF | the chain | [[order]] → [[foculus]] |
 | network | the resolved $\mathit{net}$ matches the serving node | routing | [[network]] |
@@ -28,6 +28,8 @@ the full set of conditions a signal must satisfy. each is checked one way — at
 the bulk is one verification — `decide(σ)`, $O(\log n)$, no re-execution. availability, ordering, and network are the conditions σ does not cover; their detail lives in [[order]] and [[network]], availability in the [[foculus]] DA layer.
 
 box unspent is the structural double-spend invariant ($N(n)=0 \Rightarrow$ reject); box ownership is the semantic layer on top — the *right* neuron is spending, not just that the box is unspent.
+
+every per-author criterion above — cyberlink validity, box ownership, focus sufficiency — reads a link's author off the signal, not off the link: $\vec\ell$ is grouped by author ([[signal]], the $\vec\ell$ field), and the author of $\ell \in \vec\ell_k$ is $\nu_k$. the grouping is inside the signed preimage $H(\vec\ell \,\|\, \Delta\phi^* \,\|\, t)$, so regrouping a link under another subject breaks every subject's signature.
 
 ## reject reasons
 
@@ -38,11 +40,11 @@ every criterion that can fail is a reject reason — the verdicts the gate retur
 | `Unavailable` | a referenced particle's content is not available |
 | `BadProof` | σ does not verify, or any condition it attests fails |
 | `InsufficientFocus` | focus sufficiency fails |
-| `BadOwnership` / `DoubleSpend` | box not owned by ν / nullifier reused |
+| `BadOwnership` / `DoubleSpend` | box not owned by its link's author / nullifier reused |
 | `Equivocation` / `StepNotSequential` / `PrevMismatch` | chain violations |
 | `WrongNetwork` | resolved net ≠ the serving node's |
 
-reject is total: bbg never sees an invalid signal.
+reject is total: bbg never sees an invalid signal. a signal of many subjects is rejected whole when any leg fails; no subject's links enter alone.
 
 ## mechanism, not decision
 
