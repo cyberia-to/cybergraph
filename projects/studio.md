@@ -32,8 +32,8 @@ the mockup links word → rel → word with a float weight. the spec ([[cyberlin
 
 1. one screen, the composer: from, to (search a particle by name or paste one, or drop a file — its particle is computed in the page), coin and amount (the box), valence (−1 · 0 · +1). add → the link joins the draft.
 2. the draft signal beside it: the links, their total box, the focus each costs ([[validate]] focus sufficiency), the impulse preview when tru answers; remove a link; commit = sign with the neuron.
-3. after commit: the signal page with its proof slot and its [[receipt]] slot, re-verify in the page.
-4. many subjects ([[signal]]): add a co-signer; the draft shows whose links are whose and waits for every signature; one atomic commit.
+3. after commit: the signal page with its [[proof]] slot (the σ the neuron produced) and its [[order]] slot (what the chain answers: height, prev, no equivocation), re-verify in the page.
+4. many subjects — waits on the spec, not built here: [[signal]] carries exactly one signing subject ν and one proof σ, and [[validate]] checks focus sufficiency and the signature against that same ν. a co-signed draft (whose links are whose, every signature in, one atomic commit) needs an extension to [[signal]] that no page in this tree proposes. this step is named so it is not forgotten; it starts when that extension is proposed and accepted.
 5. an intent ([[intent]]): declare a scope with its sealer (me or anyone) and offer; the intents list shows which are open to fill.
 6. gone: the seven-button bar, the ladder strip, the KPI tiles, the TSP labels. the neuron is one line in the header, not three cards.
 
@@ -48,7 +48,7 @@ works for real means: where the chain answers (pussy), commit submits; where it 
 ## order
 
 1. carve: `signal.rs` and the three page families into `cybergraph/studio/` unchanged, building and serving; cyberia.my imports nothing from it yet.
-2. the iteration above, one change per pull request: composer, draft, commit view, co-signer, intent.
+2. the iteration above, one change per pull request: composer, draft, commit view, intent. step 4 is not in this order: it waits on a proposal to extend [[signal]].
 3. cyberia.my drops the moved files and redirects.
 
 related: [[cybergraph/specs/signal|signal]] · [[cybergraph/specs/cyberlink|cyberlink]] · [[cyberia/projects/cyberia-my|cyberia.my]]
