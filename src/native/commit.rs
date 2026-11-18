@@ -232,7 +232,7 @@ impl NativeNode {
         Ok(receipt)
     }
 
-    fn validate_chains(&self, events: &[Event], admission: bool) -> Result<(), Error> {
+    pub(super) fn validate_chains(&self, events: &[Event], admission: bool) -> Result<(), Error> {
         let mut positions = BTreeMap::new();
         for event in events {
             if let Event::Signal(signal) = event {

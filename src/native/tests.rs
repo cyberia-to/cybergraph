@@ -120,3 +120,45 @@ fn local_credit_staging_failure_rolls_back_and_retry_preserves_receipt() {
     drop(node);
     std::fs::remove_dir_all(path).unwrap();
 }
+
+/// Replay does not re-run the admission proof gate. A store written before
+/// the gate existed can hold a signal whose proof the gate rejects today;
+/// recovery maps any error here to corruption, so re-checking it would make
+/// that store permanently unopenable.
+#[test]
+fn replay_keeps_a_signal_whose_proof_admission_rejects() {
+    let path = std::env::temp_dir().join(format!("native-replay-proof-{}", std::process::id()));
+    std::fs::create_dir(&path).unwrap();
+    let node = NativeNode::open(&path.join("bbg"), b"genesis").unwrap();
+    let signal = |amount| Signal {
+        neuron: [1; 32],
+        network: [88; 32],
+        links: vec![CyberlinkRecord {
+            neuron: [1; 32],
+            from: [71; 32],
+            to: [72; 32],
+            token: [0; 32],
+            amount,
+            valence: 1,
+            height: 0,
+        }],
+        delta_pi: vec![],
+        box_moves: vec![],
+        prev: [0; 32],
+        step: 0,
+        height: 0,
+        proof: None,
+    };
+    let mut stored = signal(100);
+    // a valid pay proof of another signal: the gate rejects it
+    stored.proof = Some(foculus::prove_pay(&signal(101)).unwrap());
+    let events = vec![Event::Signal(stored)];
+    match node.validate_chains(&events, true) {
+        Err(Error::Invalid(m)) => assert!(m.starts_with("signal proof: pay proof rejected"), "{m}"),
+        other => panic!("admission accepted a foreign proof: {other:?}"),
+    }
+    node.validate_chains(&events, false)
+        .expect("replay must not re-run the proof gate");
+    drop(node);
+    std::fs::remove_dir_all(path).unwrap();
+}
