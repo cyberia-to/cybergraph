@@ -10,7 +10,7 @@ $$\text{cyberlink} \;=\; \underbrace{\text{link}(from,\,to)}_{\text{structural}}
 | [[box]] | $coin$, $amount$ | [[coin]] × $\mathbb{R}_+$ | the conviction moved — a denomination and a quantity |
 | [[valence]] | $v$ | $\{-1,0,+1\}$ | the [[Bayesian Truth Serum\|BTS]] prediction |
 
-five stored fields, three concepts. who made it and when belong to the [[signal]] that carries it.
+five stored fields, three concepts. who made it and when belong to the [[signal]] that carries it: the author is the subject in whose group of links the signal carries it, the time is the signal's height. a cyberlink has no author field of its own.
 
 ## the three layers
 
@@ -20,7 +20,7 @@ five stored fields, three concepts. who made it and when belong to the [[signal]
 
 see [[two three paradox]] for why this layering is not arbitrary. see [[box]] for the conviction model, [[link]] for the edge, [[valence]] for the prediction.
 
-cyberlinks are bundled into [[signal|signals]] for broadcast. the [[signal]] adds the provenance layer: the signing [[neuron]] $\nu$, block height $t$, the destination [[network]] $\mathit{net}$, an [[cyber/impulse]] ($\Delta\phi^*$ — the proven [[focus]] shift), and a recursive [[zheng]] proof covering the entire batch. the network is a signal-envelope concern — where the assertion is delivered — not a cyberlink field.
+cyberlinks are bundled into [[signal|signals]] for broadcast. the [[signal]] adds the provenance layer: the signing [[neurons]] $\vec\nu$ — the signal's links are grouped by author, $\vec\ell = (\vec\ell_1, \dots, \vec\ell_m)$, and a link's author is the subject $\nu_k$ whose group carries it — block height $t$, the destination [[network]] $\mathit{net}$, an [[cyber/impulse]] ($\Delta\phi^*$ — the proven [[focus]] shift), and a recursive [[zheng]] proof covering the entire batch. the network is a signal-envelope concern — where the assertion is delivered — not a cyberlink field.
 
 the [[cybergraph]] is append-only. [[time]] (block height from the containing signal) distinguishes every record: the same author linking from→to in two signals at $t_1$ and $t_2 > t_1$ produces two separate entries in $L$. this enables reinforcement (higher [[amount]] on a new record), [[valence]] updates (new $v$ at a new signal), and multi-denomination staking (same structural link in different tokens)
 
@@ -74,7 +74,7 @@ every cyberlink is also a card — an epistemic asset with four properties:
 
 immutable — axiom A3 (append-only) guarantees the record is permanent once published. the assertion cannot be altered or retracted. the author's conviction, [[valence]], and timestamp are locked into the graph's history forever
 
-unique — each card is non-fungible. two signals with the same 5-tuple content submitted at different block heights produce distinct records in $L$ — the signal's $\nu$ and $t$ are what identify them. the 5-tuple is the assertion; the signal is the provenance.
+unique — each card is non-fungible. two signals with the same 5-tuple content submitted at different block heights produce distinct records in $L$ — the link's author in the carrying signal and that signal's $t$ are what identify them. the 5-tuple is the assertion; the signal is the provenance.
 
 transferable — ownership of a cyberlink and its yield rights can be transferred between [[neurons]]. the structural record stays in $L$ forever; beneficial ownership moves
 

@@ -1,25 +1,24 @@
 # signal
 
-a bundle of [[cyberlinks]] one or more [[neurons]] commit in a single [[step]] — the atomic broadcast unit in [[cyber]]. each link in the signal consumes [[focus]], making every statement a [[costly signal]]. a signal is multiparty by design: every link names its author, the subjects are the set of authors, and the signal lands for all of them or for none
+a bundle of [[cyberlinks]] one or more [[neurons]] commit in a single [[step]] — the atomic broadcast unit in [[cyber]]. each link in the signal consumes [[focus]], making every statement a [[costly signal]]. a signal is multiparty by design: its links are grouped by author, the subjects are those authors, and the signal lands for all of them or for none
 
 ## structure
 
-$$s \;=\; (\vec\nu,\; \mathit{net},\; \vec\ell,\; \Delta\phi^*,\; \sigma,\; h_0,\; h_1,\; i)$$
+$$s \;=\; (\vec\nu,\; \mathit{net},\; \vec\ell,\; \Delta\phi^*,\; \sigma,\; h_0,\; h_1)$$
 
 | field | name | type | semantics |
 |-------|------|------|-----------|
-| $\vec\nu$ | [[subject|subjects]] | $N^+$ | the signing [[neurons]] — the set of authors of the links in $\vec\ell$; a signal of one neuron is the common case, a signal of many is one atomic act of many |
-| $i$ | [[intent]] | $\text{Particle}^?$ | the intent this signal seals, when it seals one (see [[intent]], the demand face); absent for a signal that fulfils no declared intent |
+| $\vec\nu$ | [[subject|subjects]] | $N^+$ | the signing [[neurons]] — the authors of the links in $\vec\ell$, one group of links per subject; a signal of one neuron is the common case, a signal of many is one atomic act of many |
 | $\mathit{net}$ | network | $\text{CardId}$ | destination [[network]] this signal is delivered to — a [[card]] id. defaults to the sender's private network |
-| $\vec\ell$ | links | $L^+$ | one or more [[cyberlinks]] — each a 5-tuple $(p, q, \tau, a, v)$ carried under its author $\nu_k \in \vec\nu$ |
+| $\vec\ell$ | links | $(L^+)^m$ | the links, grouped by author: $\vec\ell = (\vec\ell_1, \dots, \vec\ell_m)$ for the $m$ subjects of $\vec\nu$, $\vec\ell_k$ the one or more links of $\nu_k$ — each a 5-tuple $(p, q, \tau, a, v)$. the group is where authorship lives: a cyberlink carries no author field of its own |
 | $\Delta\phi^*$ | [[cyber/impulse]] | $(P \times \mathbb{F}_p)^*$ | sparse [[focus]] update: how the batch of links shifts $\phi^*$ |
 | $\sigma$ | proof | $\Pi$ | [[zheng]] proof covering the [[cyber/impulse]], all conviction box movements, and [[cyberlink]] validity against the current [[BBG]] root |
-| $h_0$ | [[inception]] | $\mathbb{Z}_{\geq 0}$ | block height at which the signal was declared — one height for the whole signal, shared by every subject, not one per leg. when the signal seals a demand, the declarer's earlier promise carries its own height: the $h_0$ of the [[intent]] named in $i$ |
+| $h_0$ | [[inception]] | $\mathbb{Z}_{\geq 0}$ | block height at which the signal was declared — one height for the whole signal, shared by every subject, not one per leg |
 | $h_1$ | [[sealing]] | $\mathbb{Z}_{\geq 0}$ | block height when the signal was finalized and proven — one height for the whole signal; every subject's leg seals at the same height, because there is one proof |
 
 a signal has duration: $h_0$ marks when its subjects committed to the act; $h_1$ marks when the proof was produced and the signal became final. the gap $h_1 - h_0$ is the signal's span
 
-a signal a neuron declares about its own next action exists, before $h_1$ is assigned and $\sigma$ produced, as an [[intent]]: declared, identity-proven, not yet sealed. a signal that seals someone else's declared demand is not that intent's later self — the intent is a separate, earlier object, declared at its own $h_0$ by a neuron that need not be among $\vec\nu$, and the signal only names it in $i$. see [[intent]] for the two faces
+before $h_1$ is assigned and $\sigma$ produced, the signal exists as an [[intent]]: declared, identity-proven, but not yet sealed
 
 the signal separates what a [[neuron]] asserts (the [[cyberlinks]]) from what the assertion computes (the [[cyber/impulse]]). see [[cyber/impulse]] for how $\Delta\phi^*$ is computed
 
@@ -35,18 +34,18 @@ $\mathit{net}$ is bound into the signal hash, so the destination is tamper-evide
 
 $\sigma$ is a single [[zheng]] proof that covers the entire signal atomically:
 
-- correctness of each [[cyberlink]] in $\vec\ell$ (valid particle references, well-formed, and an author $\nu_k \in \vec\nu$) — a link names its author, it does not carry a signature of its own. the signature is one per subject over the whole signal, $H(\vec\ell \,\|\, \Delta\phi^* \,\|\, t)$ (see [[validate]], the signature criterion), so no subject's leg can be lifted into a signal its author never saw
+- correctness of each [[cyberlink]] in $\vec\ell$ (valid particle references, well-formed, and carried in the group of exactly one subject $\nu_k \in \vec\nu$ — its author) — a link carries neither an author field nor a signature of its own: the grouping names the author, and the signature is one per subject over the whole signal, $H(\vec\ell \,\|\, \Delta\phi^* \,\|\, t)$ (see [[validate]], the signature criterion), so no subject's leg can be lifted into a signal its author never saw
 - validity of all conviction box movements (each link's $(\tau, a)$ spend is backed by an unspent output owned by that link's author)
 - conservation over the union: $\sum$ box inputs of all subjects $= \sum$ outputs $+$ fee, one equation for the whole signal
 - correctness of the [[cyber/impulse]] $\Delta\phi^*$ (the [[tri-kernel]] computation against $\text{bbg\_root}$ from the current header)
-- when $i$ is set: that the execution σ proves is the one the intent's scope declared, $\sigma \vdash \text{scope\_hash}(i)$, and that the intent's seal nullifier is still live against the current [[BBG]] root — sealing spends it (see [[validate]], intent binding)
 
 one proof for everything. proving $n$ links together costs less than $n$ separate proofs because shared neighborhood state and box set are proved once. any verifier runs `decide(σ)` in $O(\log n)$ without recomputing anything
 
 ## many subjects, one act
 
-a signal with $|\vec\nu| > 1$ is how neurons act together: a trade, a settlement, an intent and its fulfilment, a joint claim. the rules are the single-subject rules applied per author, plus one shared id:
+a signal with $|\vec\nu| > 1$ is how neurons act together: a trade, a settlement, a joint claim. the rules are the single-subject rules applied per author, plus one shared id:
 
+- a link's author is the subject whose group carries it — $\ell \in \vec\ell_k$ means $\nu_k$ authored $\ell$. the grouping is inside $\vec\ell$, so every subject's signature over $H(\vec\ell \,\|\, \Delta\phi^* \,\|\, t)$ covers who authored what
 - authorization and ownership are checked per link against that link's author, never against one signer for all
 - the signal extends every subject's chain: one `prev` per subject, and the signal counts as that subject's step for equivocation ([[order]])
 - conservation is one equation over every subject's boxes; what one subject gives another receives inside the same signal

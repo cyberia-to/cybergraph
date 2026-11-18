@@ -19,11 +19,13 @@ cybergraph's specs described a signal as one neuron's commitment: one $\nu$ in `
 | # | sub-task | where | state |
 |---|---|---|---|
 | 1 | the multiparty signal in cybergraph's specs — $\vec\nu$, per-author checks, conservation over the union, per-subject `prev` and equivocation, atomic reject | `specs/signal.md`, `specs/validate.md`, `specs/order.md`, `specs/README.md` | [cybergraph#24](https://github.com/cyberia-to/cybergraph/pull/24) |
-| 2 | the intent demand face — the `sealer` and `offer` scope fields, the signal's $i$ field, the seal nullifier in [[bbg]], the `BadSeal` reject | `specs/intent.md`, `specs/validate.md` | written in cybergraph#24; the review of that pull request (R2) asks for it as its own pull request, since it depends on 1 and 1 does not depend on it |
+| 2 | the intent demand face — the `sealer` and `offer` scope fields, the signal's $i$ field, the seal nullifier in [[bbg]], the `BadSeal` reject | `specs/intent.md`, `specs/validate.md` | written in cybergraph#24 and taken out of it on review, so that 1 can merge alone; the text as written is in commit `fe8948e`. its own pull request, after the open question below |
 | 3 | the chain envelope's multi-signer form — one `from` and one NSIG1 per transaction today | soft3 `specs/chain.md` §2.1 | not started |
 | 4 | the implementation under the specs, once 1–3 are decided | cybergraph, foculus, bbg | not started |
 
 the project is over when a signal of many subjects is one object from the spec down to the wire.
+
+sub-task 2 has one question open before it can be written again: what authorizes the declarer's offer leg. every subject of a signal signs the whole signal, and on the demand face the sealing signal is built by the filler, over links and an impulse the declarer never saw — so the declarer cannot sign it and cannot be an ordinary subject. the candidate answer is the intent's identity proof standing as the declarer's standing authorization over the box its scope committed; the alternative is that the declarer is never a subject and the offer moves some other way. whichever is chosen must be written before the demand face is proposed again.
 
 ## status
 

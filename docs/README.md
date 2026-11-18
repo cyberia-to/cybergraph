@@ -100,7 +100,7 @@ once the mind hands over a proven signal, cybergraph's own work is four static h
 | verb | the machine | hands to |
 |---|---|---|
 | [validate](../specs/validate.md) | check the conditions a signal must satisfy | the proof σ ([[zheng]]), an availability proof ([[foculus]] DAS), the chain ([[foculus]]), routing ([[network]]) |
-| [order](../specs/order.md) | place the signal in the neuron's causal chain; reject equivocation | [[foculus]] (hash chain, VDF) |
+| [order](../specs/order.md) | place the signal in the causal chain of each of its subjects; reject equivocation | [[foculus]] (hash chain, VDF) |
 | [apply](../specs/apply.md) | move each cyberlink's box into authenticated state | [[bbg]] (`insert`, the mutator set) |
 | [expose](../specs/expose.md) | answer reads over the committed graph | [[inf]] (datalog), [[tru]] (focus) |
 

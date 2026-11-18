@@ -1,6 +1,6 @@
 # intent
 
-an intent is a declared action not yet sealed — a neuron's public, identity-proven statement of what is to be done, before it is finalized and proven. on the promise face it is the unsealed form of the declarer's own [[signal]]; on the demand face it is a standing demand some other neuron's signal fills and names
+an intent is an unsealed [[signal]] — a neuron's public declaration of a directed action before it is finalized and proven
 
 ## structure
 
@@ -13,9 +13,7 @@ $$i \;=\; (\nu,\; h_0,\; \Sigma,\; \pi_\text{id})$$
 | $\Sigma$ | [[scope]] | $S$ | structured description of the intended action: target particle, predicate, deadline, constraints |
 | $\pi_\text{id}$ | identity proof | $\text{Sig}$ | [[neuron]]'s signature over $(\nu \;\|\; h_0 \;\|\; \Sigma)$ |
 
-an intent carries an identity proof (the neuron's signature over the declared scope) but no content proof. the [[zheng]] proof is produced at sealing — it proves that someone ran the scope. the intent commits to what will be computed; the signal proves it was.
-
-an intent has two faces. declared by a neuron about its own next action, it is a promise the declarer seals. declared as a demand on the world — a scope anyone may run — it is a hole any neuron fills: the first signal whose proof satisfies the scope and names the intent seals it, whoever signed. the declarer verifies; the filler finds. the scope decides which face an intent has, by naming who may seal it (the declarer, or anyone)
+an intent carries an identity proof (the neuron's signature over the declared scope) but no content proof. the [[zheng]] proof is produced at sealing — it proves the neuron actually *ran* the scope. the intent commits to what will be computed; the signal proves it was.
 
 ## lifecycle
 
@@ -31,9 +29,7 @@ declared
 
 ### sealed
 
-a sealed intent is a [[signal]]: a neuron ran the scope, produced a [[zheng]] proof $\sigma$ over the execution (its [[cyberlinks]] and [[cyber/impulse]]), and committed it with the intent's particle in the signal's $i$ field. seal is accepted only if $\sigma$ attests the declared scope and the sealer is one the scope admits — see completion below. an intent seals once, and the state that makes it once is a nullifier: declaring an intent creates its seal nullifier in [[bbg]], the sealing signal spends it, and a second signal naming a sealed intent fails that check like any double-spend — see [[validate]], the intent-binding criterion.
-
-when the filler is another neuron, the declarer's offer and the filler's work are two legs of one [[signal]] with two subjects: the declarer's box moves to the filler in the same atomic act that seals the intent. this is the demand face, and it needs no mechanism beyond the multi-subject signal.
+a sealed intent is a [[signal]]: the neuron ran the scope, produced a [[zheng]] proof $\sigma$ over the execution (its [[cyberlinks]] and [[cyber/impulse]]), and committed it. seal is accepted only if $\sigma$ attests the declared scope — see completion below.
 
 ### abandoned
 
@@ -63,22 +59,20 @@ seal is valid only if $\sigma$ proves an execution of the intent's declared scop
 
 $$\text{seal}(i, s)\ \text{accepted} \iff \sigma(s) \vdash \text{scope\_hash}(i)$$
 
-this binding is what makes intent and signal one act rather than two unrelated records. the intent is a promise (committed scope); the signal is its proven fulfillment. a sealed signal is cryptographic proof that the scope was run exactly as declared — the alignment property, enforced at the boundary. without the binding, any signal could seal any intent. the binding says nothing about who ran it; the scope's sealer rule does.
+this binding is what makes intent and signal **one transaction** rather than two unrelated records. the intent is a promise (committed scope); the signal is its proven fulfillment. a sealed signal is cryptographic proof the neuron did exactly what it declared — the alignment property, enforced at the boundary. without the binding, any signal could seal any intent.
 
 ## relationship to signal
 
-signal and intent share the same substrate; which object becomes which depends on the face:
+signal and intent share the same substrate. signal is what intent becomes:
 
 ```
 intent   = (neuron, inception, scope, identity_proof)
-signal   = (subjects, network, links, impulse, proof, inception, sealing, intent)
+signal   = (subjects, network, links, impulse, proof, inception, sealing)
 ```
 
-in the promise face signal is what intent becomes: the declarer seals its own declaration, the sealing signal has that one neuron as its subject, and intent and signal are two stages of one act — the incomplete form and the complete one.
+the declarer seals its own declaration; a signal of one subject is the common case, and when the declared act is one several neurons perform together the sealing signal has them all as its subjects ([[signal]], many subjects one act).
 
-in the demand face they stay two objects. the intent is the declarer's standing demand, sealed by whatever signal first satisfies the scope; that signal is signed by the neurons whose links it carries — the filler alone, or the filler and the declarer as the two subjects that move the offer — and it names the intent in its $i$ field rather than growing out of it. it has its own $h_0$, later than the intent's. the signal does not become the intent; it fills it, and $i$ is the record of which demand its proof answered.
-
-the difference in both faces is completeness. an intent asserts what will happen; a signal proves it happened
+the difference is completeness. an intent asserts what will happen; a signal proves it happened
 
 ## identity proof
 
@@ -96,8 +90,6 @@ a scope describes the intended action in structured terms. minimum fields:
 | predicate | the declared relationship or transformation |
 | deadline | latest acceptable sealing height (optional) |
 | constraints | any additional conditions the neuron self-imposes |
-| sealer | who may seal: the declarer (the promise face) or anyone (the demand face) |
-| offer | what the declarer gives the filler on sealing: a [[box]] moved in the sealing signal (demand face, optional) |
 
 scope encoding is dialect-specific; the intent mechanism is dialect-agnostic
 
