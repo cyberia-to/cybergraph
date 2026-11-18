@@ -21,7 +21,7 @@ the full set of conditions a signal must satisfy. each is checked one way — at
 | box ownership | the spender owns it — $A(c)$ resolves to the key of that link's author (opening into $A(x)$) | σ | [[bbg]] |
 | conservation | $\sum$ box inputs over all subjects $= \sum$ outputs $+$ fee — one equation for the signal | σ | [[tru]] |
 | focus sufficiency | for every subject, $\text{focus}(\nu_k) \geq \sum_{\ell \text{ by } \nu_k} \text{cost}(\ell)$, $\text{cost}(\ell) = a(\ell) + \text{base\_fee}$, against $\text{BBG\_poly}(\text{neurons}, \nu_k, t)$ | σ | [[tru]] |
-| intent binding | when $i$ is set: $\sigma \vdash \text{scope\_hash}(i)$, the sealer is one the scope admits, and $i$ is unsealed | σ, the chain | [[intent]] |
+| intent binding | when $i$ is set: $\sigma \vdash \text{scope\_hash}(i)$, the sealer is one the scope admits, and $i$'s seal nullifier $N(H(\texttt{"seal:"} \,\|\, i)) \neq 0$ — sealing spends it | σ | [[intent]], [[bbg]] |
 | impulse correctness | $\Delta\phi^*$ is the true tri-kernel shift against the current root | σ | [[tru]] ([[impulse]]) |
 | ordering | height = current, prev links, no equivocation, valid VDF | the chain | [[order]] → [[foculus]] |
 | network | the resolved $\mathit{net}$ matches the serving node | routing | [[network]] |
@@ -29,6 +29,8 @@ the full set of conditions a signal must satisfy. each is checked one way — at
 the bulk is one verification — `decide(σ)`, $O(\log n)$, no re-execution. availability, ordering, and network are the conditions σ does not cover; their detail lives in [[order]] and [[network]], availability in the [[foculus]] DA layer.
 
 box unspent is the structural double-spend invariant ($N(n)=0 \Rightarrow$ reject); box ownership is the semantic layer on top — the *right* neuron is spending, not just that the box is unspent.
+
+seal-once is the same invariant one level up, and it needs the same state: declaring an intent creates one seal nullifier for its particle in [[bbg]]'s nullifier set, and the sealing signal spends it, so σ proves seal-once against the current root exactly as it proves a box unspent. the chain is not asked — height, `prev`, equivocation and the VDF ([[order]]) say nothing about a global uniqueness fact, and σ alone could not attest it without a committed set to open into. `BadSeal` is decidable because that set is [[bbg]]'s.
 
 ## reject reasons
 

@@ -1,6 +1,6 @@
 # intent
 
-an intent is an unsealed [[signal]] — a neuron's public declaration of a directed action before it is finalized and proven
+an intent is a declared action not yet sealed — a neuron's public, identity-proven statement of what is to be done, before it is finalized and proven. on the promise face it is the unsealed form of the declarer's own [[signal]]; on the demand face it is a standing demand some other neuron's signal fills and names
 
 ## structure
 
@@ -31,7 +31,7 @@ declared
 
 ### sealed
 
-a sealed intent is a [[signal]]: a neuron ran the scope, produced a [[zheng]] proof $\sigma$ over the execution (its [[cyberlinks]] and [[cyber/impulse]]), and committed it with the intent's particle in the signal's $i$ field. seal is accepted only if $\sigma$ attests the declared scope and the sealer is one the scope admits — see completion below. an intent seals once; a second signal naming a sealed intent is rejected.
+a sealed intent is a [[signal]]: a neuron ran the scope, produced a [[zheng]] proof $\sigma$ over the execution (its [[cyberlinks]] and [[cyber/impulse]]), and committed it with the intent's particle in the signal's $i$ field. seal is accepted only if $\sigma$ attests the declared scope and the sealer is one the scope admits — see completion below. an intent seals once, and the state that makes it once is a nullifier: declaring an intent creates its seal nullifier in [[bbg]], the sealing signal spends it, and a second signal naming a sealed intent fails that check like any double-spend — see [[validate]], the intent-binding criterion.
 
 when the filler is another neuron, the declarer's offer and the filler's work are two legs of one [[signal]] with two subjects: the declarer's box moves to the filler in the same atomic act that seals the intent. this is the demand face, and it needs no mechanism beyond the multi-subject signal.
 
@@ -41,7 +41,7 @@ if the neuron never seals, the intent record stays in the [[cybergraph]] at ince
 
 ### cascaded
 
-a neuron may declare an intent with scope that invites participation: subscribers observe it, self-organize into coordinated sub-signals, and the lead neuron seals a parent signal with a recursive [[zheng]] proof over the entire cascade. see [[cascade]] for the full multiparty protocol
+the multi-subject [[signal]] governs how neurons act together inside one step: one proof, one conservation equation, one id, per-author authorization ([[signal]], many subjects one act). cascade is the layer above it, across steps — it composes signals in time, it does not give neurons a second way to co-sign one. a neuron declares an intent with scope that invites participation; subscribers observe it and seal sub-signals, each a signal of the ordinary shape and each multi-subject in its own right; the lead neuron's closing signal carries a recursive [[zheng]] proof over the stages. see [[cascade]] for the staged protocol
 
 ## completion — how an intent becomes a complete signal
 
@@ -67,14 +67,18 @@ this binding is what makes intent and signal one act rather than two unrelated r
 
 ## relationship to signal
 
-signal and intent share the same substrate. signal is what intent becomes:
+signal and intent share the same substrate; which object becomes which depends on the face:
 
 ```
 intent   = (neuron, inception, scope, identity_proof)
-signal   = (neuron, links, impulse, proof, inception, sealing)
+signal   = (subjects, network, links, impulse, proof, inception, sealing, intent)
 ```
 
-the difference is completeness. an intent asserts what will happen; a signal proves it happened
+in the promise face signal is what intent becomes: the declarer seals its own declaration, the sealing signal has that one neuron as its subject, and intent and signal are two stages of one act — the incomplete form and the complete one.
+
+in the demand face they stay two objects. the intent is the declarer's standing demand, sealed by whatever signal first satisfies the scope; that signal is signed by the neurons whose links it carries — the filler alone, or the filler and the declarer as the two subjects that move the offer — and it names the intent in its $i$ field rather than growing out of it. it has its own $h_0$, later than the intent's. the signal does not become the intent; it fills it, and $i$ is the record of which demand its proof answered.
+
+the difference in both faces is completeness. an intent asserts what will happen; a signal proves it happened
 
 ## identity proof
 

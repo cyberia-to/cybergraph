@@ -15,23 +15,24 @@ a cybergraph is built from signals; a signal is built from cyberlinks; each has 
 ## the structure
 
 - [cybergraph.md](cybergraph.md) — the triple $(P, N, L)$, six axioms, derived adjacency
-- [signal.md](signal.md) — the broadcast unit a neuron commits
+- [signal.md](signal.md) — the broadcast unit one or more neurons commit together
 - [cyberlink.md](cyberlink.md) — the atomic unit a signal carries
-- [intent.md](intent.md) — an unsealed signal: declared and identity-proven, not yet sealed
+- [intent.md](intent.md) — a declared action not yet sealed: the declarer's own unsealed signal, or a demand another neuron's signal fills
 - [address.md](address.md) — the four links a neuron publishes to be reachable: FOLLOW, ANTENNA, SOCKET, LOCUS
 
 ## signal fields
 
-$$s = (\nu,\; \mathit{net},\; \vec\ell,\; \Delta\phi^*,\; \sigma,\; h_0,\; h_1)$$
+$$s = (\vec\nu,\; \mathit{net},\; \vec\ell,\; \Delta\phi^*,\; \sigma,\; h_0,\; h_1,\; i)$$
 
 | name | fields | deep mechanics |
 |---|---|---|
-| [subject](neuron.md) | $\nu$ | identity in [[mudra]] |
+| [subjects](neuron.md) | $\vec\nu$ | the authors of the links — one neuron in the common case, many in one atomic act; identity in [[mudra]] |
 | [network](network.md) | $\mathit{net}$ | — |
 | [links](cyberlink.md) | $\vec\ell$ | — |
 | [impulse](impulse.md) | $\Delta\phi^*$ | computed/rewarded in [[tru]] |
 | [proof](proof.md) | $\sigma$ | constructed by [[zheng]] |
-| [inception, sealing](signal.md) | $h_0, h_1$ | ordering in [[foculus]]; pre-seal state in [[intent]] |
+| [inception, sealing](signal.md) | $h_0, h_1$ | one pair for the whole signal; ordering in [[foculus]]; pre-seal state in [[intent]] |
+| [intent](intent.md) | $i$ | the intent this signal seals, when it seals one; the seal gate in [[intent]] |
 
 ## cyberlink — link + box + valence
 
@@ -61,7 +62,7 @@ the structure above is what cybergraph *is*; these four verbs are what it *does*
 | verb | does | routes to |
 |---|---|---|
 | [validate.md](validate.md) | verify the [[proof]] σ against the root | [[zheng]] |
-| [order.md](order.md) | place in the neuron's chain; reject equivocation | [[foculus]] |
+| [order.md](order.md) | place in each subject's chain; reject equivocation | [[foculus]] |
 | [apply.md](apply.md) | move each [[box]] into state | [[bbg]] |
 | [expose.md](expose.md) | answer reads over the committed graph | [[inf]], [[tru]] |
 
@@ -69,7 +70,7 @@ validate→order→apply is the write path (inside `link`/`seal`); expose is the
 
 ## the seal binding — promise to proof
 
-a signal's life is a promise then a proof: [intent.md](intent.md) `intend(scope)` commits a signed scope; the neuron runs it ([[nox]]) and proves it ([[zheng]]); `seal` commits the result. the commit gate enforces one rule — `seal(i, s)` accepted **iff** `σ(s) ⊢ scope_hash(i)`. that binding makes intent and signal one transaction, and is the alignment property at the commit port. see [intent.md](intent.md) `## completion`.
+a signal's life is a promise then a proof: [intent.md](intent.md) `intend(scope)` commits a signed scope; whoever the scope admits as sealer — the declarer, or any neuron, on the demand face — runs it ([[nox]]) and proves it ([[zheng]]); `seal` commits the result. the commit gate enforces one rule — `seal(i, s)` accepted **iff** `σ(s) ⊢ scope_hash(i)`. that binding makes intent and signal one transaction, and is the alignment property at the commit port. see [intent.md](intent.md) `## completion`.
 
 ## what cybergraph does NOT do — orchestration is soma's
 
