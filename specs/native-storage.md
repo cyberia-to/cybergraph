@@ -98,7 +98,7 @@ IDs use the adapter's documented domain-separated mapping.
 This contract covers local SSD durability. Archive tier replication, power-cut
 qualification, authorization and distributed consensus have separate release
 criteria.
-# Local host credit events
+## Local host credit events
 
 The local unsigned profile also records explicit `LocalCredit` events containing
 neuron, token, amount, focus increment and reason. They are host-only economic

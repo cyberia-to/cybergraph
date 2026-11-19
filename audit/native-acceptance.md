@@ -47,12 +47,14 @@ committed prefix. Batches shrink only after known resource-limit failures.
 
 ## wider suite and remaining gates
 
-The complete `cargo test --offline --locked --features local-storage` was
-attempted and fails compiling existing stack tests against current Nox.
-`tests/common/mod.rs` imports removed `OrderId`/`Tag` and treats `Order` as a
-generic allocator; other stack tests import `NounId`/`Tag`. This is not a
-passing complete Cybergraph suite. Those computation test migrations remain
-separate work.
+When this check ran on 2026-09-12, the complete `cargo test --offline --locked
+--features local-storage` did not compile: `tests/common/mod.rs` then imported
+the removed `OrderId`/`Tag` and treated `Order` as a generic allocator, and the
+other stack tests imported `NounId`/`Tag`. At that moment this was not a passing
+complete Cybergraph suite. Those stack tests were migrated afterwards on this
+same branch — `tests/common/mod.rs` now imports `nox::{Order, Reduction}` — and
+the result of that migration is recorded in the
+[stack compatibility audit](neuron-stack-compatibility.md).
 
 [BBG composition tests](../../bbg/audit/native-record-composition.md) cover
 actual redb read/write/sync faults and lost sync acknowledgement across native

@@ -57,7 +57,7 @@ global claims and request fingerprints retain their identities. Incomplete
 destinations cannot be opened as successful sessions; completion is recorded
 only after import succeeds. Normal open never performs implicit migration or
 overwrites an existing file of another format.
-# Fresh publication
+## Fresh publication
 
 `commit_fresh` validates the canonical proposal like `commit`, and requires a
 fresh request at BBG's atomic boundary. Identical prior receipts conflict. It is

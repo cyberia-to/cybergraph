@@ -20,14 +20,14 @@
 pub mod api;
 #[cfg(feature = "local-storage")]
 pub mod application;
-#[cfg(feature = "local-storage")]
-pub mod text_archive;
+pub mod content;
 #[cfg(feature = "local-storage")]
 pub mod legacy_file;
-pub mod content;
 #[cfg(feature = "local-storage")]
 pub mod native;
 pub mod source;
+#[cfg(feature = "local-storage")]
+pub mod text_archive;
 
 // Re-export foundational identity types so downstream crates don't need a
 // direct dependency on bbg just to name a Particle or NeuronId.

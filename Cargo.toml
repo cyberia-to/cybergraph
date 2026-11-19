@@ -20,6 +20,8 @@ inf-parse = { version = "0.1", path = "../inf/rs/parse" }
 inf-plan = { version = "0.1", path = "../inf/rs/plan" }
 inf-eval = { version = "0.1", path = "../inf/rs/eval" }
 nox = { package = "cyber-nox", version = "0.3", path = "../nox/rs" }
+# legacy application sources only: the import test writes one by hand.
+redb = { version = "2", optional = true }
 serde = { version = "1", features = ["derive"], optional = true }
 serde_json = { version = "1", optional = true }
 tempfile = { version = "3", optional = true }
@@ -33,6 +35,6 @@ lens = { package = "cyber-lens", version = "0.2", path = "../lens/src" }
 
 [features]
 local-storage = ["bbg/backend-ssd", "dep:serde", "dep:serde_json", "dep:tempfile", "dep:rustix"]
-legacy-redb-migration = ["local-storage", "bbg/backend-hdd"]
+legacy-redb-migration = ["local-storage", "bbg/backend-hdd", "dep:redb"]
 
 [workspace]

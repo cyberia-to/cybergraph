@@ -81,3 +81,13 @@ cybergraph and [[soma]] are one processor: cybergraph is the dumb half (store ·
 ## query
 
 - [query.md](query.md) — the relations cybergraph exposes to [[inf]]. schema only; the language lives in [[inf]]
+
+## local storage — what one host keeps on disk
+
+the structure above is what every node agrees on; these pages define what a single local host durably stores and how it returns an earlier answer unchanged.
+
+- [native-storage.md](native-storage.md) — durable native acceptance: requests, original receipts, blocks, legacy import, local host credit events
+- [native-history-view.md](native-history-view.md) — the bounded view that returns committed signals with their original receipt and operation bytes
+- [applications.md](applications.md) — application graph sessions over the shared [[bbg]] database: content closure, conditional heads, fresh publication, legacy import
+- [text-archive.md](text-archive.md) — the local text archive held in the application graph
+- [legacy-file-retirement.md](legacy-file-retirement.md) — retirement of the legacy file entry point

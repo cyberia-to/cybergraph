@@ -38,7 +38,13 @@ pub enum Event {
     Signal(Signal),
     Intent(IntentRecord),
     /// Trusted local host adjustment; never decoded from peer signal tape.
-    LocalCredit { neuron: NeuronId, token: Particle, amount: u64, focus: u64, reason: Particle },
+    LocalCredit {
+        neuron: NeuronId,
+        token: Particle,
+        amount: u64,
+        focus: u64,
+        reason: Particle,
+    },
 }
 pub enum Operation {
     Link {
@@ -144,7 +150,9 @@ impl NativeNode {
         Self::open_database(db, genesis, false)
     }
 
-    pub fn database(&self) -> Database { self.db.clone() }
+    pub fn database(&self) -> Database {
+        self.db.clone()
+    }
 
     pub fn open(path: &Path, genesis: &[u8]) -> Result<Self, Error> {
         let db = Database::open(path, Backend::Ssd)?;

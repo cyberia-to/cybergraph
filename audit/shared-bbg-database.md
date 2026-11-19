@@ -32,10 +32,14 @@ The first normal check stopped because Foculus required BBG ^0.2 while the
 sibling package was 0.3.0. Its path requirements were aligned before testing;
 Cargo.lock records the resolved versions.
 
-All five application tests passed with local-storage, and the same five passed
-with legacy-redb-migration. The production local-storage dependency tree
-contains vendored Fjall 2.11.2 and no redb dependency. Scoped rustfmt and
-git diff --check passed.
+The five application tests of that run passed with local-storage, and the same
+five passed with legacy-redb-migration. The production local-storage dependency
+tree contains vendored Fjall 2.11.2 and no redb dependency. `git diff --check`
+passed. The rustfmt claim was wrong: the application module, its submodules and
+the native modules were not rustfmt output at that commit. They were reformatted
+with `rustfmt --edition 2024` during review round 2; no test result is claimed
+for that reformatting. The migration and archive/transfer tests added in the
+same round are not part of the counts above either.
 
 Clippy completed successfully with two existing warnings in src/api.rs:
 subscriber type complexity and a collapsible network check. Three existing

@@ -50,11 +50,11 @@ impl<'a> RelationSource for BbgSource<'a> {
     fn schema(&self, rel: &str) -> Option<Schema> {
         let cols: &[&str] = match rel {
             "particles" => &["particle", "energy", "pi_star", "weight"],
-            "neurons"   => &["id", "focus", "karma", "stake"],
-            "axons"     => &["from", "to", "weight_sum"],
-            "focus"     => &["particle", "score"],
-            "karma"     => &["neuron", "k"],
-            "signals"   => &["step", "neuron", "link_count", "height"],
+            "neurons" => &["id", "focus", "karma", "stake"],
+            "axons" => &["from", "to", "weight_sum"],
+            "focus" => &["particle", "score"],
+            "karma" => &["neuron", "k"],
+            "signals" => &["step", "neuron", "link_count", "height"],
             _ => return None,
         };
         Some(Schema::new(cols))
@@ -63,23 +63,46 @@ impl<'a> RelationSource for BbgSource<'a> {
     fn scan<'b>(&'b self, rel: &str) -> Box<dyn Iterator<Item = Tuple> + 'b> {
         match rel {
             "particles" => Box::new(self.state.particles.iter().map(|(particle, r)| {
-                vec![Value::hash(*particle), int(r.energy), int(r.pi_star), int(r.weight)]
+                vec![
+                    Value::hash(*particle),
+                    int(r.energy),
+                    int(r.pi_star),
+                    int(r.weight),
+                ]
             })),
-            "neurons" => Box::new(self.state.neurons.iter().map(|(id, r)| {
-                vec![Value::hash(*id), int(r.focus), int(r.karma), int(r.stake)]
-            })),
-            "axons" => Box::new(self.state.axon_edges.iter().map(move |(axon_id, (from, to))| {
-                let weight = self.state.particles.get(axon_id).map_or(0, |p| p.weight);
-                vec![Value::hash(*from), Value::hash(*to), int(weight)]
-            })),
-            "focus" => Box::new(self.state.particles.iter().map(|(particle, r)| {
-                vec![Value::hash(*particle), int(r.pi_star)]
-            })),
-            "karma" => Box::new(self.state.neurons.iter().map(|(id, r)| {
-                vec![Value::hash(*id), int(r.karma)]
-            })),
+            "neurons" => {
+                Box::new(self.state.neurons.iter().map(|(id, r)| {
+                    vec![Value::hash(*id), int(r.focus), int(r.karma), int(r.stake)]
+                }))
+            }
+            "axons" => Box::new(
+                self.state
+                    .axon_edges
+                    .iter()
+                    .map(move |(axon_id, (from, to))| {
+                        let weight = self.state.particles.get(axon_id).map_or(0, |p| p.weight);
+                        vec![Value::hash(*from), Value::hash(*to), int(weight)]
+                    }),
+            ),
+            "focus" => Box::new(
+                self.state
+                    .particles
+                    .iter()
+                    .map(|(particle, r)| vec![Value::hash(*particle), int(r.pi_star)]),
+            ),
+            "karma" => Box::new(
+                self.state
+                    .neurons
+                    .iter()
+                    .map(|(id, r)| vec![Value::hash(*id), int(r.karma)]),
+            ),
             "signals" => Box::new(self.state.signals.iter().map(|(_, r)| {
-                vec![int(r.step), Value::hash(r.neuron), int(r.link_count as u64), int(r.block_height)]
+                vec![
+                    int(r.step),
+                    Value::hash(r.neuron),
+                    int(r.link_count as u64),
+                    int(r.block_height),
+                ]
             })),
             _ => Box::new(std::iter::empty()),
         }
@@ -101,20 +124,37 @@ mod tests {
     use super::*;
     use bbg::Bbg;
 
-    fn neuron(seed: u8) -> [u8; 32] { [seed; 32] }
-    fn particle(seed: u8) -> [u8; 32] { [seed; 32] }
+    fn neuron(seed: u8) -> [u8; 32] {
+        [seed; 32]
+    }
+    fn particle(seed: u8) -> [u8; 32] {
+        [seed; 32]
+    }
 
     fn seeded() -> Bbg {
         let mut bbg = Bbg::new();
-        bbg.state.neurons.insert(neuron(1), bbg::types::NeuronRecord { focus: 100, karma: 50, stake: 7, nonce: 0 });
+        bbg.state.neurons.insert(
+            neuron(1),
+            bbg::types::NeuronRecord {
+                focus: 100,
+                karma: 50,
+                stake: 7,
+                nonce: 0,
+            },
+        );
         bbg.insert(&bbg::Signal {
             neuron: neuron(1),
             links: vec![bbg::Cyberlink {
-                from: particle(2), to: particle(3), token: particle(0), amount: 4, valence: 1,
+                from: particle(2),
+                to: particle(3),
+                token: particle(0),
+                amount: 4,
+                valence: 1,
             }],
             box_moves: vec![],
             height: 0,
-        }).unwrap();
+        })
+        .unwrap();
         bbg
     }
 
@@ -123,8 +163,14 @@ mod tests {
         let bbg = Bbg::new();
         let src = BbgSource::new(&bbg.state);
         assert_eq!(src.schema("particles").unwrap().arity(), 4);
-        assert_eq!(src.schema("axons").unwrap().columns, vec!["from", "to", "weight_sum"]);
-        assert!(src.schema("cyberlinks").is_none(), "private layer not exposed by bbg source");
+        assert_eq!(
+            src.schema("axons").unwrap().columns,
+            vec!["from", "to", "weight_sum"]
+        );
+        assert!(
+            src.schema("cyberlinks").is_none(),
+            "private layer not exposed by bbg source"
+        );
     }
 
     #[test]
@@ -133,8 +179,15 @@ mod tests {
         let src = BbgSource::new(&bbg.state);
         let rows: Vec<Tuple> = src.scan("particles").collect();
         // target particle(3) has energy 4
-        let target = rows.iter().find(|r| r[0] == Value::hash(particle(3))).unwrap();
-        assert_eq!(target[1], Value::int(4), "energy column reflects the staked link");
+        let target = rows
+            .iter()
+            .find(|r| r[0] == Value::hash(particle(3)))
+            .unwrap();
+        assert_eq!(
+            target[1],
+            Value::int(4),
+            "energy column reflects the staked link"
+        );
     }
 
     #[test]
@@ -156,7 +209,11 @@ mod tests {
         assert_eq!(axons.len(), 1);
         assert_eq!(axons[0][0], Value::hash(particle(2)), "axon from");
         assert_eq!(axons[0][1], Value::hash(particle(3)), "axon to");
-        assert_eq!(axons[0][2], Value::int(4), "weight_sum from the staked link");
+        assert_eq!(
+            axons[0][2],
+            Value::int(4),
+            "weight_sum from the staked link"
+        );
     }
 
     #[test]

@@ -77,15 +77,23 @@ impl NativeNode {
             .zip(&bridges)
             .zip(&headers)
             .map(|((event, signal), header)| match event {
-                Event::Signal(_) => {
-                    NativeChange::Signal {
-                        signal: signal.as_ref().expect("signal bridge"),
-                        header: header.as_ref().expect("signal header"),
-                    }
-                }
+                Event::Signal(_) => NativeChange::Signal {
+                    signal: signal.as_ref().expect("signal bridge"),
+                    header: header.as_ref().expect("signal header"),
+                },
                 Event::Intent(i) => NativeChange::Intent(i),
-                Event::LocalCredit { neuron, token, amount, focus, .. } =>
-                    NativeChange::LocalCredit { neuron, token, amount: *amount, focus: *focus },
+                Event::LocalCredit {
+                    neuron,
+                    token,
+                    amount,
+                    focus,
+                    ..
+                } => NativeChange::LocalCredit {
+                    neuron,
+                    token,
+                    amount: *amount,
+                    focus: *focus,
+                },
             })
             .collect();
         let (wire, wire_blocked) =
@@ -282,7 +290,11 @@ fn bridge(s: &Signal) -> bbg::Signal {
             .collect(),
     }
 }
-pub(super) fn check_retry(bytes: &[u8], fingerprint: &Particle, id: &Particle) -> Result<Receipt, Error> {
+pub(super) fn check_retry(
+    bytes: &[u8],
+    fingerprint: &Particle,
+    id: &Particle,
+) -> Result<Receipt, Error> {
     if bytes.len() < 32 {
         return Err(corrupt("receipt fingerprint"));
     }
@@ -347,7 +359,9 @@ fn wire_frames(
                     scope_hash: i.scope_hash,
                     signature: i.signature,
                 })]),
-                Event::LocalCredit { .. } => return Err(corrupt("local credit cannot have legacy wire")),
+                Event::LocalCredit { .. } => {
+                    return Err(corrupt("local credit cannot have legacy wire"));
+                }
             };
             if codec::operation(&Operation::Events(mapped))? != codec::operation(&expected)? {
                 return Err(corrupt("legacy bytes differ from operation"));

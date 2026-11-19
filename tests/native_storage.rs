@@ -222,7 +222,10 @@ fn native_rewards_intents_and_networks_are_retained() {
     )
     .unwrap();
     assert_eq!((n.balance(&[1; 32]), n.balance(&[2; 32])), (4, 3));
-    assert_eq!(n.graph().bbg.state.signals[&bbg::signal_key(&[1; 32], 0)].network, [99; 32]);
+    assert_eq!(
+        n.graph().bbg.state.signals[&bbg::signal_key(&[1; 32], 0)].network,
+        [99; 32]
+    );
     assert_eq!(n.block(1).unwrap().unwrap().signal.height, 42);
     let root = n.root();
     drop(n);
@@ -378,7 +381,10 @@ fn authenticated_proof_bytes_and_commitment_survive_durable_recovery() {
             9,
         )
         .unwrap();
-    assert_eq!(node.graph().bbg.state.signals[&bbg::signal_key(&[1; 32], 0)].proof_hash, proof_hash);
+    assert_eq!(
+        node.graph().bbg.state.signals[&bbg::signal_key(&[1; 32], 0)].proof_hash,
+        proof_hash
+    );
     drop(node);
     let node = t.open();
     assert_eq!(node.root(), receipt.root);
@@ -391,5 +397,140 @@ fn authenticated_proof_bytes_and_commitment_survive_durable_recovery() {
         block.signal.proof.as_ref().unwrap(),
         &block.signal
     ));
-    assert_eq!(node.graph().bbg.state.signals[&bbg::signal_key(&[1; 32], 0)].proof_hash, proof_hash);
+    assert_eq!(
+        node.graph().bbg.state.signals[&bbg::signal_key(&[1; 32], 0)].proof_hash,
+        proof_hash
+    );
+}
+
+/// specs/native-history-view.md: the view keeps each entry's original receipt
+/// and operation bytes, exposes the batch's committed Signals, reconstructs the
+/// Link/Pay signal from its committed block, and never republishes an intent or
+/// a host-only local credit as a peer Signal.
+#[test]
+fn history_view_exposes_committed_signals_of_batches_and_single_operations() {
+    let t = Temp::new();
+    let mut n = t.open();
+    let mut s = signal(1);
+    s.links.push(CyberlinkRecord {
+        neuron: s.neuron,
+        from: *hemera::hash(b"zheng").as_bytes(),
+        to: *hemera::hash(b"pussy").as_bytes(),
+        token: [0; 32],
+        amount: 9,
+        valence: 1,
+        height: 0,
+    });
+    n.accept(
+        Some([1; 32]),
+        Operation::Events(vec![
+            Event::Intent(intent()),
+            Event::Signal(s),
+            Event::LocalCredit {
+                neuron: [5; 32],
+                token: [6; 32],
+                amount: 4,
+                focus: 2,
+                reason: [7; 32],
+            },
+        ]),
+        10,
+    )
+    .unwrap();
+    n.accept(Some([2; 32]), link(2, 1), 11).unwrap();
+    n.accept(
+        Some([3; 32]),
+        Operation::Pay {
+            from: [1; 32],
+            to: [2; 32],
+            amount: 5,
+        },
+        12,
+    )
+    .unwrap();
+
+    let view = n.history_view(None, 64).unwrap();
+    let history = n.history(None, 64).unwrap();
+    assert_eq!(view.len(), 3);
+    for (entry, (receipt, command)) in view.iter().zip(&history) {
+        assert_eq!(&entry.receipt, receipt);
+        assert_eq!(&entry.operation, command);
+    }
+    // One Signal of three events: the intent and the host credit stay inside the
+    // original operation bytes and never become peer Signals.
+    assert_eq!(view[0].receipt.applied, 3);
+    assert_eq!(view[0].signals.len(), 1);
+    assert_eq!(view[0].signals[0].neuron, [1; 32]);
+    assert_eq!(view[0].signals[0].links.len(), 1);
+    // Link and Pay carry no encoded Signal: each is read back from its block.
+    for entry in &view[1..] {
+        let block = n.block(entry.receipt.height).unwrap().unwrap();
+        assert_eq!(entry.signals.len(), 1);
+        assert_eq!(entry.signals[0].hash(), block.signal.hash());
+    }
+    assert_eq!(view[1].signals[0].neuron, [2; 32]);
+    assert_eq!(view[2].signals[0].delta_pi, vec![([2; 32], 5)]);
+    // Reading the view applies nothing and moves no history.
+    let root = n.root();
+    assert_eq!(n.history_view(None, 64).unwrap().len(), 3);
+    assert_eq!((n.root(), n.height()), (root, 3));
+    assert_eq!(n.history_view(Some(2), 64).unwrap().len(), 1);
+}
+
+/// Strict admission refuses exactly the payment leg that native replay commits
+/// with the leg skipped; the legacy skip semantics themselves are unchanged.
+#[test]
+fn strict_payment_validation_rejects_a_leg_that_replay_would_skip() {
+    let t = Temp::new();
+    let mut n = t.open();
+    n.accept(Some([1; 32]), reward(1, 10), 1).unwrap();
+    let batch = |step: u64, prev: [u8; 32], amount: u64| {
+        let mut s = signal(1);
+        s.step = step;
+        s.prev = prev;
+        s.delta_pi.push(([2; 32], amount));
+        Operation::Events(vec![Event::Signal(s)])
+    };
+    let over = batch(1, n.block(1).unwrap().unwrap().signal.hash(), 25);
+    assert!(matches!(n.validate_payments(&over), Err(Error::Invalid(_))));
+    assert_eq!(n.accept(Some([2; 32]), over, 2).unwrap().applied, 1);
+    assert_eq!((n.balance(&[1; 32]), n.balance(&[2; 32])), (10, 0));
+
+    let funded = batch(2, n.block(2).unwrap().unwrap().signal.hash(), 10);
+    n.validate_payments(&funded).unwrap();
+    n.accept(Some([3; 32]), funded, 3).unwrap();
+    assert_eq!((n.balance(&[1; 32]), n.balance(&[2; 32])), (0, 10));
+
+    let pay = |amount| Operation::Pay {
+        from: [2; 32],
+        to: [1; 32],
+        amount,
+    };
+    assert!(matches!(
+        n.validate_payments(&pay(0)),
+        Err(Error::Invalid(_))
+    ));
+    assert!(matches!(
+        n.validate_payments(&pay(11)),
+        Err(Error::Invalid(_))
+    ));
+    n.validate_payments(&pay(10)).unwrap();
+    // A link carries no payment leg at all.
+    n.validate_payments(&link(1, 1)).unwrap();
+}
+
+/// The Link/Pay branch reads its Signal back from the committed block: a lost
+/// block is reported as corruption, never as an entry without its signal.
+#[test]
+fn history_view_reports_a_missing_committed_block_as_corruption() {
+    let t = Temp::new();
+    let db = Database::open(t.db(), Backend::Ssd).unwrap();
+    let mut n = NativeNode::from_database(db.clone(), GENESIS).unwrap();
+    n.accept(Some([1; 32]), link(1, 1), 1).unwrap();
+    assert_eq!(n.history_view(None, 64).unwrap().len(), 1);
+    db.transaction::<_, bbg::storage::StorageError>(|tx| {
+        tx.remove_record(D::NativeBlocks, &1u64.to_be_bytes())
+    })
+    .unwrap();
+    assert!(matches!(n.history_view(None, 64), Err(Error::Corrupt(_))));
 }

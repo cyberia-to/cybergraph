@@ -317,6 +317,7 @@ dependencies = [
  "inf-plan",
  "inf-source",
  "inf-value",
+ "redb",
  "rustix",
  "serde",
  "serde_json",
